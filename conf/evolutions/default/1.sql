@@ -1,6 +1,7 @@
 # --- !Ups
+
 CREATE TABLE "User" (
-  uuid UUID NOT NULL DEFAULT uuid_generate_v1(),
+  uuid UUID NOT NULL,
   name TEXT NOT NULL,
   emailAddress TEXT NOT NULL,
   isAdmin BOOLEAN NOT NULL DEFAULT FALSE,
