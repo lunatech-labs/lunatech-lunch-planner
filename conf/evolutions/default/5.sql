@@ -1,12 +1,12 @@
 # --- !Ups
 
-CREATE TABLE "MenuPerDay" (
+CREATE TABLE "MenuPerDayPerPerson" (
   uuid UUID NOT NULL,
-  menuUUID UUID NOT NULL,
-  date Date NOT NULL,
-  CONSTRAINT menuPerDay_pkey_ PRIMARY KEY (uuid)
+  menuPerDayUUID UUID NOT NULL,
+  userUUID UUID NOT NULL,
+  CONSTRAINT menuPerDayPerPerson_pkey_ PRIMARY KEY (uuid)
 );
 
 # --- !Downs
 
-DROP TABLE "MenuPerDay";
+DROP TABLE "MenuPerDayPerPerson";

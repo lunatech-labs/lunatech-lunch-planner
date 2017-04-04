@@ -5,9 +5,9 @@ import java.util.UUID
 import play.api.libs.json._
 
 case class User (
-  uuid: Option[UUID] = None,
+  uuid: UUID,
   name: String,
-  email: String,
+  emailAddress: String,
   isAdmin: Boolean = false
 )
 

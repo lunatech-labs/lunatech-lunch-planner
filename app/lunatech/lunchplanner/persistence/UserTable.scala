@@ -7,30 +7,40 @@ import lunatech.lunchplanner.models.User
 import slick.driver.PostgresDriver.api._
 import slick.lifted.{ ProvenShape, TableQuery }
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class UserTable(tag: Tag) extends Table[User](tag, "users") {
+class UserTable(tag: Tag) extends Table[User](tag, "User") {
   def uuid: Rep[UUID] = column[UUID]("uuid", O.PrimaryKey)
   def name: Rep[String] = column[String]("name")
-  def emailAddress: Rep[String] = column[String]("emailAddress")
-  def isAdmin: Rep[Boolean] = column[Boolean]("isAdmin")
+  def emailAddress: Rep[String] = column[String]("emailaddress")
+  def isAdmin: Rep[Boolean] = column[Boolean]("isadmin")
 
-  def * : ProvenShape[User] = (uuid.?, name, emailAddress, isAdmin) <> ((User.apply _).tupled, User.unapply)
+  def * : ProvenShape[User] = (uuid, name, emailAddress, isAdmin) <> ((User.apply _).tupled, User.unapply)
 }
 
 object UserTable {
   val userTable: TableQuery[UserTable] = TableQuery[UserTable]
 
-  def getUserByUUID(userUUID: Int)(implicit connection: DBConnection): Future[Option[User]] = {
-    exists(userUUID).flatMap {
+  def addUser(user: User)(implicit connection: DBConnection): Future[User] = {
+    val query = userTable returning userTable += user
+    connection.db.run(query)
+  }
+
+  def userExists(uuid: UUID)(implicit connection: DBConnection): Future[Boolean] = {
+    connection.db.run(userTable.filter(_.uuid === uuid).exists.result)
+  }
+
+  def getUserByUUID(uuid: UUID)(implicit connection: DBConnection): Future[Option[User]] = {
+    userExists(uuid).flatMap {
       case true =>
-        val query = userTable.filter(x => x.uuid === userUUID)
+        val query = userTable.filter(x => x.uuid === uuid)
         connection.db.run(query.result.headOption)
       case false => Future(None)
     }
   }
 
-  def getUserByEmail(emailAddress: String)(implicit connection: DBConnection): Future[Option[User]] = {
+  def getUserByEmailAddress(emailAddress: String)(implicit connection: DBConnection): Future[Option[User]] = {
     val query = userTable.filter(_.emailAddress === emailAddress)
     connection.db.run(query.result.headOption)
   }
@@ -39,12 +49,13 @@ object UserTable {
     connection.db.run(userTable.result)
   }
 
-  def exists(id: Int)(implicit connection: DBConnection): Future[Boolean] = {
-    connection.db.run(userTable.filter(_.uuid === id).exists.result)
+  def removeUser(uuid: UUID)(implicit connection: DBConnection): Future[Int]  = {
+    userExists(uuid).flatMap {
+      case true =>
+        val query = userTable.filter(x => x.uuid === uuid).delete
+        connection.db.run(query)
+      case false => Future(0)
+    }
   }
 
-  def add(user: User)(implicit connection: DBConnection): Future[User] = {
-    val query = userTable returning userTable += user
-    connection.db.run(query)
-  }
 }
