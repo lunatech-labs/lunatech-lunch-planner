@@ -4,14 +4,12 @@ import java.util.UUID
 
 import lunatech.lunchplanner.common.{ AcceptanceSpec, DBConnection, TestDatabaseProvider }
 import lunatech.lunchplanner.models.Dish
-import play.api.db.slick.DatabaseConfigProvider
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
 class DishTableSpec extends AcceptanceSpec with TestDatabaseProvider {
   implicit val dbConnection = app.injector.instanceOf[DBConnection]
-  implicit val dbConnectionProvider = app.injector.instanceOf[DatabaseConfigProvider]
   val defaultTimeout = 10.seconds
 
   val pastaBologneseDish = Dish(

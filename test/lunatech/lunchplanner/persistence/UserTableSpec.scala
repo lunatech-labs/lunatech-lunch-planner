@@ -4,15 +4,13 @@ import java.util.UUID
 
 import lunatech.lunchplanner.common.{ AcceptanceSpec, DBConnection, TestDatabaseProvider }
 import lunatech.lunchplanner.models.User
-import play.api.db.slick.DatabaseConfigProvider
 
+import scala.concurrent.Await
 import scala.concurrent.duration._
-import scala.concurrent.{ Await, Future }
 
 class UserTableSpec extends AcceptanceSpec with TestDatabaseProvider {
 
   implicit val dbConnection = app.injector.instanceOf[DBConnection]
-  implicit val dbConnectionProvider = app.injector.instanceOf[DatabaseConfigProvider]
   val defaultTimeout = 10.seconds
 
   override def beforeAll {

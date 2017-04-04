@@ -12,8 +12,11 @@ import scala.concurrent.Future
 
 class UserTable(tag: Tag) extends Table[User](tag, "User") {
   def uuid: Rep[UUID] = column[UUID]("uuid", O.PrimaryKey)
+
   def name: Rep[String] = column[String]("name")
+
   def emailAddress: Rep[String] = column[String]("emailAddress")
+
   def isAdmin: Rep[Boolean] = column[Boolean]("isAdmin")
 
   def * : ProvenShape[User] = (uuid, name, emailAddress, isAdmin) <> ((User.apply _).tupled, User.unapply)
