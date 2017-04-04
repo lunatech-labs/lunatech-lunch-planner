@@ -2,15 +2,9 @@ package lunatech.lunchplanner.models
 
 import java.util.UUID
 
-import play.api.libs.json._
-
 case class User (
-  uuid: UUID,
+  uuid: UUID = UUID.randomUUID(),
   name: String,
   emailAddress: String,
   isAdmin: Boolean = false
 )
-
-object User {
-  implicit val userFormat = Json.format[User]
-}
