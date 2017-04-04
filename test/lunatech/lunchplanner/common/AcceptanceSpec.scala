@@ -10,7 +10,6 @@ import slick.jdbc.JdbcBackend
 trait AcceptanceSpec extends PlaySpec
   with MustMatchers
   with ScalaFutures
-  with BeforeAndAfter
   with BeforeAndAfterAll
   with OneServerPerSuite
   with DBConnectionProvider {
