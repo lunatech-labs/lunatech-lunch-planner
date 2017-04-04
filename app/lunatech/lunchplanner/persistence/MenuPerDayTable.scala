@@ -4,7 +4,7 @@ import java.sql.Date
 import java.util.UUID
 
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.{ Dish, Menu, MenuPerDay }
+import lunatech.lunchplanner.models.{ Menu, MenuPerDay }
 import slick.driver.PostgresDriver.api._
 import slick.lifted.{ ForeignKeyQuery, ProvenShape, TableQuery }
 
