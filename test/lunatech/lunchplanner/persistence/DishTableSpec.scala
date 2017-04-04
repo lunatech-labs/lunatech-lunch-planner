@@ -9,17 +9,17 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 
 class DishTableSpec extends AcceptanceSpec with TestDatabaseProvider {
-  implicit val dbConnection = app.injector.instanceOf[DBConnection]
-  val defaultTimeout = 10.seconds
+  implicit private val dbConnection = app.injector.instanceOf[DBConnection]
+  private val defaultTimeout = 10.seconds
 
-  val pastaBologneseDish = Dish(
+  private val pastaBologneseDish = Dish(
     name = "pasta bolognese",
     description = "pasta bolognese for 2 people",
     hasBeef = true,
     remarks = Some("favorite dish of person A")
   )
 
-  val vegetarianDish = Dish(
+  private val vegetarianDish = Dish(
     name = "vegetarian",
     description = "warm vegetarian food from fancy restaurant",
     isVegetarian = true,
@@ -27,19 +27,19 @@ class DishTableSpec extends AcceptanceSpec with TestDatabaseProvider {
     hasLactose = true
   )
 
-  val seaFoodDish = Dish(
+  private val seaFoodDish = Dish(
     name = "shrimps",
     description = "fresh shrimps",
     hasSeaFood = true
   )
 
-  val porkDish = Dish(
+  private val porkDish = Dish(
     name = "pork",
     description = "nice dish with pork",
     hasPork = true
   )
 
-  val chickenDish = Dish(
+  private val chickenDish = Dish(
     name = "chicken sate",
     description = "suriname sate dish",
     hasChicken = true

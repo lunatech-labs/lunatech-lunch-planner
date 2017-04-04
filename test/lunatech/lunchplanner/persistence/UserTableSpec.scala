@@ -10,15 +10,15 @@ import scala.concurrent.duration._
 
 class UserTableSpec extends AcceptanceSpec with TestDatabaseProvider {
 
-  implicit val dbConnection = app.injector.instanceOf[DBConnection]
-  val defaultTimeout = 10.seconds
+  implicit private val dbConnection = app.injector.instanceOf[DBConnection]
+  private val defaultTimeout = 10.seconds
 
   override def beforeAll {
     cleanDatabase()
   }
 
-  val newUserIsNotAdmin = User(UUID.randomUUID(), "Pedro Ferreira", "pedro.ferreira@lunatech.com")
-  val newUserIsAdmin = User(UUID.randomUUID(), "Leonor Boga", "leonor.boga@lunatech.com", isAdmin = true)
+  private val newUserIsNotAdmin = User(UUID.randomUUID(), "Pedro Ferreira", "pedro.ferreira@lunatech.com")
+  private val newUserIsAdmin = User(UUID.randomUUID(), "Leonor Boga", "leonor.boga@lunatech.com", isAdmin = true)
 
   "A User table" must {
     "add a new user that is not an admin user" in {
