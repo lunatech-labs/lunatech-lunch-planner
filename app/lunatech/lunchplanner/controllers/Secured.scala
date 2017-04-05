@@ -18,7 +18,7 @@ trait Secured extends GoogleSecured {
   val environment: Environment
   implicit val connection: DBConnection
 
-  def IsAdmin(f: => String => Request[AnyContent] => Future[Result]) = IsAuthenticatedAsync { userEmailAddress =>
+  override def IsAdminAsync(f: String => Request[AnyContent] => Future[Result]) = IsAuthenticatedAsync { userEmailAddress =>
     request =>
       val isAdminResult = UserTable.isAdminUser(userEmailAddress)(connection)
       isAdminResult.flatMap{ isUserAdmin =>
