@@ -1,5 +1,39 @@
-@(admin: lunatech.lunchplanner.models.User)
+@import b3.vertical.fieldConstructor
+
+@(admin: lunatech.lunchplanner.models.User, dishForm: Form[lunatech.lunchplanner.viewModels.DishForm])(implicit messages: play.api.i18n.Messages)
 @main("Overview", admin, "admin") {
     <div id="Wrapper">
+        <div id="Container">
+            <div class="Left">
+                <div class="col">
+
+                    <h1>Manage dishes and menus</h1>
+
+                        <!-- Nav tabs -->
+                    <ul class="nav nav-tabs">
+                        <li role="presentation" class="active"><a data-toggle="tab" href="#newDish">New dish</a></li>
+                    </ul>
+                    <hr>
+                        <!-- Tab panes -->
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active" id="newDish">
+                            @helper.form(lunatech.lunchplanner.controllers.routes.DishController.createNewDish) {
+                                @b3.text( dishForm("name"), '_label -> "Name", 'placeholder -> "Short dish name" )
+                                @b3.text( dishForm("description"), '_label -> "Description",  'placeholder -> "Dish description")
+                                @b3.checkbox( dishForm("isVegetarian"), '_text -> "Is vegetarian" )
+                                @b3.checkbox( dishForm("hasSeaFood"), '_text -> "Has sea food")
+                                @b3.checkbox( dishForm("hasPork"), '_text -> "Has pork")
+                                @b3.checkbox( dishForm("hasBeef"), '_text -> "Has beef")
+                                @b3.checkbox( dishForm("hasChicken"), '_text -> "Has Chicken")
+                                @b3.checkbox( dishForm("isGlutenFree"), '_text -> "Is gluten free")
+                                @b3.checkbox( dishForm("hasLactose"), '_text -> "Has lactose")
+                                @b3.text( dishForm("remarks"), '_label -> "Additional remarks", 'placeholder -> "Optional" )
+                                @b3.submit('class -> "btn btn-default"){ Create dish }
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 }

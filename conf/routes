@@ -7,9 +7,13 @@ GET         /                                  lunatech.lunchplanner.controllers
 GET         /admin                             lunatech.lunchplanner.controllers.Application.admin
 
 # redirect to google authentication
-GET         /login                             lunatech.lunchplanner.controllers.Authentication.login()
+GET         /login                             lunatech.lunchplanner.controllers.Authentication.login
 GET         /authenticate                      lunatech.lunchplanner.controllers.Authentication.authenticate(code: String, id_token: String, access_token: String)
-GET         /logout                            lunatech.lunchplanner.controllers.Authentication.logout()
+GET         /logout                            lunatech.lunchplanner.controllers.Authentication.logout
+
+# Dish
+GET         /dish/all                          lunatech.lunchplanner.controllers.DishController.getAllDishes
+POST        /dish/add                          lunatech.lunchplanner.controllers.DishController.createNewDish()
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                      controllers.Assets.at(path="/public", file)

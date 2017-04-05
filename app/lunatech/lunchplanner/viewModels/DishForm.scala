@@ -1,11 +1,10 @@
-package lunatech.lunchplanner.models
+package lunatech.lunchplanner.viewModels
 
 import java.util.UUID
 
 import play.api.libs.json.{ Json, OFormat }
 
-case class Dish (
-  uuid: UUID = UUID.randomUUID(),
+case class DishForm (
   name: String,
   description: String,
   isVegetarian: Boolean = false,
@@ -18,6 +17,6 @@ case class Dish (
   remarks: Option[String] = None
 )
 
-object Dish {
-  implicit val dishFormat: OFormat[Dish] = Json.format[Dish]
+object DishForm {
+  implicit val dishFormat: OFormat[DishForm] = Json.format[DishForm]
 }

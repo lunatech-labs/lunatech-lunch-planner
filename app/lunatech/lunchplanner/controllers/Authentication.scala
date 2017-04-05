@@ -13,12 +13,12 @@ class Authentication @Inject()(configuration: Configuration, environment: Enviro
     * Login page.
     */
   def login = Action { implicit request =>
-//    if (environment.mode == Mode.Prod) {
+    if (environment.mode == Mode.Prod) {
       val clientId: String = configuration.getString("google.clientId").get
       Ok(views.html.login(clientId)).withSession("state" -> auth.generateState)
-//    } else {
-//      Redirect(routes.Application.index()).withSession("email" -> "leonor.boga@lunatech.com")
-//    }
+    } else {
+      Redirect(routes.Application.index()).withSession("email" -> "developer@lunatech.com")
+    }
   }
 
   def authenticate(code: String, idToken: String, accessToken: String) = Action.async {

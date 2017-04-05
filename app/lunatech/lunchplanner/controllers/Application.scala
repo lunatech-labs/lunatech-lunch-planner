@@ -33,7 +33,7 @@ class Application @Inject() (
 
   private def getAdminPage(adminUser: Future[Option[User]])=
     adminUser.map {
-      case Some(user) => Ok(views.html.admin(user))
+      case Some(user) => Ok(views.html.admin(user, DishController.dishForm))
       case None => Unauthorized
     }
 
