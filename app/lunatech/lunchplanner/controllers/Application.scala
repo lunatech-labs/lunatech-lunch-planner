@@ -18,14 +18,14 @@ class Application @Inject() (
   implicit val connection: DBConnection)
   extends Controller with Secured with I18nSupport {
 
-  def index = IsAuthenticated { username =>
+  def index = IsAuthenticatedAsync { username =>
     implicit request =>
       val currentUser = UserTable.getUserByEmailAddress(username)
       getIndexPage(currentUser)
   }
 
   def admin =
-    IsAdmin { username =>
+    IsAdminAsync { username =>
       implicit request =>
         val userAdmin = UserTable.getUserByEmailAddress(username)
         getAdminPage(userAdmin)

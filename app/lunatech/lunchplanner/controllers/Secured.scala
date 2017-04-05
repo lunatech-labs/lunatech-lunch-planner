@@ -1,14 +1,10 @@
 package lunatech.lunchplanner.controllers
 
-import java.net.URL
-
-import com.google.gdata.client.appsforyourdomain.UserService
-import com.google.gdata.client.authn.oauth.{ GoogleOAuthParameters, OAuthHmacSha1Signer }
-import com.google.gdata.data.appsforyourdomain.provisioning.UserFeed
+import com.lunatech.openconnect.GoogleSecured
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.persistence.UserTable
-import play.api.mvc.{ Action, RequestHeader, Result, Results, Security, _ }
-import play.api.{ Configuration, Environment, Mode }
+import play.api.mvc.{ RequestHeader, Result, Results, _ }
+import play.api.{ Configuration, Environment }
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -16,13 +12,13 @@ import scala.concurrent.Future
 /**
   * Provide security features
   */
-trait Secured {
+trait Secured extends GoogleSecured {
 
   val configuration: Configuration
   val environment: Environment
   implicit val connection: DBConnection
 
-  def IsAdmin(f: => String => Request[AnyContent] => Future[Result]) = IsAuthenticated { userEmailAddress =>
+  def IsAdmin(f: => String => Request[AnyContent] => Future[Result]) = IsAuthenticatedAsync { userEmailAddress =>
     request =>
       val isAdminResult = UserTable.isAdminUser(userEmailAddress)(connection)
       isAdminResult.flatMap{ isUserAdmin =>
@@ -36,15 +32,6 @@ trait Secured {
   }
 
   /**
-    * Action for authenticated users.
-    */
-
-  def IsAuthenticated(f: => String => Request[AnyContent] => Future[Result]) =
-    Security.Authenticated(username, onUnauthorized) { user =>
-      Action.async(request => f(user)(request))
-    }
-
-  /**
     * Retrieve the connected user email.
     */
   private def username(request: RequestHeader) =
@@ -53,35 +40,9 @@ trait Secured {
   /**
     * Redirect to login if the user in not authorized.
     */
-  private def onUnauthorized(request: RequestHeader) =
+  override def onUnauthorized(request: RequestHeader) =
     Results.Redirect(lunatech.lunchplanner.controllers.routes.Authentication.login())
 
-
-  def isOnWhiteList(email: String) = {
-//    if (environment.mode == Mode.Prod) {
-      val CONSUMER_KEY = configuration.getString("google.clientId")
-      val CONSUMER_SECRET = configuration.getString("google.secret")
-      val DOMAIN = configuration.getString("google.domain")
-
-      val oauthParameters = new GoogleOAuthParameters()
-      oauthParameters.setOAuthConsumerKey(CONSUMER_KEY.get)
-      oauthParameters.setOAuthConsumerSecret(CONSUMER_SECRET.get)
-      val signer = new OAuthHmacSha1Signer()
-      val feedUrl = new URL("https://apps-apis.google.com/a/feeds/" + DOMAIN.get + "/user/2.0")
-
-      val service = new UserService("ProvisiongApiClient")
-      service.setOAuthCredentials(oauthParameters, signer)
-      service.useSsl()
-      val resultFeed = service.getFeed(feedUrl, classOf[UserFeed])
-
-      import scala.collection.JavaConversions._
-      val users = resultFeed.getEntries.toSet
-      val filteredUsers = users.map(entry => entry.getTitle.getPlainText + "@" + DOMAIN.get)
-
-      filteredUsers.contains(email)
-//    } else {
-//      true
-//    }
-  }
+  override def onForbidden(request: RequestHeader): Result = Results.Forbidden("YOU ARE NOT ADMIN!!!")
 
 }

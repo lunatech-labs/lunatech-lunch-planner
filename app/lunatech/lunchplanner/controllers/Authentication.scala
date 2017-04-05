@@ -1,8 +1,5 @@
 package lunatech.lunchplanner.controllers
 
-import java.math.BigInteger
-import java.security.SecureRandom
-
 import com.google.inject.Inject
 import com.lunatech.openconnect.Authenticate
 import play.api.mvc.{ Action, Controller }
@@ -16,14 +13,12 @@ class Authentication @Inject()(configuration: Configuration, environment: Enviro
     * Login page.
     */
   def login = Action { implicit request =>
-    if (environment.mode == Mode.Prod) {
+//    if (environment.mode == Mode.Prod) {
       val clientId: String = configuration.getString("google.clientId").get
-      val state: String = new BigInteger(130, new SecureRandom()).toString(32)
-
-      Ok(views.html.login(clientId)).withSession("state" -> state)
-    } else {
-      Redirect(routes.Application.index()).withSession("email" -> "developer@lunatech.com")
-    }
+      Ok(views.html.login(clientId)).withSession("state" -> auth.generateState)
+//    } else {
+//      Redirect(routes.Application.index()).withSession("email" -> "leonor.boga@lunatech.com")
+//    }
   }
 
   def authenticate(code: String, idToken: String, accessToken: String) = Action.async {
