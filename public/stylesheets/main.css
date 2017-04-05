@@ -1,0 +1,10 @@
+h3 {
+	padding-top:30px;
+}
+
+.form-error {
+	font-size: small;
+	padding-left: 5px;
+	color: #E73535;
+	line-height: 10px;
+}
