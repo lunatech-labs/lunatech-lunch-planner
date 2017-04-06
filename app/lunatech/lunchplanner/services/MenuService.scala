@@ -15,4 +15,6 @@ class MenuService @Inject() (implicit val connection: DBConnection){
     val newMenu = Menu(name = menuForm.menuName)
     MenuTable.addMenu(newMenu)
   }
+
+  def getAllMenus(): Future[Seq[Menu]] = MenuTable.getAllMenus
 }

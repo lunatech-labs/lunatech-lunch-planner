@@ -31,20 +31,19 @@ class MenuController  @Inject() (
     implicit request => {
       val currentUser = userService.getUserByEmailAddress(username)
       val allDishes = dishService.getAllDishes.map(_.toArray)
+      val allMenus = menuService.getAllMenus().map(_.toArray)
       currentUser.flatMap(user =>
-        allDishes.map(dishes =>
-        MenuController
-          .menuForm
-          .bindFromRequest
-          .fold(
-            formWithErrors => BadRequest(views.html.admin(user.get, DishController.dishForm, formWithErrors, dishes)),
-            menuData => {
-              addNewMenuDishes(menuData)
-              Redirect(lunatech.lunchplanner.controllers.routes.Application.admin())
-            }
-          )
-        )
-      )
+        allDishes.flatMap(dishes =>
+          allMenus.map(menus =>
+          MenuController
+            .menuForm
+            .bindFromRequest
+            .fold(
+              formWithErrors => BadRequest(views.html.admin(user.get, DishController.dishForm, formWithErrors, dishes, menus)),
+              menuData => {
+                addNewMenuDishes(menuData)
+                Redirect(lunatech.lunchplanner.controllers.routes.Application.admin())
+              }))))
     }
   }
 
@@ -75,9 +74,4 @@ object MenuController {
     )(MenuForm.apply)(MenuForm.unapply)
   )
 
-  // Adicional mutiple checkbox no interface
-  //uma por cada dish
-
-  // for each
-  /// adicionar check box
 }

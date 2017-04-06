@@ -2,7 +2,7 @@ package lunatech.lunchplanner.controllers
 
 import com.google.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.Dish
+import lunatech.lunchplanner.models.{ Dish, Menu }
 import lunatech.lunchplanner.persistence.UserTable
 import lunatech.lunchplanner.services.DishService
 import lunatech.lunchplanner.viewModels.DishForm
@@ -39,7 +39,7 @@ class DishController @Inject() (
           .dishForm
           .bindFromRequest
           .fold(
-            formWithErrors => BadRequest(views.html.admin(user.get, formWithErrors, MenuController.menuForm, Array.empty[Dish])),
+            formWithErrors => BadRequest(views.html.admin(user.get, formWithErrors, MenuController.menuForm, Array.empty[Dish], Array.empty[Menu])),
             dishData => {
               dishService.addNewDish(dishData)
               Redirect(lunatech.lunchplanner.controllers.routes.Application.admin())
