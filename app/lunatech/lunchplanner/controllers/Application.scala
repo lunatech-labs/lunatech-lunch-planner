@@ -3,7 +3,7 @@ package lunatech.lunchplanner.controllers
 import com.google.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.User
-import lunatech.lunchplanner.services.{ DishService, MenuPerDayService, MenuService, UserService }
+import lunatech.lunchplanner.services.{ DishService, MenuPerDayPerPersonService, MenuPerDayService, MenuService, UserService }
 import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.mvc.{ Controller, Result }
 import play.api.{ Configuration, Environment }
@@ -16,6 +16,7 @@ class Application @Inject() (
   dishService: DishService,
   menuService: MenuService,
   menuPerDayService: MenuPerDayService,
+  menuPerDayPerPersonService: MenuPerDayPerPersonService,
   val connection: DBConnection,
   val environment: Environment,
   val messagesApi: MessagesApi,
@@ -60,9 +61,12 @@ class Application @Inject() (
     }
 
   private def getIndexPage(normalUser: Future[Option[User]]) =
-    normalUser.map {
-      case Some(user) => Ok(views.html.index(user))
-      case None => Unauthorized
+    normalUser.flatMap {
+      case Some(user) =>
+        val allMenusPerDayPerPersonAndSelected = menuPerDayPerPersonService.getAllMenuWithNamePerDayPerPerson(user.uuid).map(_.toArray)
+        allMenusPerDayPerPersonAndSelected.map(menusPerDayPerPerson =>
+          Ok(views.html.index(user, menusPerDayPerPerson, MenuPerDayPerPersonController.menuPerDayPerPersonForm)))
+      case None => Future.successful(Unauthorized)
     }
 
 }
