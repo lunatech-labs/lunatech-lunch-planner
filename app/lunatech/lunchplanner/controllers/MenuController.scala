@@ -4,7 +4,7 @@ import java.util.UUID
 
 import com.google.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.{ Menu, MenuDish }
+import lunatech.lunchplanner.models.{ Menu, MenuDish, MenuWithNamePerDay }
 import lunatech.lunchplanner.persistence.{ MenuDishTable, MenuTable }
 import lunatech.lunchplanner.services.{ DishService, MenuService, UserService }
 import lunatech.lunchplanner.viewModels.MenuForm
@@ -46,7 +46,8 @@ class MenuController  @Inject() (
                 dishes,
                 menus,
                 MenuPerDayController.menuPerDayForm,
-                Seq.empty[(String, String)])),
+                Seq.empty[(String, String)],
+                Array.empty[MenuWithNamePerDay])),
               menuData => {
                 addNewMenuDishes(menuData)
                 Redirect(lunatech.lunchplanner.controllers.routes.Application.admin())

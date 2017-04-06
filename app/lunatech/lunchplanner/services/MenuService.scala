@@ -1,13 +1,14 @@
 package lunatech.lunchplanner.services
 
+import java.util.UUID
 import javax.inject.Inject
 
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.Menu
 import lunatech.lunchplanner.persistence.MenuTable
 import lunatech.lunchplanner.viewModels.MenuForm
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class MenuService @Inject() (implicit val connection: DBConnection){
@@ -25,4 +26,6 @@ class MenuService @Inject() (implicit val connection: DBConnection){
       menuSeq.map( menu => (menu.uuid.toString, menu.name))
     )
   }
+
+  def getMenuByUuid(uuid: UUID): Future[Option[Menu]] = MenuTable.getMenuByUUID(uuid)
 }

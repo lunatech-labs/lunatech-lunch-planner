@@ -32,26 +32,30 @@ class MenuPerDayController  @Inject() (
       val allDishes = dishService.getAllDishes.map(_.toArray)
       val allMenus = menuService.getAllMenus.map(_.toArray)
       val allMenusUuidsAndNames = menuService.getAllMenusUuidAndNames
+      val allMenusPerDay = menuPerDayService.getAllMenuWithNamePerDay.map(_.toArray)
+
       currentUser.flatMap(user =>
         allDishes.flatMap(dishes =>
           allMenus.flatMap(menus =>
-            allMenusUuidsAndNames.map(menusUuidAndNames =>
-            MenuPerDayController
-              .menuPerDayForm
-              .bindFromRequest
-              .fold(
-                formWithErrors => BadRequest(views.html.admin(
-                  user.get,
-                  DishController.dishForm,
-                  MenuController.menuForm,
-                  dishes,
-                  menus,
-                  formWithErrors,
-                  menusUuidAndNames)),
-                menuPerDayData => {
-                  menuPerDayService.addNewMenuPerDay(menuPerDayData)
-                  Redirect(lunatech.lunchplanner.controllers.routes.Application.admin())
-                })))))
+            allMenusUuidsAndNames.flatMap(menusUuidAndNames =>
+              allMenusPerDay.map(menusPerDay =>
+                MenuPerDayController
+                .menuPerDayForm
+                .bindFromRequest
+                .fold(
+                  formWithErrors => BadRequest(views.html.admin(
+                    user.get,
+                    DishController.dishForm,
+                    MenuController.menuForm,
+                    dishes,
+                    menus,
+                    formWithErrors,
+                    menusUuidAndNames,
+                    menusPerDay)),
+                  menuPerDayData => {
+                    menuPerDayService.addNewMenuPerDay(menuPerDayData)
+                    Redirect(lunatech.lunchplanner.controllers.routes.Application.admin())
+                  }))))))
     }
   }
 

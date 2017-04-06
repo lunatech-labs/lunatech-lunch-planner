@@ -3,7 +3,7 @@ package lunatech.lunchplanner.controllers
 import com.google.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.User
-import lunatech.lunchplanner.services.{ DishService, MenuService, UserService }
+import lunatech.lunchplanner.services.{ DishService, MenuPerDayService, MenuService, UserService }
 import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.mvc.{ Controller, Result }
 import play.api.{ Configuration, Environment }
@@ -15,6 +15,7 @@ class Application @Inject() (
   userService: UserService,
   dishService: DishService,
   menuService: MenuService,
+  menuPerDayService: MenuPerDayService,
   val connection: DBConnection,
   val environment: Environment,
   val messagesApi: MessagesApi,
@@ -40,17 +41,21 @@ class Application @Inject() (
         val allDishes = dishService.getAllDishes.map(_.toArray)
         val allMenus = menuService.getAllMenus.map(_.toArray)
         val allMenusUuidsAndNames = menuService.getAllMenusUuidAndNames
+        val allMenusPerDay = menuPerDayService.getAllMenuWithNamePerDay.map(_.toArray)
+
         allDishes.flatMap(dishes =>
           allMenus.flatMap(menus =>
-            allMenusUuidsAndNames.map(menusUuidAndNames =>
-            Ok(views.html.admin(
-              user,
-              DishController.dishForm,
-              MenuController.menuForm,
-              dishes,
-              menus,
-              MenuPerDayController.menuPerDayForm,
-              menusUuidAndNames)))))
+            allMenusUuidsAndNames.flatMap(menusUuidAndNames =>
+              allMenusPerDay.map(menusPerDay =>
+                Ok(views.html.admin(
+                  user,
+                  DishController.dishForm,
+                  MenuController.menuForm,
+                  dishes,
+                  menus,
+                  MenuPerDayController.menuPerDayForm,
+                  menusUuidAndNames,
+                  menusPerDay))))))
       case None => Future.successful(Unauthorized)
     }
 

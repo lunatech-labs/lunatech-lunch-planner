@@ -2,11 +2,12 @@
 @import lunatech.lunchplanner.models.Dish
 @import lunatech.lunchplanner.models.User
 @import lunatech.lunchplanner.models.Menu
+@import lunatech.lunchplanner.models.MenuWithNamePerDay
 @import lunatech.lunchplanner.viewModels.DishForm
 @import lunatech.lunchplanner.viewModels.MenuForm
 @import lunatech.lunchplanner.viewModels.MenuPerDayForm
 
-@(admin: User, dishForm: Form[DishForm], menuForm: Form[MenuForm], listOfDishes: Array[Dish], listOfMenus: Array[Menu],  menuPerDayForm: Form[MenuPerDayForm], menuOptions: Seq[(String,String)])(implicit messages: play.api.i18n.Messages)
+@(admin: User, dishForm: Form[DishForm], menuForm: Form[MenuForm], listOfDishes: Array[Dish], listOfMenus: Array[Menu],  menuPerDayForm: Form[MenuPerDayForm], menuOptions: Seq[(String,String)], listOfMenusPerDay: Array[MenuWithNamePerDay])(implicit messages: play.api.i18n.Messages)
 @main("Overview", admin, "admin") {
     <div id="Wrapper">
         <div id="Container">
@@ -61,7 +62,7 @@
                                     @b3.text( menuForm("menuName"), '_label -> "Name", 'placeholder -> "Short menu name" )
 
                                     @for(index <- listOfDishes.indices) {
-                                        @b3.checkbox( dishForm("dishesUuid[]"), '_text -> listOfDishes(index).name, 'value -> listOfDishes(index).uuid)
+                                        @b3.checkbox( menuForm("dishesUuid[]"), '_text -> listOfDishes(index).name, 'value -> listOfDishes(index).uuid)
                                     }
                                     @b3.submit('class -> "btn btn-primary"){ Create Menu }
                                 }
@@ -70,7 +71,7 @@
                                 <br>
                                 <label>List of menus</label>
                                 @for(index <- listOfMenus.indices) {
-                                    @b3.checkbox( dishForm("uuid[]"), '_text -> listOfMenus(index).name, 'value -> listOfDishes(index).uuid)
+                                    @b3.checkbox( menuForm("uuid[]"), '_text -> listOfMenus(index).name, 'value -> listOfDishes(index).uuid)
                                 }
                             </div>
                         </div>
@@ -85,6 +86,13 @@
                                         '_label -> "Date")
                                     @b3.select(menuPerDayForm("menuUuid"), options = menuOptions, '_label -> "Select menu", '_default -> "Select an option")
                                     @b3.submit('class -> "btn btn-primary") { Associate menu with date }
+                                }
+                            </div>
+                            <div>
+                                <br>
+                                <label>List of menus per day</label>
+                                @for(index <- listOfMenusPerDay.indices) {
+                                    @b3.checkbox( menuPerDayForm("uuid[]"), '_text -> listOfMenusPerDay(index).menuDateAndName, 'value -> listOfDishes(index).uuid)
                                 }
                             </div>
                         </div>
