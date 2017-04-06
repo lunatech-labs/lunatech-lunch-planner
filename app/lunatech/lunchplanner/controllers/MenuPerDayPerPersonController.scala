@@ -28,11 +28,11 @@ class MenuPerDayPerPersonController @Inject() (
 
   def createNewMenuPerDayPerPerson = IsAuthenticatedAsync { username =>
     implicit request => {
-      val currentUser = userService.getUserByEmailAddress(username)
 
-      currentUser.flatMap { user =>
-        val allMenusPerDayPerPerson = menuPerDayPerPersonService.getAllMenuWithNamePerDayPerPerson(user.get.uuid).map(_.toArray)
-        allMenusPerDayPerPerson.map( menusPerDayPerPerson =>
+      for{
+        user <- userService.getUserByEmailAddress(username)
+        menusPerDayPerPerson <- menuPerDayPerPersonService.getAllMenuWithNamePerDayPerPerson(user.get.uuid).map(_.toArray)
+      } yield
           MenuPerDayPerPersonController
             .menuPerDayPerPersonForm
             .bindFromRequest
@@ -43,10 +43,8 @@ class MenuPerDayPerPersonController @Inject() (
                 Redirect(lunatech.lunchplanner.controllers.routes.Application.index())
               }
             )
-      )
       }
     }
-  }
 
   private def updateMenusPerDayPerPerson(userUuid: UUID, form: MenuPerDayPerPersonForm) = {
     val allMenusPerDayPerPerson = menuPerDayPerPersonService.getAllMenusPerDayPerPersonByUserUuid(userUuid)

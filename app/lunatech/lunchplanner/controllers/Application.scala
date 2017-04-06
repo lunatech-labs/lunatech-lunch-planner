@@ -44,19 +44,21 @@ class Application @Inject() (
         val allMenusUuidsAndNames = menuService.getAllMenusUuidAndNames
         val allMenusPerDay = menuPerDayService.getAllMenuWithNamePerDay.map(_.toArray)
 
-        allDishes.flatMap(dishes =>
-          allMenus.flatMap(menus =>
-            allMenusUuidsAndNames.flatMap(menusUuidAndNames =>
-              allMenusPerDay.map(menusPerDay =>
-                Ok(views.html.admin(
-                  user,
-                  DishController.dishForm,
-                  MenuController.menuForm,
-                  dishes,
-                  menus,
-                  MenuPerDayController.menuPerDayForm,
-                  menusUuidAndNames,
-                  menusPerDay))))))
+        for {
+          dishes <- allDishes
+          menus <- allMenus
+          menusUuidAndNames <- allMenusUuidsAndNames
+          menusPerDay <- allMenusPerDay
+        } yield
+          Ok(views.html.admin(
+            user,
+            DishController.dishForm,
+            MenuController.menuForm,
+            dishes,
+            menus,
+            MenuPerDayController.menuPerDayForm,
+            menusUuidAndNames,
+            menusPerDay))
       case None => Future.successful(Unauthorized)
     }
 

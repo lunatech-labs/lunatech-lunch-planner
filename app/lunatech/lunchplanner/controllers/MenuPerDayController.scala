@@ -28,34 +28,31 @@ class MenuPerDayController  @Inject() (
 
   def createNewMenuPerDay() = IsAdminAsync { username =>
     implicit request => {
-      val currentUser = userService.getUserByEmailAddress(username)
-      val allDishes = dishService.getAllDishes.map(_.toArray)
-      val allMenus = menuService.getAllMenus.map(_.toArray)
-      val allMenusUuidsAndNames = menuService.getAllMenusUuidAndNames
-      val allMenusPerDay = menuPerDayService.getAllMenuWithNamePerDay.map(_.toArray)
 
-      currentUser.flatMap(user =>
-        allDishes.flatMap(dishes =>
-          allMenus.flatMap(menus =>
-            allMenusUuidsAndNames.flatMap(menusUuidAndNames =>
-              allMenusPerDay.map(menusPerDay =>
-                MenuPerDayController
-                .menuPerDayForm
-                .bindFromRequest
-                .fold(
-                  formWithErrors => BadRequest(views.html.admin(
-                    user.get,
-                    DishController.dishForm,
-                    MenuController.menuForm,
-                    dishes,
-                    menus,
-                    formWithErrors,
-                    menusUuidAndNames,
-                    menusPerDay)),
-                  menuPerDayData => {
-                    menuPerDayService.addNewMenuPerDay(menuPerDayData)
-                    Redirect(lunatech.lunchplanner.controllers.routes.Application.admin())
-                  }))))))
+      for {
+        user <- userService.getUserByEmailAddress(username)
+        dishes <- dishService.getAllDishes.map(_.toArray)
+        menus <- menuService.getAllMenus.map(_.toArray)
+        menusUuidAndNames <- menuService.getAllMenusUuidAndNames
+        menusPerDay <- menuPerDayService.getAllMenuWithNamePerDay.map(_.toArray)
+      } yield
+        MenuPerDayController
+        .menuPerDayForm
+        .bindFromRequest
+        .fold(
+          formWithErrors => BadRequest(views.html.admin(
+            user.get,
+            DishController.dishForm,
+            MenuController.menuForm,
+            dishes,
+            menus,
+            formWithErrors,
+            menusUuidAndNames,
+            menusPerDay)),
+          menuPerDayData => {
+            menuPerDayService.addNewMenuPerDay(menuPerDayData)
+            Redirect(lunatech.lunchplanner.controllers.routes.Application.admin())
+          })
     }
   }
 
