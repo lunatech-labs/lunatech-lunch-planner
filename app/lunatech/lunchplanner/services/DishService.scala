@@ -1,7 +1,7 @@
 package lunatech.lunchplanner.services
 
 import java.util.UUID
-import javax.inject.Inject
+import javax.inject.{ Inject, Singleton }
 
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.Dish
@@ -28,5 +28,7 @@ class DishService @Inject() (implicit val connection: DBConnection){
 
     DishTable.addDish(newDish)
   }
+
+  def getAllDishes: Future[Seq[Dish]] = DishTable.getAllDishes
 
 }
