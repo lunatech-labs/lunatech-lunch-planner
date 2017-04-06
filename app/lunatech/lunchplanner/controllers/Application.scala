@@ -39,9 +39,18 @@ class Application @Inject() (
       case Some(user) =>
         val allDishes = dishService.getAllDishes.map(_.toArray)
         val allMenus = menuService.getAllMenus.map(_.toArray)
+        val allMenusUuidsAndNames = menuService.getAllMenusUuidAndNames
         allDishes.flatMap(dishes =>
-          allMenus.map(menus =>
-            Ok(views.html.admin(user, DishController.dishForm, MenuController.menuForm, dishes, menus))))
+          allMenus.flatMap(menus =>
+            allMenusUuidsAndNames.map(menusUuidAndNames =>
+            Ok(views.html.admin(
+              user,
+              DishController.dishForm,
+              MenuController.menuForm,
+              dishes,
+              menus,
+              MenuPerDayController.menuPerDayForm,
+              menusUuidAndNames)))))
       case None => Future.successful(Unauthorized)
     }
 

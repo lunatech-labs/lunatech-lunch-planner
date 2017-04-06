@@ -31,7 +31,7 @@ class MenuController  @Inject() (
     implicit request => {
       val currentUser = userService.getUserByEmailAddress(username)
       val allDishes = dishService.getAllDishes.map(_.toArray)
-      val allMenus = menuService.getAllMenus().map(_.toArray)
+      val allMenus = menuService.getAllMenus.map(_.toArray)
       currentUser.flatMap(user =>
         allDishes.flatMap(dishes =>
           allMenus.map(menus =>
@@ -39,7 +39,14 @@ class MenuController  @Inject() (
             .menuForm
             .bindFromRequest
             .fold(
-              formWithErrors => BadRequest(views.html.admin(user.get, DishController.dishForm, formWithErrors, dishes, menus)),
+              formWithErrors => BadRequest(views.html.admin(
+                user.get,
+                DishController.dishForm,
+                formWithErrors,
+                dishes,
+                menus,
+                MenuPerDayController.menuPerDayForm,
+                Seq.empty[(String, String)])),
               menuData => {
                 addNewMenuDishes(menuData)
                 Redirect(lunatech.lunchplanner.controllers.routes.Application.admin())

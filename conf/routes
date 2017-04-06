@@ -18,5 +18,8 @@ POST        /dish/add                          lunatech.lunchplanner.controllers
 # Menu
 POST        /menu/add                          lunatech.lunchplanner.controllers.MenuController.createNewMenu
 
+# Menu per day
+POST        /menuPerDay/add                    lunatech.lunchplanner.controllers.MenuPerDayController.createNewMenuPerDay
+
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                      controllers.Assets.at(path="/public", file)

@@ -4,8 +4,9 @@
 @import lunatech.lunchplanner.models.Menu
 @import lunatech.lunchplanner.viewModels.DishForm
 @import lunatech.lunchplanner.viewModels.MenuForm
+@import lunatech.lunchplanner.viewModels.MenuPerDayForm
 
-@(admin: User, dishForm: Form[DishForm], menuForm: Form[MenuForm], listOfDishes: Array[Dish], listOfMenus: Array[Menu])(implicit messages: play.api.i18n.Messages)
+@(admin: User, dishForm: Form[DishForm], menuForm: Form[MenuForm], listOfDishes: Array[Dish], listOfMenus: Array[Menu],  menuPerDayForm: Form[MenuPerDayForm], menuOptions: Seq[(String,String)])(implicit messages: play.api.i18n.Messages)
 @main("Overview", admin, "admin") {
     <div id="Wrapper">
         <div id="Container">
@@ -18,6 +19,7 @@
                     <ul class="nav nav-tabs">
                         <li role="presentation" class="active"><a data-toggle="tab" href="#dishes">Dishes</a></li>
                         <li role="presentation"><a data-toggle="tab" href="#menus">Menus</a></li>
+                        <li role="presentation"><a data-toggle="tab" href="#menuPerDay">Scheduling of menus</a></li>
                     </ul>
 
                         <!-- Tab panes -->
@@ -50,7 +52,6 @@
                             </div>
                         </div>
 
-
                         <!-- Menus -->
                         <div role="tabpanel" class="tab-pane" id="menus">
                             <div>
@@ -70,6 +71,20 @@
                                 <label>List of menus</label>
                                 @for(index <- listOfMenus.indices) {
                                     @b3.checkbox( dishForm("uuid[]"), '_text -> listOfMenus(index).name, 'value -> listOfDishes(index).uuid)
+                                }
+                            </div>
+                        </div>
+
+                            <!-- Menus -->
+                        <div role="tabpanel" class="tab-pane" id="menuPerDay">
+                            <div>
+                                <br>
+                                <label>Associate a menu to a date</label>
+                                @helper.form(lunatech.lunchplanner.controllers.routes.MenuPerDayController.createNewMenuPerDay) {
+                                    @datepicker(menuPerDayForm("date"), 'value -> "2017-05-01")(
+                                        '_label -> "Date")
+                                    @b3.select(menuPerDayForm("menuUuid"), options = menuOptions, '_label -> "Select menu", '_default -> "Select an option")
+                                    @b3.submit('class -> "btn btn-primary") { Associate menu with date }
                                 }
                             </div>
                         </div>
