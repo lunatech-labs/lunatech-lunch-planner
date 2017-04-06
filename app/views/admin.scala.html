@@ -1,6 +1,10 @@
 @import b3.vertical.fieldConstructor
+@import lunatech.lunchplanner.models.Dish
+@import lunatech.lunchplanner.models.User
+@import lunatech.lunchplanner.viewModels.DishForm
+@import lunatech.lunchplanner.viewModels.MenuForm
 
-@(admin: lunatech.lunchplanner.models.User, dishForm: Form[lunatech.lunchplanner.viewModels.DishForm])(implicit messages: play.api.i18n.Messages)
+@(admin: User, dishForm: Form[DishForm], menuForm: Form[MenuForm], listOfDishes: Array[Dish])(implicit messages: play.api.i18n.Messages)
 @main("Overview", admin, "admin") {
     <div id="Wrapper">
         <div id="Container">
@@ -9,11 +13,12 @@
 
                     <h1>Manage dishes and menus</h1>
 
-                        <!-- Nav tabs -->
+                    <!-- Nav tabs -->
                     <ul class="nav nav-tabs">
-                        <li role="presentation" class="active"><a data-toggle="tab" href="#newDish">New dish</a></li>
+                        <li role="presentation" class="active"><a data-toggle="tab" href="#newDish">New Dish</a></li>
+                        <li role="presentation"><a data-toggle="tab" href="#newMenu">New Menu</a></li>
                     </ul>
-                    <hr>
+
                         <!-- Tab panes -->
                     <div class="tab-content">
                         <div role="tabpanel" class="tab-pane active" id="newDish">
@@ -30,6 +35,16 @@
                                 @b3.text( dishForm("remarks"), '_label -> "Additional remarks", 'placeholder -> "Optional" )
                                 @b3.submit('class -> "btn btn-default"){ Create dish }
                             }
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="newMenu">
+                        @helper.form(lunatech.lunchplanner.controllers.routes.MenuController.createNewMenu) {
+                            @b3.text( menuForm("menuName"), '_label -> "Name", 'placeholder -> "Short menu name" )
+
+                            @for(index <- listOfDishes.indices) {
+                                @b3.checkbox( dishForm("dishesUuid[]"), '_text -> listOfDishes(index).name, 'value -> listOfDishes(index).uuid)
+                            }
+                            @b3.submit('class -> "btn btn-default"){ Create Menu }
+                        }
                         </div>
                     </div>
                 </div>
