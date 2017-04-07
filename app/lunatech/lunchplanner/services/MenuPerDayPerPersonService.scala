@@ -4,13 +4,14 @@ import java.util.UUID
 import javax.inject.Inject
 
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.{ MenuPerDay, MenuPerDayPerPerson, MenuWithNamePerDay, MenuWithNamePerDayPerPerson }
-import lunatech.lunchplanner.persistence.{ MenuPerDayPerPersonTable, MenuPerDayTable }
+import lunatech.lunchplanner.models.{ MenuPerDay, MenuPerDayPerPerson, MenuWithDishes, MenuWithNamePerDay, MenuWithNamePerDayPerPerson, MenuWithNamePerDayWithDishesPerPerson }
+import lunatech.lunchplanner.persistence.{ MenuDishTable, MenuPerDayPerPersonTable, MenuPerDayTable }
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class MenuPerDayPerPersonService  @Inject() (
+  dishService: DishService,
   menuService: MenuService,
   menuPerDayService: MenuPerDayService,
   implicit val connection: DBConnection) {
@@ -28,6 +29,23 @@ class MenuPerDayPerPersonService  @Inject() (
         val isMenuSelected = isMenuPerDaySelectedForPerson(userUuid, menuWithNamePerDay.uuid)
         isMenuSelected.map( isSelected =>
         MenuWithNamePerDayPerPerson(menuWithNamePerDay.uuid, menuWithNamePerDay.menuDateAndName, userUuid, isSelected))
+      }
+    }
+  }
+
+  def getAllMenuWithNamePerDayWithDishesPerPerson(userUuid: UUID): Future[Seq[MenuWithNamePerDayWithDishesPerPerson]]  = {
+    val allMenusWithNamePerDay = getAllMenuWithNamePerDay
+
+    allMenusWithNamePerDay.flatMap {
+      Future.traverse(_) { menuWithNamePerDay =>
+        MenuDishTable.getMenuDishByMenuUuid(menuWithNamePerDay.menuUuid)
+          .flatMap(Future.traverse(_)(dish =>
+            dishService.getDishByUuid(dish.dishUuid)).map(_.flatten))
+          .flatMap { dishes =>
+            val isMenuSelected = isMenuPerDaySelectedForPerson(userUuid, menuWithNamePerDay.uuid)
+            isMenuSelected.map(isSelected =>
+              MenuWithNamePerDayWithDishesPerPerson(menuWithNamePerDay.uuid, menuWithNamePerDay.menuDateAndName, dishes, userUuid, isSelected))
+          }
       }
     }
   }

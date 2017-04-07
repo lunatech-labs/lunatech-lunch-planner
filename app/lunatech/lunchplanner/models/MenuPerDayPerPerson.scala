@@ -14,3 +14,11 @@ case class MenuWithNamePerDayPerPerson(
   userUuid: UUID,
   isSelected: Boolean
 )
+
+case class MenuWithNamePerDayWithDishesPerPerson(
+  menuPerDayUuid: UUID,
+  menuDateAndName: String,
+  listOfDishes: Seq[Dish],
+  userUuid: UUID,
+  isSelected: Boolean
+)

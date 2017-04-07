@@ -31,4 +31,5 @@ class DishService @Inject() (implicit val connection: DBConnection){
 
   def getAllDishes: Future[Seq[Dish]] = DishTable.getAllDishes
 
+  def getDishByUuid(uuid: UUID): Future[Option[Dish]] = DishTable.getDishByUUID(uuid)
 }

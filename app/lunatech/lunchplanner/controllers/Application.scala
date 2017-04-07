@@ -38,16 +38,11 @@ class Application @Inject() (
   private def getAdminPage(adminUser: Future[Option[User]], activePage: Int): Future[Result] =
     adminUser.flatMap {
       case Some(user) =>
-        val allDishes = dishService.getAllDishes.map(_.toArray)
-        val allMenus = menuService.getAllMenus.map(_.toArray)
-        val allMenusUuidsAndNames = menuService.getAllMenusUuidAndNames
-        val allMenusPerDay = menuPerDayPerPersonService.getAllMenuWithNamePerDay.map(_.toArray)
-
         for {
-          dishes <- allDishes
-          menus <- allMenus
-          menusUuidAndNames <- allMenusUuidsAndNames
-          menusPerDay <- allMenusPerDay
+          dishes <- dishService.getAllDishes.map(_.toArray)
+          menus <- menuService.getAllMenusWithListOfDishes.map(_.toArray)
+          menusUuidAndNames <- menuService.getAllMenusUuidAndNames
+          menusPerDay <- menuPerDayPerPersonService.getAllMenuWithNamePerDay.map(_.toArray)
         } yield
           Ok(views.html.admin(
             activePage,
@@ -65,7 +60,7 @@ class Application @Inject() (
   private def getIndexPage(normalUser: Future[Option[User]]) =
     normalUser.flatMap {
       case Some(user) =>
-        val allMenusPerDayPerPersonAndSelected = menuPerDayPerPersonService.getAllMenuWithNamePerDayPerPerson(user.uuid).map(_.toArray)
+        val allMenusPerDayPerPersonAndSelected = menuPerDayPerPersonService.getAllMenuWithNamePerDayWithDishesPerPerson(user.uuid).map(_.toArray)
         allMenusPerDayPerPersonAndSelected.map(menusPerDayPerPerson =>
           Ok(views.html.index(user, menusPerDayPerPerson, MenuPerDayPerPersonController.menuPerDayPerPersonForm)))
       case None => Future.successful(Unauthorized)

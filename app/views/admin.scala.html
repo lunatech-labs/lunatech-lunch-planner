@@ -1,13 +1,13 @@
 @import b3.vertical.fieldConstructor
 @import lunatech.lunchplanner.models.Dish
 @import lunatech.lunchplanner.models.User
-@import lunatech.lunchplanner.models.Menu
+@import lunatech.lunchplanner.models.MenuWithDishes
 @import lunatech.lunchplanner.models.MenuWithNamePerDay
 @import lunatech.lunchplanner.viewModels.DishForm
 @import lunatech.lunchplanner.viewModels.MenuForm
 @import lunatech.lunchplanner.viewModels.MenuPerDayForm
 
-@(activeTab: Int = 0, admin: User, dishForm: Form[DishForm], menuForm: Form[MenuForm], listOfDishes: Array[Dish], listOfMenus: Array[Menu],  menuPerDayForm: Form[MenuPerDayForm], menuOptions: Seq[(String,String)], listOfMenusPerDay: Array[MenuWithNamePerDay])(implicit messages: play.api.i18n.Messages)
+@(activeTab: Int = 0, admin: User, dishForm: Form[DishForm], menuForm: Form[MenuForm], listOfDishes: Array[Dish], listOfMenus: Array[MenuWithDishes],  menuPerDayForm: Form[MenuPerDayForm], menuOptions: Seq[(String,String)], listOfMenusPerDay: Array[MenuWithNamePerDay])(implicit messages: play.api.i18n.Messages)
 @main("Overview", admin, "admin") {
     <div id="Wrapper">
         <div id="Container">
@@ -71,12 +71,15 @@
                                 <br>
                                 <label>List of menus</label>
                                 @for(index <- listOfMenus.indices) {
-                                    @b3.checkbox( menuForm("uuid[]"), '_text -> listOfMenus(index).name, 'value -> listOfDishes(index).uuid)
+                                    @b3.checkbox( menuForm("uuid"), '_text -> listOfMenus(index).name, 'value -> listOfDishes(index).uuid)
+                                    @for(dishIndex <- listOfMenus(index).listOfDishes.indices) {
+                                        <label style="font-weight: normal">@listOfMenus(index).listOfDishes(dishIndex).name</label> <br>
+                                    }
                                 }
                             </div>
                         </div>
 
-                            <!-- Menus -->
+                        <!-- Menus Per Day -->
                         <div role="tabpanel" class="tab-pane @if(activeTab == 2){ active }" id="menuPerDay">
                             <div>
                                 <br>

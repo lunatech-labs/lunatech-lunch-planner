@@ -31,7 +31,7 @@ class MenuPerDayPerPersonController @Inject() (
 
       for{
         user <- userService.getUserByEmailAddress(username)
-        menusPerDayPerPerson <- menuPerDayPerPersonService.getAllMenuWithNamePerDayPerPerson(user.get.uuid).map(_.toArray)
+        menusPerDayPerPerson <- menuPerDayPerPersonService.getAllMenuWithNamePerDayWithDishesPerPerson(user.get.uuid).map(_.toArray)
         result <- MenuPerDayPerPersonController
             .menuPerDayPerPersonForm
             .bindFromRequest
