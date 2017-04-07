@@ -14,6 +14,7 @@ import play.api.mvc.Controller
 import play.api.{ Configuration, Environment }
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class DishController @Inject() (
   dishService: DishService,
@@ -34,12 +35,12 @@ class DishController @Inject() (
   def createNewDish() = IsAdminAsync { username =>
     implicit request => {
       val currentUser = UserTable.getUserByEmailAddress(username)
-      currentUser.map(user =>
+      currentUser.flatMap(user =>
         DishController
           .dishForm
           .bindFromRequest
           .fold(
-            formWithErrors => BadRequest(views.html.admin(
+            formWithErrors => Future.successful(BadRequest(views.html.admin(
               activeTab = 0,
               user.get,
               formWithErrors,
@@ -48,10 +49,11 @@ class DishController @Inject() (
               Array.empty[Menu],
               MenuPerDayController.menuPerDayForm,
               Seq.empty[(String, String)],
-              Array.empty[MenuWithNamePerDay])),
+              Array.empty[MenuWithNamePerDay]))),
             dishData => {
-              dishService.addNewDish(dishData)
-              Redirect(lunatech.lunchplanner.controllers.routes.Application.admin(activePage = 0))
+              dishService.addNewDish(dishData).map { _ =>
+                Redirect(lunatech.lunchplanner.controllers.routes.Application.admin(activePage = 0))
+              }
             }
           )
       )

@@ -32,17 +32,18 @@ class MenuPerDayPerPersonController @Inject() (
       for{
         user <- userService.getUserByEmailAddress(username)
         menusPerDayPerPerson <- menuPerDayPerPersonService.getAllMenuWithNamePerDayPerPerson(user.get.uuid).map(_.toArray)
-      } yield
-          MenuPerDayPerPersonController
+        result <- MenuPerDayPerPersonController
             .menuPerDayPerPersonForm
             .bindFromRequest
             .fold(
-              formWithErrors => BadRequest(views.html.index(user.get, menusPerDayPerPerson, formWithErrors)),
+              formWithErrors => Future.successful(
+                BadRequest(views.html.index(user.get, menusPerDayPerPerson, formWithErrors))),
               menuPerDayPerPersonData => {
-                updateMenusPerDayPerPerson(user.get.uuid, menuPerDayPerPersonData)
-                Redirect(lunatech.lunchplanner.controllers.routes.Application.index())
+                updateMenusPerDayPerPerson(user.get.uuid, menuPerDayPerPersonData).map(_ =>
+                  Redirect(lunatech.lunchplanner.controllers.routes.Application.index()))
               }
             )
+      } yield result
       }
     }
 

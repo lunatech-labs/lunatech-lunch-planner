@@ -14,6 +14,7 @@ import play.api.mvc.Controller
 import play.api.{ Configuration, Environment }
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class MenuPerDayController  @Inject() (
   userService: UserService,
@@ -35,25 +36,25 @@ class MenuPerDayController  @Inject() (
         menus <- menuService.getAllMenus.map(_.toArray)
         menusUuidAndNames <- menuService.getAllMenusUuidAndNames
         menusPerDay <- menuPerDayService.getAllMenuWithNamePerDay.map(_.toArray)
-      } yield
-        MenuPerDayController
-        .menuPerDayForm
-        .bindFromRequest
-        .fold(
-          formWithErrors => BadRequest(views.html.admin(
-            activeTab = 2,
-            user.get,
-            DishController.dishForm,
-            MenuController.menuForm,
-            dishes,
-            menus,
-            formWithErrors,
-            menusUuidAndNames,
-            menusPerDay)),
-          menuPerDayData => {
-            menuPerDayService.addNewMenuPerDay(menuPerDayData)
-            Redirect(lunatech.lunchplanner.controllers.routes.Application.admin(activePage = 2))
-          })
+        result <- MenuPerDayController
+          .menuPerDayForm
+          .bindFromRequest
+          .fold(
+            formWithErrors => Future.successful(BadRequest(views.html.admin(
+              activeTab = 2,
+              user.get,
+              DishController.dishForm,
+              MenuController.menuForm,
+              dishes,
+              menus,
+              formWithErrors,
+              menusUuidAndNames,
+              menusPerDay))),
+            menuPerDayData => {
+              menuPerDayService.addNewMenuPerDay(menuPerDayData).map(_ =>
+                Redirect(lunatech.lunchplanner.controllers.routes.Application.admin(activePage = 2)))
+            })
+      } yield result
     }
   }
 
