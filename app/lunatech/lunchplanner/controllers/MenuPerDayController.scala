@@ -41,6 +41,7 @@ class MenuPerDayController  @Inject() (
         .bindFromRequest
         .fold(
           formWithErrors => BadRequest(views.html.admin(
+            activeTab = 2,
             user.get,
             DishController.dishForm,
             MenuController.menuForm,
@@ -51,7 +52,7 @@ class MenuPerDayController  @Inject() (
             menusPerDay)),
           menuPerDayData => {
             menuPerDayService.addNewMenuPerDay(menuPerDayData)
-            Redirect(lunatech.lunchplanner.controllers.routes.Application.admin())
+            Redirect(lunatech.lunchplanner.controllers.routes.Application.admin(activePage = 2))
           })
     }
   }

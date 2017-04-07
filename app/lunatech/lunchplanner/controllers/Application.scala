@@ -29,14 +29,14 @@ class Application @Inject() (
       getIndexPage(currentUser)
   }
 
-  def admin =
+  def admin(activePage: Int) =
     IsAdminAsync { username =>
       implicit request =>
         val userAdmin = userService.getUserByEmailAddress(username)
-        getAdminPage(userAdmin)
+        getAdminPage(userAdmin, activePage)
     }
 
-  private def getAdminPage(adminUser: Future[Option[User]]): Future[Result] =
+  private def getAdminPage(adminUser: Future[Option[User]], activePage: Int): Future[Result] =
     adminUser.flatMap {
       case Some(user) =>
         val allDishes = dishService.getAllDishes.map(_.toArray)
@@ -51,6 +51,7 @@ class Application @Inject() (
           menusPerDay <- allMenusPerDay
         } yield
           Ok(views.html.admin(
+            activePage,
             user,
             DishController.dishForm,
             MenuController.menuForm,

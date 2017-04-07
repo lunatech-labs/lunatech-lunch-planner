@@ -4,7 +4,7 @@
 
 GET         /                                  lunatech.lunchplanner.controllers.Application.index
 
-GET         /admin                             lunatech.lunchplanner.controllers.Application.admin
+GET         /admin                             lunatech.lunchplanner.controllers.Application.admin(activePage: Int ?= 0)
 
 # redirect to google authentication
 GET         /login                             lunatech.lunchplanner.controllers.Authentication.login

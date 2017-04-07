@@ -40,6 +40,7 @@ class DishController @Inject() (
           .bindFromRequest
           .fold(
             formWithErrors => BadRequest(views.html.admin(
+              activeTab = 0,
               user.get,
               formWithErrors,
               MenuController.menuForm,
@@ -50,7 +51,7 @@ class DishController @Inject() (
               Array.empty[MenuWithNamePerDay])),
             dishData => {
               dishService.addNewDish(dishData)
-              Redirect(lunatech.lunchplanner.controllers.routes.Application.admin())
+              Redirect(lunatech.lunchplanner.controllers.routes.Application.admin(activePage = 0))
             }
           )
       )
