@@ -4,13 +4,14 @@ import java.util.UUID
 import javax.inject.Inject
 
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.{ MenuPerDay, MenuPerDayPerPerson, MenuWithNamePerDayPerPerson }
+import lunatech.lunchplanner.models.{ MenuPerDay, MenuPerDayPerPerson, MenuWithNamePerDay, MenuWithNamePerDayPerPerson }
 import lunatech.lunchplanner.persistence.{ MenuPerDayPerPersonTable, MenuPerDayTable }
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class MenuPerDayPerPersonService  @Inject() (
+  menuService: MenuService,
   menuPerDayService: MenuPerDayService,
   implicit val connection: DBConnection) {
 
@@ -20,7 +21,7 @@ class MenuPerDayPerPersonService  @Inject() (
   def getAllMenusPerDayPerPersonByUserUuid(userUuid: UUID): Future[Seq[MenuPerDayPerPerson]] = MenuPerDayPerPersonTable.getMenuPerDayPerPersonByUserUuid(userUuid)
 
   def getAllMenuWithNamePerDayPerPerson(userUuid: UUID): Future[Seq[MenuWithNamePerDayPerPerson]]  = {
-    val allMenusWithNamePerDay = menuPerDayService.getAllMenuWithNamePerDay
+    val allMenusWithNamePerDay = getAllMenuWithNamePerDay
 
     allMenusWithNamePerDay.flatMap {
       Future.traverse(_) { menuWithNamePerDay =>
@@ -37,4 +38,24 @@ class MenuPerDayPerPersonService  @Inject() (
   def removeMenuPerDayPerPerson(menuPerDayPerPersonUuid: UUID): Future[Int] =
     MenuPerDayPerPersonTable.removeMenuPerDayPerPerson(menuPerDayPerPersonUuid)
 
+  def getNumberOfMenusPerDayPerPersonForMenuPerDay(menuPerDayUuid: UUID): Future[Int] =
+    MenuPerDayPerPersonTable.getMenuPerDayPerPersonByMenuPerDayUuid(menuPerDayUuid).map(_.length)
+
+  def getAllMenuWithNamePerDay: Future[Seq[MenuWithNamePerDay]] = {
+    val allMenusPerDay = menuPerDayService.getAllMenusPerDay
+
+    allMenusPerDay.flatMap {
+      Future.traverse(_) { menuPerDay =>
+        val menu = menuService.getMenuByUuid(menuPerDay.menuUuid)
+        menu.flatMap {
+          case Some(menuData) => {
+              getNumberOfMenusPerDayPerPersonForMenuPerDay(menuPerDay.uuid)
+              .map(count =>
+                MenuWithNamePerDay(menuPerDay.uuid, menuData.uuid, menuPerDay.date.toString + "  " + menuData.name, numberOfPeopleSignedIn = count))
+            }
+          case None => ???
+        }
+      }
+    }
+  }
 }

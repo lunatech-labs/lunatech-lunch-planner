@@ -15,7 +15,6 @@ class Application @Inject() (
   userService: UserService,
   dishService: DishService,
   menuService: MenuService,
-  menuPerDayService: MenuPerDayService,
   menuPerDayPerPersonService: MenuPerDayPerPersonService,
   val connection: DBConnection,
   val environment: Environment,
@@ -42,7 +41,7 @@ class Application @Inject() (
         val allDishes = dishService.getAllDishes.map(_.toArray)
         val allMenus = menuService.getAllMenus.map(_.toArray)
         val allMenusUuidsAndNames = menuService.getAllMenusUuidAndNames
-        val allMenusPerDay = menuPerDayService.getAllMenuWithNamePerDay.map(_.toArray)
+        val allMenusPerDay = menuPerDayPerPersonService.getAllMenuWithNamePerDay.map(_.toArray)
 
         for {
           dishes <- allDishes

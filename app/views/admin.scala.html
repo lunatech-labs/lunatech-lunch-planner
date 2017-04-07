@@ -92,7 +92,7 @@
                                 <br>
                                 <label>List of menus per day</label>
                                 @for(index <- listOfMenusPerDay.indices) {
-                                    @b3.checkbox( menuPerDayForm("uuid[]"), '_text -> listOfMenusPerDay(index).menuDateAndName, 'value -> listOfMenusPerDay(index).uuid)
+                                    @b3.checkbox( menuPerDayForm("uuid[]"), '_text -> (listOfMenusPerDay(index).menuDateAndName + " (" + listOfMenusPerDay(index).numberOfPeopleSignedIn + " people attending)"), 'value -> listOfMenusPerDay(index).uuid)
                                 }
                             </div>
                         </div>

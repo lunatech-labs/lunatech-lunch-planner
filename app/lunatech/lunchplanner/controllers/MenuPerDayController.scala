@@ -4,7 +4,7 @@ import java.util.UUID
 
 import com.google.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.services.{ DishService, MenuPerDayService, MenuService, UserService }
+import lunatech.lunchplanner.services.{ DishService, MenuPerDayPerPersonService, MenuPerDayService, MenuService, UserService }
 import lunatech.lunchplanner.viewModels.MenuPerDayForm
 import play.api.data.Form
 import play.api.data.Forms.{ mapping, of, _ }
@@ -21,6 +21,7 @@ class MenuPerDayController  @Inject() (
   dishService: DishService,
   menuService: MenuService,
   menuPerDayService: MenuPerDayService,
+  menuPerDayPerPersonService: MenuPerDayPerPersonService,
   val environment: Environment,
   val messagesApi: MessagesApi,
   val configuration: Configuration,
@@ -35,7 +36,7 @@ class MenuPerDayController  @Inject() (
         dishes <- dishService.getAllDishes.map(_.toArray)
         menus <- menuService.getAllMenus.map(_.toArray)
         menusUuidAndNames <- menuService.getAllMenusUuidAndNames
-        menusPerDay <- menuPerDayService.getAllMenuWithNamePerDay.map(_.toArray)
+        menusPerDay <- menuPerDayPerPersonService.getAllMenuWithNamePerDay.map(_.toArray)
         result <- MenuPerDayController
           .menuPerDayForm
           .bindFromRequest
