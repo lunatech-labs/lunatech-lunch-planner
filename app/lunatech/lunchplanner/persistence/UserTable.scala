@@ -17,9 +17,7 @@ class UserTable(tag: Tag) extends Table[User](tag, "User") {
 
   def emailAddress: Rep[String] = column[String]("emailAddress")
 
-  def isAdmin: Rep[Boolean] = column[Boolean]("isAdmin")
-
-  def * : ProvenShape[User] = (uuid, name, emailAddress, isAdmin) <> ((User.apply _).tupled, User.unapply)
+  def * : ProvenShape[User] = (uuid, name, emailAddress) <> ((User.apply _).tupled, User.unapply)
 }
 
 object UserTable {
@@ -32,6 +30,10 @@ object UserTable {
 
   def userExists(uuid: UUID)(implicit connection: DBConnection): Future[Boolean] = {
     connection.db.run(userTable.filter(_.uuid === uuid).exists.result)
+  }
+
+  def userWithEmailExists(emailAddress: String)(implicit connection: DBConnection): Future[Boolean] = {
+    connection.db.run(userTable.filter(_.emailAddress === emailAddress).exists.result)
   }
 
   def getUserByUUID(uuid: UUID)(implicit connection: DBConnection): Future[Option[User]] = {

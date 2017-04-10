@@ -37,7 +37,11 @@ class MenuPerDayPerPersonController @Inject() (
             .bindFromRequest
             .fold(
               formWithErrors => Future.successful(
-                BadRequest(views.html.index(user.get, menusPerDayPerPerson, formWithErrors))),
+                BadRequest(views.html.index(
+                  user.get,
+                  isUserAdmin = userService.isAdminUser(user.get.emailAddress),
+                  menusPerDayPerPerson,
+                  formWithErrors))),
               menuPerDayPerPersonData => {
                 updateMenusPerDayPerPerson(user.get.uuid, menuPerDayPerPersonData).map(_ =>
                   Redirect(lunatech.lunchplanner.controllers.routes.Application.index()))
