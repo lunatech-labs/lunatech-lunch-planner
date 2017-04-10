@@ -14,23 +14,28 @@
 </ul>
 <div class="tab-content">
     <div role="tabpanel" class="tab-pane @if(activeTab == 0){ active }" id="newDish">
-        <div>
-            <br>
-            <label>Create new dish</label>
-            @helper.form(lunatech.lunchplanner.controllers.routes.DishController.createNewDish) {
+        <br>
+        @b3.form(lunatech.lunchplanner.controllers.routes.DishController.createNewDish) {
+        <div class="row">
+            <div class="col col-lg-6">
                 @b3.text( dishForm("name"), '_label -> "Name", 'placeholder -> "Short dish name" )
-                @b3.text( dishForm("description"), '_label -> "Description",  'placeholder -> "Dish description")
-                @b3.checkbox( dishForm("isVegetarian"), '_text -> "Is vegetarian" )
-                @b3.checkbox( dishForm("hasSeaFood"), '_text -> "Has sea food")
-                @b3.checkbox( dishForm("hasPork"), '_text -> "Has pork")
-                @b3.checkbox( dishForm("hasBeef"), '_text -> "Has beef")
-                @b3.checkbox( dishForm("hasChicken"), '_text -> "Has Chicken")
-                @b3.checkbox( dishForm("isGlutenFree"), '_text -> "Is gluten free")
-                @b3.checkbox( dishForm("hasLactose"), '_text -> "Has lactose")
+                @b3.textarea( dishForm("description"), '_label -> "Description",  'placeholder -> "Dish description", 'rows -> 4, 'resize -> false)
                 @b3.text( dishForm("remarks"), '_label -> "Additional remarks", 'placeholder -> "Optional" )
                 @b3.submit('class -> "btn btn-primary"){ Create dish }
-            }
+            </div>
+            <div class="col col-lg-6">
+                <label style="height: 0">Extra info: </label>
+                @b3.checkbox( dishForm("isVegetarian"), '_text -> "Vegetarian" )
+                @b3.checkbox( dishForm("hasSeaFood"), '_text -> "Sea food")
+                @b3.checkbox( dishForm("hasPork"), '_text -> "Pork")
+                @b3.checkbox( dishForm("hasBeef"), '_text -> "Beef")
+                @b3.checkbox( dishForm("hasChicken"), '_text -> "Chicken")
+                @b3.checkbox( dishForm("isGlutenFree"), '_text -> "Gluten free")
+                @b3.checkbox( dishForm("hasLactose"), '_text -> "Lactose")
+            </div>
         </div>
+        }
+
     </div>
     <div role="tabpanel" class="tab-pane @if(activeTab == 1){ active }" id="list">
         <div>
