@@ -3,7 +3,7 @@ package lunatech.lunchplanner.controllers
 import com.google.inject.Inject
 import com.lunatech.openconnect.Authenticate
 import lunatech.lunchplanner.services.UserService
-import play.api.mvc.{ Action, Controller }
+import play.api.mvc.{ Action, AnyContent, Controller }
 import play.api.{ Configuration, Environment, Mode }
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -24,7 +24,7 @@ class Authentication @Inject()(
     }
   }
 
-  def authenticate(code: String, idToken: String, accessToken: String) = Action.async {
+  def authenticate(code: String, idToken: String, accessToken: String): Action[AnyContent] = Action.async {
     val response = auth.authenticateToken(code, idToken, accessToken)
 
     response.flatMap {

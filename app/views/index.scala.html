@@ -4,38 +4,19 @@
 
 @(user: lunatech.lunchplanner.models.User, isUserAdmin: Boolean, listOfMenusPerDayPerPerson: Array[MenuWithNamePerDayWithDishesPerPerson], form: Form[MenuPerDayPerPersonForm])(implicit messages: play.api.i18n.Messages)
 @main("Lunatech Lunch Planner", user, isUserAdmin) {
-  <div id="Wrapper">
-    <div id="Container">
-      <div class="Left">
-        <div class="col">
 
-          <h1>Manage dishes and menus</h1>
-
-            <!-- Nav tabs -->
-          <ul class="nav nav-tabs">
-            <li role="presentation" class="active"><a data-toggle="tab" href="#meals">Scheduled meals</a></li>
-          </ul>
-
-            <!-- Tab panes -->
-          <div class="tab-content">
-              <!-- Meals -->
-            <div role="tabpanel" class="tab-pane active" id="meals">
-              <br>
-              <label>What Lunatech will be feeding you</label>
-                @helper.form(lunatech.lunchplanner.controllers.routes.MenuPerDayPerPersonController.createNewMenuPerDayPerPerson) {
-                  @for(index <- listOfMenusPerDayPerPerson.indices) {
-                    @b3.checkbox( form("menuPerDayUuid[]"), '_text -> listOfMenusPerDayPerPerson(index).menuDateAndName, 'value -> listOfMenusPerDayPerPerson(index).menuPerDayUuid, 'checked -> listOfMenusPerDayPerPerson(index).isSelected)
-                    @for(dishIndex <- listOfMenusPerDayPerPerson(index).listOfDishes.indices) {
-                      <label style="font-weight: normal">@listOfMenusPerDayPerPerson(index).listOfDishes(dishIndex).name</label> <br>
-                    }
-                  }
-                  @b3.submit('class -> "btn btn-primary"){ Save selected meals }
-                }
-            </div>
-
-          </div>
-        </div>
+    <h2>What Lunatech will be feeding you</h2>
+      <!-- Tab panes -->
+        <!-- Meals -->
+      <div role="tabpanel" class="tab-pane active" id="meals">
+        @helper.form(lunatech.lunchplanner.controllers.routes.MenuPerDayPerPersonController.createNewMenuPerDayPerPerson) {
+          @for(index <- listOfMenusPerDayPerPerson.indices) {
+            @b3.checkbox( form("menuPerDayUuid[]"), '_text -> listOfMenusPerDayPerPerson(index).menuDateAndName, 'value -> listOfMenusPerDayPerPerson(index).menuPerDayUuid, 'checked -> listOfMenusPerDayPerPerson(index).isSelected)
+            @for(dishIndex <- listOfMenusPerDayPerPerson(index).listOfDishes.indices) {
+              <label style="font-weight: normal">@listOfMenusPerDayPerPerson(index).listOfDishes(dishIndex).name</label> <br>
+            }
+          }
+          @b3.submit('class -> "btn btn-primary"){ Save selected meals }
+        }
       </div>
-    </div>
-  </div>
 }

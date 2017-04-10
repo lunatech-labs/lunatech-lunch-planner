@@ -4,12 +4,9 @@ import java.util.UUID
 import javax.inject.Inject
 
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.{ MenuPerDayPerPerson, MenuWithNamePerDayPerPerson }
+import lunatech.lunchplanner.models.MenuPerDayPerPerson
 import lunatech.lunchplanner.services.{ MenuPerDayPerPersonService, MenuPerDayService, UserService }
 import lunatech.lunchplanner.viewModels.MenuPerDayPerPersonForm
-import play.api.data.Form
-import play.api.data.Forms.{ list, mapping, of, _ }
-import play.api.data.format.Formats._
 import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.mvc.Controller
 import play.api.{ Configuration, Environment }
@@ -32,7 +29,7 @@ class MenuPerDayPerPersonController @Inject() (
       for{
         user <- userService.getUserByEmailAddress(username)
         menusPerDayPerPerson <- menuPerDayPerPersonService.getAllMenuWithNamePerDayWithDishesPerPerson(user.get.uuid).map(_.toArray)
-        result <- MenuPerDayPerPersonController
+        result <- MenuPerDayPerPersonForm
             .menuPerDayPerPersonForm
             .bindFromRequest
             .fold(
@@ -52,31 +49,22 @@ class MenuPerDayPerPersonController @Inject() (
     }
 
   private def updateMenusPerDayPerPerson(userUuid: UUID, form: MenuPerDayPerPersonForm) = {
-    val allMenusPerDayPerPerson = menuPerDayPerPersonService.getAllMenusPerDayPerPersonByUserUuid(userUuid)
-    menusPerDayToAdd(allMenusPerDayPerPerson, userUuid, form)
-    menusPerDayToRemove(allMenusPerDayPerPerson, userUuid, form)
+    menuPerDayPerPersonService.getAllMenusPerDayPerPersonByUserUuid(userUuid).map(allMenusPerDayPerPerson => {
+      menusPerDayToAdd(allMenusPerDayPerPerson, userUuid, form)
+      menusPerDayToRemove(allMenusPerDayPerPerson, userUuid, form)
+    })
   }
 
-  private def menusPerDayToAdd(allMenusPerDayPerPerson: Future[Seq[MenuPerDayPerPerson]], userUuid: UUID, form: MenuPerDayPerPersonForm) =
-    allMenusPerDayPerPerson.map{ menusChosen =>
-      form.menuPerDayUuid
-        .filter(!menusChosen.map(_.menuPerDayUuid).contains(_))
-        .foreach{ uuid =>
-        val newMenuPerDayPerPerson = MenuPerDayPerPerson(menuPerDayUuid = uuid, userUuid = userUuid)
-        menuPerDayPerPersonService.addNewMenusPerDayPerPerson(newMenuPerDayPerPerson)
-      }
+  private def menusPerDayToAdd(menusChosen: Seq[MenuPerDayPerPerson], userUuid: UUID, form: MenuPerDayPerPersonForm) =
+    form.menuPerDayUuid
+      .filter(!menusChosen.map(_.menuPerDayUuid).contains(_))
+      .foreach{ uuid =>
+      val newMenuPerDayPerPerson = MenuPerDayPerPerson(menuPerDayUuid = uuid, userUuid = userUuid)
+      menuPerDayPerPersonService.addNewMenusPerDayPerPerson(newMenuPerDayPerPerson)
     }
 
-  private def menusPerDayToRemove(allMenusPerDayPerPerson: Future[Seq[MenuPerDayPerPerson]], userUuid: UUID, form: MenuPerDayPerPersonForm) =
-    allMenusPerDayPerPerson.map(_.filter(menu => !form.menuPerDayUuid.contains(menu.menuPerDayUuid))
-      .foreach(menu => menuPerDayPerPersonService.removeMenuPerDayPerPerson(menu.uuid)))
+  private def menusPerDayToRemove(allMenusPerDayPerPerson: Seq[MenuPerDayPerPerson], userUuid: UUID, form: MenuPerDayPerPersonForm) =
+    allMenusPerDayPerPerson.filter(menu => !form.menuPerDayUuid.contains(menu.menuPerDayUuid))
+      .foreach(menu => menuPerDayPerPersonService.removeMenuPerDayPerPerson(menu.uuid))
 
-}
-
-object MenuPerDayPerPersonController {
-  val menuPerDayPerPersonForm = Form(
-    mapping(
-      "menuPerDayUuid" -> list(of[UUID])
-    )(MenuPerDayPerPersonForm.apply)(MenuPerDayPerPersonForm.unapply)
-  )
 }
