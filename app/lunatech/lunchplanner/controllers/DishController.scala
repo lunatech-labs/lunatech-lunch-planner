@@ -1,5 +1,7 @@
 package lunatech.lunchplanner.controllers
 
+import java.util.UUID
+
 import com.google.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.{ Dish, MenuWithDishes, MenuWithNamePerDay }
@@ -21,27 +23,36 @@ class DishController @Inject() (
   implicit val connection: DBConnection)
   extends Controller with Secured with I18nSupport {
 
-  def getAllDishes(activePage: Int) = IsAdminAsync { username =>
+  def getAllDishes = IsAdminAsync { username =>
     implicit request => {
       for{
         currentUser <- UserTable.getUserByEmailAddress(username)
         dishes <- dishService.getAllDishes.map(_.toArray)
       } yield
-        Ok(views.html.admin.dishes(activePage, currentUser.get, DishForm.dishForm, dishes))
+        Ok(views.html.admin.dishes(currentUser.get, dishes))
     }
   }
+
+  def getNewDish = IsAdminAsync { username =>
+    implicit request => {
+      for{
+        currentUser <- UserTable.getUserByEmailAddress(username)
+      } yield
+        Ok(views.html.admin.newDish(currentUser.get, DishForm.dishForm))
+    }
+  }
+
 
   def createNewDish = IsAdminAsync { username =>
     implicit request => {
       for{
         currentUser <- UserTable.getUserByEmailAddress(username)
-        dishes <- dishService.getAllDishes.map(_.toArray)
         result <- DishForm
           .dishForm
           .bindFromRequest
           .fold(
             formWithErrors => Future.successful(BadRequest(
-              views.html.admin.dishes(activeTab = 0, currentUser.get, formWithErrors, dishes))),
+              views.html.admin.newDish(currentUser.get, formWithErrors))),
             dishData =>
               dishService.addNewDish(dishData).map( _ =>
                 Redirect(lunatech.lunchplanner.controllers.routes.DishController.getAllDishes()))
@@ -50,14 +61,32 @@ class DishController @Inject() (
     }
   }
 
-  def removeDish() = ???
-  def filterDishByUUID = ???
-  def filterDishByName = ???
-  def filterIsvegetarianDishes= ???
-  def filterHasSeaFoodDishes = ???
-  def filterHasPorkDishes = ???
-  def filterHasBeefDishes = ???
-  def filterHasChickenDishes = ???
-  def filterIsGlutenFreeDishes = ???
-  def filterHasLactoseDishes = ???
+  def getDishDetails(uuid: UUID) = IsAdminAsync { username =>
+    implicit request => {
+      for{
+        currentUser <- UserTable.getUserByEmailAddress(username)
+        dish <- dishService.getDishByUuid(uuid)
+      } yield
+        Ok(views.html.admin.dishDetail(currentUser.get, DishForm.dishForm, dish))
+    }
+  }
+
+  def saveDishDetails(uuid: UUID) = IsAdminAsync { username =>
+    implicit request => {
+      for{
+        currentUser <- UserTable.getUserByEmailAddress(username)
+        dish <- dishService.getDishByUuid(uuid)
+        result <- DishForm
+          .dishForm
+          .bindFromRequest
+          .fold(
+            formWithErrors => Future.successful(BadRequest(
+              views.html.admin.dishDetail(currentUser.get, formWithErrors, dish))),
+            dishData =>
+              dishService.insertOrUpdateDish(uuid, dishData).map( _ =>
+                Redirect(lunatech.lunchplanner.controllers.routes.DishController.getAllDishes()))
+          )
+      } yield result
+    }
+  }
 }
