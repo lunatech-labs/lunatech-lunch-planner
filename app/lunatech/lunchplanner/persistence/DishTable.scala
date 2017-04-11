@@ -102,12 +102,17 @@ object DishTable {
     connection.db.run(dishTable.result)
   }
 
-  def removeDish(uuid: UUID)(implicit connection: DBConnection): Future[Int]  = {
+  def removeDish(uuid: UUID)(implicit connection: DBConnection): Future[Int] = {
     dishExists(uuid).flatMap {
       case true =>
         val query = dishTable.filter(x => x.uuid === uuid).delete
         connection.db.run(query)
       case false => Future(0)
     }
+  }
+
+  def insertOrUpdate(dish: Dish)(implicit connection: DBConnection): Future[Boolean] = {
+    val query = dishTable.insertOrUpdate(dish)
+    connection.db.run(query).map(_ == 1)
   }
 }
