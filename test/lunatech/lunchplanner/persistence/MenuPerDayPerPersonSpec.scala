@@ -13,7 +13,7 @@ class MenuPerDayPerPersonTableSpec extends AcceptanceSpec with TestDatabaseProvi
   implicit private val dbConnection = app.injector.instanceOf[DBConnection]
   private val defaultTimeout = 10.seconds
 
-  private val newUser = User(name = "Leonor Boga", emailAddress ="leonor.boga@lunatech.com", isAdmin = true)
+  private val newUser = User(name = "Leonor Boga", emailAddress ="leonor.boga@lunatech.com")
   private val newMenu = Menu(name = "Main menu")
   private val newMenuPerDay = MenuPerDay(menuUuid = newMenu.uuid, date = new Date(3000000))
 

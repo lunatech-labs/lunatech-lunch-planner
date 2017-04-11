@@ -17,42 +17,38 @@ class UserTableSpec extends AcceptanceSpec with TestDatabaseProvider {
     cleanDatabase()
   }
 
-  private val newUserIsNotAdmin = User(UUID.randomUUID(), "Pedro Ferreira", "pedro.ferreira@lunatech.com")
-  private val newUserIsAdmin = User(UUID.randomUUID(), "Leonor Boga", "leonor.boga@lunatech.com", isAdmin = true)
+  private val newUser = User(UUID.randomUUID(), "Leonor Boga", "leonor.boga@lunatech.com")
+  private val newUser2 = User(UUID.randomUUID(), "Pedro Ferreira", "pedro.ferreira@lunatech.com")
 
   "A User table" must {
-    "add a new user that is not an admin user" in {
-      val result = Await.result(UserTable.addUser(newUserIsNotAdmin), defaultTimeout)
-      result mustBe newUserIsNotAdmin
-    }
-
-    "add a new user that is an admin user" in {
-      val result = Await.result(UserTable.addUser(newUserIsAdmin), defaultTimeout)
-      result mustBe newUserIsAdmin
+    "add a new user" in {
+      val result = Await.result(UserTable.addUser(newUser), defaultTimeout)
+      result mustBe newUser
     }
 
     "query for existing users successfully" in {
-      val result = Await.result(UserTable.userExists(newUserIsAdmin.uuid), defaultTimeout)
+      val result = Await.result(UserTable.userExists(newUser.uuid), defaultTimeout)
       result mustBe true
     }
 
     "query for users by uuid" in {
-      val result = Await.result(UserTable.getUserByUUID(newUserIsAdmin.uuid), defaultTimeout)
-      result mustBe Some(newUserIsAdmin)
+      val result = Await.result(UserTable.getUserByUUID(newUser.uuid), defaultTimeout)
+      result mustBe Some(newUser)
     }
 
     "query for users by email address" in {
-      val result = Await.result(UserTable.getUserByEmailAddress(newUserIsAdmin.emailAddress), defaultTimeout)
-      result mustBe Some(newUserIsAdmin)
+      val result = Await.result(UserTable.getUserByEmailAddress(newUser.emailAddress), defaultTimeout)
+      result mustBe Some(newUser)
     }
 
     "query all users" in {
+      Await.result(UserTable.addUser(newUser2), defaultTimeout)
       val result = Await.result(UserTable.getAllUsers, defaultTimeout)
-      result mustBe Vector(newUserIsNotAdmin, newUserIsAdmin)
+      result mustBe Vector(newUser, newUser2)
     }
 
     "remove an existing user by uuid" in {
-      val result = Await.result(UserTable.removeUser(newUserIsAdmin.uuid), defaultTimeout)
+      val result = Await.result(UserTable.removeUser(newUser.uuid), defaultTimeout)
       result mustBe 1
     }
 
