@@ -23,7 +23,7 @@ class DishTable(tag: Tag) extends Table[Dish](tag, "Dish") {
 
   def hasPork: Rep[Boolean] = column[Boolean]("hasPork")
 
-  def hasBeef: Rep[Boolean] = column[Boolean]("HasBeef")
+  def hasBeef: Rep[Boolean] = column[Boolean]("hasBeef")
 
   def hasChicken: Rep[Boolean] = column[Boolean]("hasChicken")
 
