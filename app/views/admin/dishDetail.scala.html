@@ -24,8 +24,13 @@
                         @b3.text( dishForm("name"), '_label -> "Name", 'placeholder -> "Short dish name", 'value -> dish.name)
                         @b3.textarea( dishForm("description"), '_label -> "Description",  'placeholder -> "Dish description", 'rows -> 4, 'value -> dish.description)
                         @b3.text( dishForm("remarks"), '_label -> "Additional remarks", 'placeholder -> "Optional", 'value -> dish.remarks.getOrElse(""))
-                        <br>
-                        @b3.submit('class -> "btn btn-primary"){ Save dish }
+                        <div class="col col-lg-2" style="padding-left: 0px">
+                            <button type="submit" class="btn btn-danger" formaction="/dish/delete/@dish.uuid">
+                                <span class="glyphicon glyphicon-remove"></span> Delete </button>
+                        </div>
+                        <div class="col col-lg-4" style="padding-left: 0px">
+                            @b3.submit('class -> "btn btn-primary"){ <span class="glyphicon glyphicon-ok"></span> Save }
+                        </div>
                     </div>
                     <div class="col col-lg-6">
                         <label style="height: 0">Extra info: </label>

@@ -13,6 +13,8 @@ GET         /logout                            lunatech.lunchplanner.controllers
 GET         /dish/all                          lunatech.lunchplanner.controllers.DishController.getAllDishes
 GET         /dish/new                          lunatech.lunchplanner.controllers.DishController.getNewDish
 POST        /dish/add                          lunatech.lunchplanner.controllers.DishController.createNewDish
+POST        /dish/delete                       lunatech.lunchplanner.controllers.DishController.deleteDishes
+POST        /dish/delete/:uuid                  lunatech.lunchplanner.controllers.DishController.deleteDish(uuid: java.util.UUID)
 GET         /dish/:uuid                        lunatech.lunchplanner.controllers.DishController.getDishDetails(uuid: java.util.UUID)
 POST        /dish/:uuid                        lunatech.lunchplanner.controllers.DishController.saveDishDetails(uuid: java.util.UUID)
 

@@ -6,9 +6,9 @@ import javax.inject.{ Inject, Singleton }
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.Dish
 import lunatech.lunchplanner.persistence.DishTable
-import lunatech.lunchplanner.viewModels.DishForm
-import scala.concurrent.ExecutionContext.Implicits.global
+import lunatech.lunchplanner.viewModels.{ DishForm, ListDishesForm }
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class DishService @Inject() (implicit val connection: DBConnection){
@@ -58,4 +58,9 @@ class DishService @Inject() (implicit val connection: DBConnection){
             addNewDish(dishForm)
         }
       }
+
+  def deleteListDishes(listDishes: ListDishesForm): Future[List[Int]] =
+    Future.sequence(listDishes.listUuids.map(DishTable.removeDish))
+
+  def deleteDish(uuid: UUID): Future[Int] = DishTable.removeDish(uuid)
 }

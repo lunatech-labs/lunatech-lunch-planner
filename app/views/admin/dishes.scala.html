@@ -1,7 +1,9 @@
+@import b3.vertical.fieldConstructor
 @import lunatech.lunchplanner.models.Dish
 @import lunatech.lunchplanner.models.User
+@import lunatech.lunchplanner.viewModels.ListDishesForm
 
-@(admin: User, listOfDishes: Array[Dish])(implicit messages: play.api.i18n.Messages)
+@(admin: User, listOfDishes: Array[Dish], listDishesForm: Form[ListDishesForm])(implicit messages: play.api.i18n.Messages)
 @main("Dishes", admin, isUserAdmin = true) {
 <!-- Nav tabs -->
 <ul class="nav nav-tabs">
@@ -13,15 +15,20 @@
         <div>
             <br>
             <label>List of dishes</label>
-            @for(index <- listOfDishes.indices) {
-                <div class="form-group  " id="dishesUuid[]">
-                    <div class="checkbox">
-                        <label for="@listOfDishes(index).uuid">
-                            <input type="checkbox" id="@listOfDishes(index).uuid" name="@listOfDishes(index).uuid">
-                            <a href="@lunatech.lunchplanner.controllers.routes.DishController.getDishDetails(listOfDishes(index).uuid)">@listOfDishes(index).name</a>
-                        </label>
+            @b3.form(lunatech.lunchplanner.controllers.routes.DishController.deleteDishes) {
+                @for(index <- listOfDishes.indices) {
+                    <div class="form-group" id="uuid">
+                        <div class="checkbox">
+                            <label for="@listOfDishes(index).uuid">
+                                <input type="checkbox" id="uuid" name="uuid[]" value="@listOfDishes(index).uuid">
+                                <a href="@lunatech.lunchplanner.controllers.routes.DishController.getDishDetails(listOfDishes(index).uuid)">@listOfDishes(index).name
+                                <span class="glyphicon glyphicon-edit"></span>
+                                </a>
+                            </label>
+                        </div>
                     </div>
-                </div>
+                }
+                @b3.submit('class -> "btn btn-primary"){ <span class="glyphicon glyphicon-remove"></span> Delete selected }
             }
         </div>
     </div>
