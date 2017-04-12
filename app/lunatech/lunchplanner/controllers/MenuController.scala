@@ -2,10 +2,10 @@ package lunatech.lunchplanner.controllers
 
 import com.google.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.{ MenuDish, MenuWithNamePerDay }
-import lunatech.lunchplanner.persistence.{ MenuDishTable }
+import lunatech.lunchplanner.models.MenuDish
+import lunatech.lunchplanner.persistence.MenuDishTable
 import lunatech.lunchplanner.services.{ DishService, MenuService, UserService }
-import lunatech.lunchplanner.viewModels.{ DishForm, MenuForm, MenuPerDayForm }
+import lunatech.lunchplanner.viewModels.MenuForm
 import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.mvc.Controller
 import play.api.{ Configuration, Environment }
@@ -23,14 +23,14 @@ class MenuController  @Inject() (
   implicit val connection: DBConnection)
   extends Controller with Secured with I18nSupport {
 
-  def getAllMenus(activePage: Int) = IsAdminAsync { username =>
+  def getAllMenus = IsAdminAsync { username =>
     implicit request => {
       for{
         currentUser <- userService.getUserByEmailAddress(username)
         dishes <- dishService.getAllDishes.map(_.toArray)
         menus <- menuService.getAllMenusWithListOfDishes.map(_.toArray)
       } yield
-        Ok(views.html.admin.menus(activePage, currentUser.get, MenuForm.menuForm, dishes, menus))
+        Ok(views.html.admin.menus(currentUser.get, MenuForm.menuForm, dishes, menus))
     }
   }
 
@@ -46,7 +46,6 @@ class MenuController  @Inject() (
           .bindFromRequest
           .fold(
             formWithErrors => Future.successful(BadRequest(views.html.admin.menus(
-              activeTab = 0,
               user.get,
               formWithErrors,
               dishes,
@@ -73,8 +72,13 @@ class MenuController  @Inject() (
     )
   }
 
-  def removeMenuDish() = ???
-  def filterDishByMenuName = ???
-  def filterDishByUUID = ???
-  def filterDishByMenuUUID = ???
+  def getNewMenu = IsAdminAsync { username =>
+    implicit request => {
+      for{
+        currentUser <- userService.getUserByEmailAddress(username)
+        dishes <- dishService.getAllDishes.map(_.toArray)
+      } yield
+        Ok(views.html.admin.newMenu(currentUser.get, MenuForm.menuForm, dishes))
+    }
+  }
 }
