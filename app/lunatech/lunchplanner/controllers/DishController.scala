@@ -65,7 +65,7 @@ class DishController @Inject() (
         currentUser <- userService.getUserByEmailAddress(username)
         dish <- dishService.getDishByUuid(uuid)
       } yield
-        Ok(views.html.admin.dish.dishDetail(currentUser.get, DishForm.dishForm, dish))
+        Ok(views.html.admin.dish.dishDetails(currentUser.get, DishForm.dishForm, dish))
     }
   }
 
@@ -79,7 +79,7 @@ class DishController @Inject() (
           .bindFromRequest
           .fold(
             formWithErrors => Future.successful(BadRequest(
-              views.html.admin.dish.dishDetail(currentUser.get, formWithErrors, dish))),
+              views.html.admin.dish.dishDetails(currentUser.get, formWithErrors, dish))),
             dishData =>
               dishService.insertOrUpdateDish(uuid, dishData).map( _ =>
                 Redirect(lunatech.lunchplanner.controllers.routes.DishController.getAllDishes()))
