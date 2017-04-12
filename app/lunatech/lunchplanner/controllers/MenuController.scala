@@ -30,7 +30,7 @@ class MenuController  @Inject() (
         dishes <- dishService.getAllDishes.map(_.toArray)
         menus <- menuService.getAllMenusWithListOfDishes.map(_.toArray)
       } yield
-        Ok(views.html.admin.menus(currentUser.get, MenuForm.menuForm, dishes, menus))
+        Ok(views.html.admin.menu.menus(currentUser.get, MenuForm.menuForm, dishes, menus))
     }
   }
 
@@ -45,7 +45,7 @@ class MenuController  @Inject() (
           .menuForm
           .bindFromRequest
           .fold(
-            formWithErrors => Future.successful(BadRequest(views.html.admin.menus(
+            formWithErrors => Future.successful(BadRequest(views.html.admin.menu.menus(
               user.get,
               formWithErrors,
               dishes,
@@ -78,7 +78,7 @@ class MenuController  @Inject() (
         currentUser <- userService.getUserByEmailAddress(username)
         dishes <- dishService.getAllDishes.map(_.toArray)
       } yield
-        Ok(views.html.admin.newMenu(currentUser.get, MenuForm.menuForm, dishes))
+        Ok(views.html.admin.menu.newMenu(currentUser.get, MenuForm.menuForm, dishes))
     }
   }
 }
