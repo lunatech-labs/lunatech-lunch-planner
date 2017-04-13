@@ -2,8 +2,8 @@ package lunatech.lunchplanner.controllers
 
 import com.google.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.services.{ DishService, MenuDishService, MenuPerDayPerPersonService, MenuPerDayService, MenuService, UserService }
-import lunatech.lunchplanner.viewModels.{ DishForm, MenuForm, MenuPerDayForm }
+import lunatech.lunchplanner.services.{ MenuDishService, MenuPerDayPerPersonService, MenuPerDayService, MenuService, UserService }
+import lunatech.lunchplanner.viewModels.MenuPerDayForm
 import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.mvc.Controller
 import play.api.{ Configuration, Environment }
@@ -26,8 +26,8 @@ class MenuPerDayController  @Inject() (
   def getAllMenusPerDay(activePage: Int) = IsAdminAsync { username =>
     implicit request => {
       for{
-        currentUser <- userService.getUserByEmailAddress(username)
-        menus <- menuDishService.getAllMenusWithListOfDishes.map(_.toArray)
+        currentUser <- userService.getByEmailAddress(username)
+        menus <- menuDishService.getAllWithListOfDishes.map(_.toArray)
         menusUuidAndNames <- menuService.getAllMenusUuidAndNames
         menusPerDay <- menuPerDayPerPersonService.getAllMenuWithNamePerDay.map(_.toArray)
       } yield
@@ -45,8 +45,8 @@ class MenuPerDayController  @Inject() (
     implicit request => {
 
       for {
-        user <- userService.getUserByEmailAddress(username)
-        menus <- menuDishService.getAllMenusWithListOfDishes.map(_.toArray)
+        user <- userService.getByEmailAddress(username)
+        menus <- menuDishService.getAllWithListOfDishes.map(_.toArray)
         menusUuidAndNames <- menuService.getAllMenusUuidAndNames
         menusPerDay <- menuPerDayPerPersonService.getAllMenuWithNamePerDay.map(_.toArray)
         result <- MenuPerDayForm
@@ -61,7 +61,7 @@ class MenuPerDayController  @Inject() (
               menusUuidAndNames,
               menusPerDay))),
             menuPerDayData => {
-              menuPerDayService.addNewMenuPerDay(menuPerDayData).map(_ =>
+              menuPerDayService.add(menuPerDayData).map(_ =>
                 Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay()))
             })
       } yield result

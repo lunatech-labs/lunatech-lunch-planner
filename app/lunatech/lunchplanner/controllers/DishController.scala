@@ -25,17 +25,17 @@ class DishController @Inject() (
   def getAllDishes = IsAdminAsync { username =>
     implicit request => {
       for{
-        currentUser <- userService.getUserByEmailAddress(username)
-        dishes <- dishService.getAllDishes.map(_.toArray)
+        currentUser <- userService.getByEmailAddress(username)
+        dishes <- dishService.getAll.map(_.toArray)
       } yield
-        Ok(views.html.admin.dish.dishes(currentUser.get, dishes, ListDishesForm.listDishesForm))
+        Ok(views.html.admin.dish.dishes(currentUser.get, ListDishesForm.listDishesForm, dishes))
     }
   }
 
   def getNewDish = IsAdminAsync { username =>
     implicit request => {
       for{
-        currentUser <- userService.getUserByEmailAddress(username)
+        currentUser <- userService.getByEmailAddress(username)
       } yield
         Ok(views.html.admin.dish.newDish(currentUser.get, DishForm.dishForm))
     }
@@ -44,7 +44,7 @@ class DishController @Inject() (
   def createNewDish = IsAdminAsync { username =>
     implicit request => {
       for{
-        currentUser <- userService.getUserByEmailAddress(username)
+        currentUser <- userService.getByEmailAddress(username)
         result <- DishForm
           .dishForm
           .bindFromRequest
@@ -52,7 +52,7 @@ class DishController @Inject() (
             formWithErrors => Future.successful(BadRequest(
               views.html.admin.dish.newDish(currentUser.get, formWithErrors))),
             dishData =>
-              dishService.addNewDish(dishData).map( _ =>
+              dishService.add(dishData).map( _ =>
                 Redirect(lunatech.lunchplanner.controllers.routes.DishController.getAllDishes()))
           )
       } yield result
@@ -62,8 +62,8 @@ class DishController @Inject() (
   def getDishDetails(uuid: UUID) = IsAdminAsync { username =>
     implicit request => {
       for{
-        currentUser <- userService.getUserByEmailAddress(username)
-        dish <- dishService.getDishByUuid(uuid)
+        currentUser <- userService.getByEmailAddress(username)
+        dish <- dishService.getByUuid(uuid)
       } yield
         Ok(views.html.admin.dish.dishDetails(currentUser.get, DishForm.dishForm, dish))
     }
@@ -72,8 +72,8 @@ class DishController @Inject() (
   def saveDishDetails(uuid: UUID) = IsAdminAsync { username =>
     implicit request => {
       for{
-        currentUser <- userService.getUserByEmailAddress(username)
-        dish <- dishService.getDishByUuid(uuid)
+        currentUser <- userService.getByEmailAddress(username)
+        dish <- dishService.getByUuid(uuid)
         result <- DishForm
           .dishForm
           .bindFromRequest
@@ -81,7 +81,7 @@ class DishController @Inject() (
             formWithErrors => Future.successful(BadRequest(
               views.html.admin.dish.dishDetails(currentUser.get, formWithErrors, dish))),
             dishData =>
-              dishService.insertOrUpdateDish(uuid, dishData).map( _ =>
+              dishService.insertOrUpdate(uuid, dishData).map( _ =>
                 Redirect(lunatech.lunchplanner.controllers.routes.DishController.getAllDishes()))
           )
       } yield result
@@ -91,16 +91,16 @@ class DishController @Inject() (
   def deleteDishes = IsAdminAsync { username =>
     implicit request => {
       for{
-        currentUser <- userService.getUserByEmailAddress(username)
-        dishes <- dishService.getAllDishes.map(_.toArray)
+        currentUser <- userService.getByEmailAddress(username)
+        dishes <- dishService.getAll.map(_.toArray)
         result <- ListDishesForm
           .listDishesForm
           .bindFromRequest
           .fold(
             formWithErrors => Future.successful(BadRequest(
-              views.html.admin.dish.dishes(currentUser.get, dishes, ListDishesForm.listDishesForm))),
+              views.html.admin.dish.dishes(currentUser.get, ListDishesForm.listDishesForm, dishes))),
             dishData =>
-              dishService.deleteListDishes(dishData).map( _ =>
+              dishService.deleteMany(dishData).map( _ =>
                 Redirect(lunatech.lunchplanner.controllers.routes.DishController.getAllDishes()))
           )
       } yield result
@@ -110,11 +110,11 @@ class DishController @Inject() (
   def deleteDish(uuid: UUID) = IsAdminAsync { username =>
     implicit request => {
       for{
-        _ <- dishService.deleteDish(uuid)
-        currentUser <- userService.getUserByEmailAddress(username)
-        dishes <- dishService.getAllDishes.map(_.toArray)
+        _ <- dishService.delete(uuid)
+        currentUser <- userService.getByEmailAddress(username)
+        dishes <- dishService.getAll.map(_.toArray)
       } yield
-        Ok(views.html.admin.dish.dishes(currentUser.get, dishes, ListDishesForm.listDishesForm))
+        Ok(views.html.admin.dish.dishes(currentUser.get, ListDishesForm.listDishesForm, dishes))
     }
   }
 }

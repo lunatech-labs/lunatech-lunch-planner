@@ -12,12 +12,12 @@ import scala.concurrent.Future
 
 class UserService @Inject() (configuration: Configuration, implicit val connection: DBConnection) {
 
-  def getUserByEmailAddress(emailAddress: String): Future[Option[User]] = UserTable.getByEmailAddress(emailAddress)
+  def getByEmailAddress(emailAddress: String): Future[Option[User]] = UserTable.getByEmailAddress(emailAddress)
 
   def isAdminUser(emailAddress: String): Boolean =
     configuration.getStringList("administrators").get.contains(emailAddress)
 
-  def addIfNewUser(emailAddress: String): Future[User] = {
+  def addIfNew(emailAddress: String): Future[User] = {
     val name = getUserNameFromEmail(emailAddress)
     val newUser = User(name = name, emailAddress = emailAddress)
 

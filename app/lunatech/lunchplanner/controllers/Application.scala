@@ -23,7 +23,7 @@ class Application @Inject() (
 
   def index = IsAuthenticatedAsync { username =>
     implicit request =>
-      userService.getUserByEmailAddress(username).flatMap(currentUser =>
+      userService.getByEmailAddress(username).flatMap(currentUser =>
         getIndexPage(currentUser))
   }
 

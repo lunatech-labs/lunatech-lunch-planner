@@ -5,9 +5,8 @@ import java.util.UUID
 import com.google.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.MenuDish
-import lunatech.lunchplanner.persistence.MenuDishTable
 import lunatech.lunchplanner.services.{ DishService, MenuDishService, MenuPerDayPerPersonService, MenuPerDayService, MenuService, UserService }
-import lunatech.lunchplanner.viewModels.{ DishForm, ListMenusForm, MenuForm }
+import lunatech.lunchplanner.viewModels.{ ListMenusForm, MenuForm }
 import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.mvc.Controller
 import play.api.{ Configuration, Environment }
@@ -31,8 +30,8 @@ class MenuController  @Inject() (
   def getAllMenus = IsAdminAsync { username =>
     implicit request => {
       for{
-        currentUser <- userService.getUserByEmailAddress(username)
-        menus <- menuDishService.getAllMenusWithListOfDishes.map(_.toArray)
+        currentUser <- userService.getByEmailAddress(username)
+        menus <- menuDishService.getAllWithListOfDishes.map(_.toArray)
       } yield
         Ok(views.html.admin.menu.menus(currentUser.get, ListMenusForm.listMenusForm, menus))
     }
@@ -41,8 +40,8 @@ class MenuController  @Inject() (
   def createNewMenu = IsAdminAsync { username =>
     implicit request => {
       for {
-        currentUser <- userService.getUserByEmailAddress(username)
-        dishes <- dishService.getAllDishes.map(_.toArray)
+        currentUser <- userService.getByEmailAddress(username)
+        dishes <- dishService.getAll.map(_.toArray)
         result <- MenuForm
           .menuForm
           .bindFromRequest
@@ -63,8 +62,8 @@ class MenuController  @Inject() (
   def getNewMenu = IsAdminAsync { username =>
     implicit request => {
       for{
-        currentUser <- userService.getUserByEmailAddress(username)
-        dishes <- dishService.getAllDishes.map(_.toArray)
+        currentUser <- userService.getByEmailAddress(username)
+        dishes <- dishService.getAll.map(_.toArray)
       } yield
         Ok(views.html.admin.menu.newMenu(currentUser.get, MenuForm.menuForm, dishes))
     }
@@ -73,8 +72,8 @@ class MenuController  @Inject() (
   def getMenuDetails(menuUuid: UUID) = IsAdminAsync { username =>
     implicit request => {
       for{
-        currentUser <- userService.getUserByEmailAddress(username)
-        menuDish <- menuDishService.getMenuDishByUuidWithSelectedDishes(menuUuid)
+        currentUser <- userService.getByEmailAddress(username)
+        menuDish <- menuDishService.getByUuidWithSelectedDishes(menuUuid)
       } yield
         Ok(views.html.admin.menu.menuDetails(currentUser.get, MenuForm.menuForm, menuDish))
     }
@@ -83,8 +82,8 @@ class MenuController  @Inject() (
   def saveMenuDetails(menuUuid: UUID) = IsAdminAsync { username =>
     implicit request => {
       for {
-        currentUser <- userService.getUserByEmailAddress(username)
-        menuDish <- menuDishService.getMenuDishByUuidWithSelectedDishes(menuUuid)
+        currentUser <- userService.getByEmailAddress(username)
+        menuDish <- menuDishService.getByUuidWithSelectedDishes(menuUuid)
         result <- MenuForm
           .menuForm
           .bindFromRequest
@@ -106,8 +105,8 @@ class MenuController  @Inject() (
         .fold(
           formWithErrors => {
             for {
-              currentUser <- userService.getUserByEmailAddress(username)
-              menuDish <- menuDishService.getMenuDishByUuidWithSelectedDishes(menuUuid)
+              currentUser <- userService.getByEmailAddress(username)
+              menuDish <- menuDishService.getByUuidWithSelectedDishes(menuUuid)
             } yield BadRequest(views.html.admin.menu.menuDetails(currentUser.get, formWithErrors, menuDish))
           },
           _ => {
@@ -120,8 +119,8 @@ class MenuController  @Inject() (
   def deleteMenus = IsAdminAsync { username =>
     implicit request => {
       for{
-        currentUser <- userService.getUserByEmailAddress(username)
-        menus <- menuDishService.getAllMenusWithListOfDishes.map(_.toArray)
+        currentUser <- userService.getByEmailAddress(username)
+        menus <- menuDishService.getAllWithListOfDishes.map(_.toArray)
         result <- ListMenusForm
           .listMenusForm
           .bindFromRequest
@@ -138,34 +137,34 @@ class MenuController  @Inject() (
 
   private def addNewMenuDishes(menuData: MenuForm) = {
     // add new menu
-   menuService.addNewMenu(menuData)
+   menuService.add(menuData)
      .flatMap(menu =>
-      //Add MenuDish
-       Future.sequence(menuData.dishesUuid.map { uuid =>
-        val newMenuDish = MenuDish(menuUuid = menu.uuid, dishUuid = uuid)
-        MenuDishTable.addMenuDish(newMenuDish)
-      }))
+      //Add MenuDishes
+       addMenuDishes(menu.uuid, menuData))
   }
 
   private def updateMenuDishes(menuUuid: UUID, menuData: MenuForm) = {
     // update menu name
-    menuService.insertOrUpdateMenu(menuUuid, menuData)
+    menuService.insertOrUpdate(menuUuid, menuData)
 
     // remove all previous menu dishes and add them again
-    menuDishService.deleteMenuDishesByMenuUuid(menuUuid)
+    menuDishService.deleteByMenuUuid(menuUuid)
+    addMenuDishes(menuUuid, menuData)
+  }
+
+  private def addMenuDishes(menuUuid: UUID, menuData: MenuForm) =
     Future.sequence(menuData.dishesUuid.map { uuid =>
       val newMenuDish = MenuDish(menuUuid = menuUuid, dishUuid = uuid)
-      MenuDishTable.addMenuDish(newMenuDish)
+      menuDishService.add(newMenuDish)
     })
-  }
 
   private def deleteMenuDish(menuUuid: UUID) = {
     for {
-      menusPerDay <- menuPerDayService.getAllMenusPerDayByMenuUuid(menuUuid)
-      _ <- Future.sequence(menusPerDay.map(mpd => menuPerDayPerPersonService.deleteMenusPerDayPerPersonByMenuPerPersonUuid(mpd.uuid)))
-      _ <- menuPerDayService.deleteMenuPerDayByMenuUuid(menuUuid)
-      _ <- menuDishService.deleteMenuDishesByMenuUuid(menuUuid)
-      result <- menuService.deleteMenu(menuUuid)
+      menusPerDay <- menuPerDayService.getAllByMenuUuid(menuUuid)
+      _ <- Future.sequence(menusPerDay.map(mpd => menuPerDayPerPersonService.deleteByMenuPerPersonUuid(mpd.uuid)))
+      _ <- menuPerDayService.deleteByMenuUuid(menuUuid)
+      _ <- menuDishService.deleteByMenuUuid(menuUuid)
+      result <- menuService.delete(menuUuid)
     } yield result
   }
 

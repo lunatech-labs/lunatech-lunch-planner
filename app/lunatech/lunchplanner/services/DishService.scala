@@ -1,7 +1,7 @@
 package lunatech.lunchplanner.services
 
 import java.util.UUID
-import javax.inject.{ Inject, Singleton }
+import javax.inject.Inject
 
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.Dish
@@ -13,7 +13,7 @@ import scala.concurrent.Future
 
 class DishService @Inject() (implicit val connection: DBConnection){
 
-  def addNewDish(dishForm: DishForm): Future[Dish] = {
+  def add(dishForm: DishForm): Future[Dish] = {
     val newDish = Dish(
       UUID.randomUUID(),
       dishForm.name,
@@ -30,12 +30,12 @@ class DishService @Inject() (implicit val connection: DBConnection){
     DishTable.add(newDish)
   }
 
-  def getAllDishes: Future[Seq[Dish]] = DishTable.getAll
+  def getAll: Future[Seq[Dish]] = DishTable.getAll
 
-  def getDishByUuid(uuid: UUID): Future[Option[Dish]] = DishTable.getByUUID(uuid)
+  def getByUuid(uuid: UUID): Future[Option[Dish]] = DishTable.getByUUID(uuid)
 
-  def insertOrUpdateDish(uuid: UUID, dishForm: DishForm): Future[Dish] = {
-    getDishByUuid(uuid)
+  def insertOrUpdate(uuid: UUID, dishForm: DishForm): Future[Dish] = {
+    getByUuid(uuid)
       .flatMap {
         case Some(dish) =>
             val updatedDish = dish.copy(
@@ -52,15 +52,15 @@ class DishService @Inject() (implicit val connection: DBConnection){
             DishTable.insertOrUpdate(updatedDish)
               .flatMap {
                 case true => Future.successful(updatedDish)
-                case false => addNewDish(dishForm)
+                case false => add(dishForm)
               }
           case None =>
-            addNewDish(dishForm)
+            add(dishForm)
         }
       }
 
-  def deleteListDishes(listDishes: ListDishesForm): Future[List[Int]] =
+  def deleteMany(listDishes: ListDishesForm): Future[List[Int]] =
     Future.sequence(listDishes.listUuids.map(DishTable.remove))
 
-  def deleteDish(uuid: UUID): Future[Int] = DishTable.remove(uuid)
+  def delete(uuid: UUID): Future[Int] = DishTable.remove(uuid)
 }

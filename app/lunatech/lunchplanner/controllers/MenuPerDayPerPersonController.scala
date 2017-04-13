@@ -27,7 +27,7 @@ class MenuPerDayPerPersonController @Inject() (
     implicit request => {
 
       for{
-        user <- userService.getUserByEmailAddress(username)
+        user <- userService.getByEmailAddress(username)
         menusPerDayPerPerson <- menuPerDayPerPersonService.getAllMenuWithNamePerDayWithDishesPerPerson(user.get.uuid).map(_.toArray)
         result <- MenuPerDayPerPersonForm
             .menuPerDayPerPersonForm
@@ -49,7 +49,7 @@ class MenuPerDayPerPersonController @Inject() (
     }
 
   private def updateMenusPerDayPerPerson(userUuid: UUID, form: MenuPerDayPerPersonForm) = {
-    menuPerDayPerPersonService.getAllMenusPerDayPerPersonByUserUuid(userUuid).map(allMenusPerDayPerPerson => {
+    menuPerDayPerPersonService.getAllByUserUuid(userUuid).map(allMenusPerDayPerPerson => {
       menusPerDayToAdd(allMenusPerDayPerPerson, userUuid, form)
       menusPerDayToRemove(allMenusPerDayPerPerson, userUuid, form)
     })
@@ -60,11 +60,11 @@ class MenuPerDayPerPersonController @Inject() (
       .filter(!menusChosen.map(_.menuPerDayUuid).contains(_))
       .foreach{ uuid =>
       val newMenuPerDayPerPerson = MenuPerDayPerPerson(menuPerDayUuid = uuid, userUuid = userUuid)
-      menuPerDayPerPersonService.addNewMenusPerDayPerPerson(newMenuPerDayPerPerson)
+      menuPerDayPerPersonService.add(newMenuPerDayPerPerson)
     }
 
   private def menusPerDayToRemove(allMenusPerDayPerPerson: Seq[MenuPerDayPerPerson], userUuid: UUID, form: MenuPerDayPerPersonForm) =
     allMenusPerDayPerPerson.filter(menu => !form.menuPerDayUuid.contains(menu.menuPerDayUuid))
-      .foreach(menu => menuPerDayPerPersonService.removeMenuPerDayPerPerson(menu.uuid))
+      .foreach(menu => menuPerDayPerPersonService.remove(menu.uuid))
 
 }

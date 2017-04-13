@@ -22,8 +22,8 @@ POST        /dish/:uuid                        lunatech.lunchplanner.controllers
 GET         /menu/all                          lunatech.lunchplanner.controllers.MenuController.getAllMenus
 GET         /menu/new                          lunatech.lunchplanner.controllers.MenuController.getNewMenu
 POST        /menu/add                          lunatech.lunchplanner.controllers.MenuController.createNewMenu
-#POST        /menu/delete                       lunatech.lunchplanner.controllers.MenuController.deleteMenus
-POST        /menu/delete/:menuUuid                 lunatech.lunchplanner.controllers.MenuController.deleteMenu(menuUuid: java.util.UUID)
+POST        /menu/delete                       lunatech.lunchplanner.controllers.MenuController.deleteMenus
+POST        /menu/delete/:menuUuid             lunatech.lunchplanner.controllers.MenuController.deleteMenu(menuUuid: java.util.UUID)
 GET         /menu/:menuUuid                    lunatech.lunchplanner.controllers.MenuController.getMenuDetails(menuUuid: java.util.UUID)
 POST        /menu/:menuUuid                    lunatech.lunchplanner.controllers.MenuController.saveMenuDetails(menuUuid: java.util.UUID)
 
