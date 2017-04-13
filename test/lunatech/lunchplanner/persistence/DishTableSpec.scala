@@ -47,30 +47,30 @@ class DishTableSpec extends AcceptanceSpec with TestDatabaseProvider {
 
   override def beforeAll {
     cleanDatabase()
-    Await.result(DishTable.addDish(vegetarianDish), defaultTimeout)
-    Await.result(DishTable.addDish(seaFoodDish), defaultTimeout)
-    Await.result(DishTable.addDish(porkDish), defaultTimeout)
-    Await.result(DishTable.addDish(chickenDish), defaultTimeout)
+    Await.result(DishTable.add(vegetarianDish), defaultTimeout)
+    Await.result(DishTable.add(seaFoodDish), defaultTimeout)
+    Await.result(DishTable.add(porkDish), defaultTimeout)
+    Await.result(DishTable.add(chickenDish), defaultTimeout)
   }
 
   "A Dish table" must {
     "add a new dish" in {
-      val result = Await.result(DishTable.addDish(pastaBologneseDish), defaultTimeout)
+      val result = Await.result(DishTable.add(pastaBologneseDish), defaultTimeout)
       result mustBe pastaBologneseDish
     }
 
     "query for existing dishes successfully" in {
-      val result = Await.result(DishTable.dishExists(pastaBologneseDish.uuid), defaultTimeout)
+      val result = Await.result(DishTable.exists(pastaBologneseDish.uuid), defaultTimeout)
       result mustBe true
     }
 
     "query for dishes by uuid" in {
-      val result = Await.result(DishTable.getDishByUUID(vegetarianDish.uuid), defaultTimeout)
+      val result = Await.result(DishTable.getByUUID(vegetarianDish.uuid), defaultTimeout)
       result mustBe Some(vegetarianDish)
     }
 
     "query for dishes by name" in {
-      val result = Await.result(DishTable.getDishByName(vegetarianDish.name), defaultTimeout)
+      val result = Await.result(DishTable.getByName(vegetarianDish.name), defaultTimeout)
       result mustBe Some(vegetarianDish)
     }
 
@@ -110,17 +110,17 @@ class DishTableSpec extends AcceptanceSpec with TestDatabaseProvider {
     }
 
     "query all dishes" in {
-      val result = Await.result(DishTable.getAllDishes, defaultTimeout)
+      val result = Await.result(DishTable.getAll, defaultTimeout)
       result mustBe Vector(vegetarianDish, seaFoodDish, porkDish, chickenDish, pastaBologneseDish)
     }
 
     "remove an existing dish by uuid" in {
-      val result = Await.result(DishTable.removeDish(vegetarianDish.uuid), defaultTimeout)
+      val result = Await.result(DishTable.remove(vegetarianDish.uuid), defaultTimeout)
       result mustBe 1
     }
 
     "not fail when trying to remove a dish that does not exist" in {
-      val result = Await.result(DishTable.removeDish(UUID.randomUUID()), defaultTimeout)
+      val result = Await.result(DishTable.remove(UUID.randomUUID()), defaultTimeout)
       result mustBe 0
     }
 
@@ -131,7 +131,7 @@ class DishTableSpec extends AcceptanceSpec with TestDatabaseProvider {
       val result = Await.result(DishTable.insertOrUpdate(updatedPastaBologneseDish), defaultTimeout)
       result mustBe true
 
-      val updatedDish = Await.result(DishTable.getDishByUUID(updatedPastaBologneseDish.uuid), defaultTimeout)
+      val updatedDish = Await.result(DishTable.getByUUID(updatedPastaBologneseDish.uuid), defaultTimeout)
       updatedDish.get.description mustBe "updated description"
     }
   }

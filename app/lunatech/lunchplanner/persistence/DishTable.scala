@@ -40,17 +40,17 @@ class DishTable(tag: Tag) extends Table[Dish](tag, "Dish") {
 object DishTable {
   val dishTable: TableQuery[DishTable] = TableQuery[DishTable]
 
-  def addDish(dish: Dish)(implicit connection: DBConnection): Future[Dish] = {
+  def add(dish: Dish)(implicit connection: DBConnection): Future[Dish] = {
     val query = dishTable returning dishTable += dish
     connection.db.run(query)
   }
 
-  def dishExists(uuid: UUID)(implicit connection: DBConnection): Future[Boolean] = {
+  def exists(uuid: UUID)(implicit connection: DBConnection): Future[Boolean] = {
     connection.db.run(dishTable.filter(_.uuid === uuid).exists.result)
   }
 
-  def getDishByUUID(uuid: UUID)(implicit connection: DBConnection): Future[Option[Dish]] = {
-    dishExists(uuid).flatMap {
+  def getByUUID(uuid: UUID)(implicit connection: DBConnection): Future[Option[Dish]] = {
+    exists(uuid).flatMap {
       case true =>
         val query = dishTable.filter(x => x.uuid === uuid)
         connection.db.run(query.result.headOption)
@@ -58,7 +58,7 @@ object DishTable {
     }
   }
 
-  def getDishByName(name: String)(implicit connection: DBConnection): Future[Option[Dish]] = {
+  def getByName(name: String)(implicit connection: DBConnection): Future[Option[Dish]] = {
     val query = dishTable.filter(_.name === name)
     connection.db.run(query.result.headOption)
   }
@@ -98,12 +98,12 @@ object DishTable {
     connection.db.run(query.result)
   }
 
-  def getAllDishes(implicit connection: DBConnection): Future[Seq[Dish]] = {
+  def getAll(implicit connection: DBConnection): Future[Seq[Dish]] = {
     connection.db.run(dishTable.result)
   }
 
-  def removeDish(uuid: UUID)(implicit connection: DBConnection): Future[Int] = {
-    dishExists(uuid).flatMap {
+  def remove(uuid: UUID)(implicit connection: DBConnection): Future[Int] = {
+    exists(uuid).flatMap {
       case true =>
         val query = dishTable.filter(x => x.uuid === uuid).delete
         connection.db.run(query)

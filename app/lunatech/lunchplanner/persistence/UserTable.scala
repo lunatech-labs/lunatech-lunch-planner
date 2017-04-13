@@ -23,21 +23,21 @@ class UserTable(tag: Tag) extends Table[User](tag, "User") {
 object UserTable {
   val userTable: TableQuery[UserTable] = TableQuery[UserTable]
 
-  def addUser(user: User)(implicit connection: DBConnection): Future[User] = {
+  def add(user: User)(implicit connection: DBConnection): Future[User] = {
     val query = userTable returning userTable += user
     connection.db.run(query)
   }
 
-  def userExists(uuid: UUID)(implicit connection: DBConnection): Future[Boolean] = {
+  def exists(uuid: UUID)(implicit connection: DBConnection): Future[Boolean] = {
     connection.db.run(userTable.filter(_.uuid === uuid).exists.result)
   }
 
-  def userWithEmailExists(emailAddress: String)(implicit connection: DBConnection): Future[Boolean] = {
+  def existsByEmail(emailAddress: String)(implicit connection: DBConnection): Future[Boolean] = {
     connection.db.run(userTable.filter(_.emailAddress === emailAddress).exists.result)
   }
 
-  def getUserByUUID(uuid: UUID)(implicit connection: DBConnection): Future[Option[User]] = {
-    userExists(uuid).flatMap {
+  def getByUUID(uuid: UUID)(implicit connection: DBConnection): Future[Option[User]] = {
+    exists(uuid).flatMap {
       case true =>
         val query = userTable.filter(x => x.uuid === uuid)
         connection.db.run(query.result.headOption)
@@ -45,17 +45,17 @@ object UserTable {
     }
   }
 
-  def getUserByEmailAddress(emailAddress: String)(implicit connection: DBConnection): Future[Option[User]] = {
+  def getByEmailAddress(emailAddress: String)(implicit connection: DBConnection): Future[Option[User]] = {
     val query = userTable.filter(_.emailAddress === emailAddress)
     connection.db.run(query.result.headOption)
   }
 
-  def getAllUsers(implicit connection: DBConnection): Future[Seq[User]] = {
+  def getAll(implicit connection: DBConnection): Future[Seq[User]] = {
     connection.db.run(userTable.result)
   }
 
-  def removeUser(uuid: UUID)(implicit connection: DBConnection): Future[Int]  = {
-    userExists(uuid).flatMap {
+  def remove(uuid: UUID)(implicit connection: DBConnection): Future[Int]  = {
+    exists(uuid).flatMap {
       case true =>
         val query = userTable.filter(x => x.uuid === uuid).delete
         connection.db.run(query)

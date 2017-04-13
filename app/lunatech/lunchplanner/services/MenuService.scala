@@ -15,10 +15,10 @@ class MenuService @Inject() (implicit val connection: DBConnection) {
 
   def addNewMenu(menuForm: MenuForm): Future[Menu] = {
     val newMenu = Menu(name = menuForm.menuName)
-    MenuTable.addMenu(newMenu)
+    MenuTable.add(newMenu)
   }
 
-  def getAllMenus: Future[Seq[Menu]] = MenuTable.getAllMenus
+  def getAllMenus: Future[Seq[Menu]] = MenuTable.getAll
 
   def getAllMenusUuidAndNames: Future[Seq[(String, String)]] = {
     val allMenus = getAllMenus
@@ -27,12 +27,12 @@ class MenuService @Inject() (implicit val connection: DBConnection) {
     )
   }
 
-  def getMenuByUuid(uuid: UUID): Future[Option[Menu]] = MenuTable.getMenuByUUID(uuid)
+  def getMenuByUuid(uuid: UUID): Future[Option[Menu]] = MenuTable.getByUUID(uuid)
 
   def insertOrUpdateMenu(menuUuid: UUID, menuForm: MenuForm): Future[Boolean] = {
     val menu = Menu(menuUuid, menuForm.menuName)
     MenuTable.insertOrUpdate(menu)
   }
 
-  def deleteMenu(uuid: UUID): Future[Int] = MenuTable.removeMenu(uuid)
+  def deleteMenu(uuid: UUID): Future[Int] = MenuTable.remove(uuid)
 }

@@ -27,12 +27,12 @@ class DishService @Inject() (implicit val connection: DBConnection){
       dishForm.hasLactose,
       dishForm.remarks)
 
-    DishTable.addDish(newDish)
+    DishTable.add(newDish)
   }
 
-  def getAllDishes: Future[Seq[Dish]] = DishTable.getAllDishes
+  def getAllDishes: Future[Seq[Dish]] = DishTable.getAll
 
-  def getDishByUuid(uuid: UUID): Future[Option[Dish]] = DishTable.getDishByUUID(uuid)
+  def getDishByUuid(uuid: UUID): Future[Option[Dish]] = DishTable.getByUUID(uuid)
 
   def insertOrUpdateDish(uuid: UUID, dishForm: DishForm): Future[Dish] = {
     getDishByUuid(uuid)
@@ -60,7 +60,7 @@ class DishService @Inject() (implicit val connection: DBConnection){
       }
 
   def deleteListDishes(listDishes: ListDishesForm): Future[List[Int]] =
-    Future.sequence(listDishes.listUuids.map(DishTable.removeDish))
+    Future.sequence(listDishes.listUuids.map(DishTable.remove))
 
-  def deleteDish(uuid: UUID): Future[Int] = DishTable.removeDish(uuid)
+  def deleteDish(uuid: UUID): Future[Int] = DishTable.remove(uuid)
 }

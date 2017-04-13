@@ -18,14 +18,14 @@ class MenuDishService @Inject() (
 
   def addNewMenuDish(menuUuid: UUID, dishUuid: UUID): Future[MenuDish] = {
     val newMenuDish = MenuDish(menuUuid = menuUuid, dishUuid = dishUuid)
-    MenuDishTable.addMenuDish(newMenuDish)
+    MenuDishTable.add(newMenuDish)
   }
 
   def getAllMenusWithListOfDishes: Future[Seq[MenuWithDishes]] = {
     val allMenus = menuService.getAllMenus
     allMenus.flatMap {
       Future.traverse(_) { menu =>
-        MenuDishTable.getMenuDishByMenuUuid(menu.uuid)
+        MenuDishTable.getByMenuUuid(menu.uuid)
           .flatMap(Future.traverse(_)(dish =>
             dishService.getDishByUuid(dish.dishUuid)).map(_.flatten))
           .map(dishes =>
@@ -35,7 +35,7 @@ class MenuDishService @Inject() (
   }
 
   def deleteMenuDishesByMenuUuid(menuUuid: UUID): Future[Int] =
-    MenuDishTable.removeMenuDishesByMenuUuid(menuUuid)
+    MenuDishTable.removeByMenuUuid(menuUuid)
 
   def getMenuDishByUuidWithSelectedDishes(menuUuid: UUID): Future[Option[MenuWithAllDishesAndIsSelected]] = {
     for{
@@ -52,7 +52,7 @@ class MenuDishService @Inject() (
   }
 
   private def getDishIsSelected(menuUuid: UUID, dishUuid: UUID): Future[Boolean] = {
-    MenuDishTable.getMenuDishByMenuUuid(menuUuid)
+    MenuDishTable.getByMenuUuid(menuUuid)
     .map(_.exists((dish: MenuDish) => dish.dishUuid == dishUuid))
   }
 }

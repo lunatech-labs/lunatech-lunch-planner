@@ -41,57 +41,57 @@ class MenuDishTableSpec extends AcceptanceSpec with TestDatabaseProvider {
   override def beforeAll {
     cleanDatabase()
 
-    Await.result(MenuTable.addMenu(newMenu), defaultTimeout)
-    Await.result(DishTable.addDish(pastaBologneseDish), defaultTimeout)
-    Await.result(DishTable.addDish(vegetarianDish), defaultTimeout)
+    Await.result(MenuTable.add(newMenu), defaultTimeout)
+    Await.result(DishTable.add(pastaBologneseDish), defaultTimeout)
+    Await.result(DishTable.add(vegetarianDish), defaultTimeout)
   }
 
   "A MenuDish table" must {
     "add a new menu dish" in {
-      val result = Await.result(MenuDishTable.addMenuDish(newMenuDish), defaultTimeout)
+      val result = Await.result(MenuDishTable.add(newMenuDish), defaultTimeout)
       result mustBe newMenuDish
     }
 
     "query for existing menus dishes successfully" in {
-      val result = Await.result(MenuDishTable.menuDishExists(newMenuDish.uuid), defaultTimeout)
+      val result = Await.result(MenuDishTable.exists(newMenuDish.uuid), defaultTimeout)
       result mustBe true
     }
 
     "query for menus dishes by uuid" in {
-      val result = Await.result(MenuDishTable.getMenuDishByUuid(newMenuDish.uuid), defaultTimeout)
+      val result = Await.result(MenuDishTable.getByUuid(newMenuDish.uuid), defaultTimeout)
       result mustBe Some(newMenuDish)
     }
 
     "query for menus dishes by menu uuid" in {
-      Await.result(MenuDishTable.addMenuDish(newMenuDishVegetarian), defaultTimeout)
+      Await.result(MenuDishTable.add(newMenuDishVegetarian), defaultTimeout)
 
-      val result = Await.result(MenuDishTable.getMenuDishByMenuUuid(newMenu.uuid), defaultTimeout)
+      val result = Await.result(MenuDishTable.getByMenuUuid(newMenu.uuid), defaultTimeout)
       result mustBe Vector(newMenuDish, newMenuDishVegetarian)
     }
 
     "query for menus dishes by non existent menu uuid" in {
-      val result = Await.result(MenuDishTable.getMenuDishByMenuUuid(UUID.randomUUID()), defaultTimeout)
+      val result = Await.result(MenuDishTable.getByMenuUuid(UUID.randomUUID()), defaultTimeout)
       result mustBe Vector()
     }
 
     "query all menus dishes" in {
-      val result = Await.result(MenuDishTable.getAllMenuDishes, defaultTimeout)
+      val result = Await.result(MenuDishTable.getAll, defaultTimeout)
       result mustBe Vector(newMenuDish, newMenuDishVegetarian)
     }
 
     "remove an existing menu dish by uuid" in {
-      val result = Await.result(MenuDishTable.removeMenuDish(newMenuDish.uuid), defaultTimeout)
+      val result = Await.result(MenuDishTable.remove(newMenuDish.uuid), defaultTimeout)
       result mustBe 1
     }
 
     "remove an existing menu dish by menu uuid" in {
-      Await.result(MenuDishTable.addMenuDish(newMenuDish), defaultTimeout)
-      val result = Await.result(MenuDishTable.removeMenuDishesByMenuUuid(newMenu.uuid), defaultTimeout)
+      Await.result(MenuDishTable.add(newMenuDish), defaultTimeout)
+      val result = Await.result(MenuDishTable.removeByMenuUuid(newMenu.uuid), defaultTimeout)
       result mustBe 2
     }
 
     "not fail when trying to remove a menu that does not exist" in {
-      val result = Await.result(MenuDishTable.removeMenuDish(UUID.randomUUID()), defaultTimeout)
+      val result = Await.result(MenuDishTable.remove(UUID.randomUUID()), defaultTimeout)
       result mustBe 0
     }
   }

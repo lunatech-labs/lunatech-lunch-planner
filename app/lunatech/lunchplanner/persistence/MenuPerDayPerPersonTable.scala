@@ -32,17 +32,17 @@ class MenuPerDayPerPersonTable(tag: Tag) extends Table[MenuPerDayPerPerson](tag,
 object MenuPerDayPerPersonTable {
   val menuPerDayPerPersonTable: TableQuery[MenuPerDayPerPersonTable] = TableQuery[MenuPerDayPerPersonTable]
 
-  def addMenuPerDayPerPerson(menuPerDayPerPerson: MenuPerDayPerPerson)(implicit connection: DBConnection): Future[MenuPerDayPerPerson] = {
+  def add(menuPerDayPerPerson: MenuPerDayPerPerson)(implicit connection: DBConnection): Future[MenuPerDayPerPerson] = {
     val query = menuPerDayPerPersonTable returning menuPerDayPerPersonTable += menuPerDayPerPerson
     connection.db.run(query)
   }
 
-  def menuPerDayPerPersonExists(uuid: UUID)(implicit connection: DBConnection): Future[Boolean] = {
+  def exists(uuid: UUID)(implicit connection: DBConnection): Future[Boolean] = {
     connection.db.run(menuPerDayPerPersonTable.filter(_.uuid === uuid).exists.result)
   }
 
-  def getMenuPerDayPerPersonByUUID(uuid: UUID)(implicit connection: DBConnection): Future[Option[MenuPerDayPerPerson]] = {
-    menuPerDayPerPersonExists(uuid).flatMap {
+  def getByUUID(uuid: UUID)(implicit connection: DBConnection): Future[Option[MenuPerDayPerPerson]] = {
+    exists(uuid).flatMap {
       case true =>
         val query = menuPerDayPerPersonTable.filter(x => x.uuid === uuid)
         connection.db.run(query.result.headOption)
@@ -50,31 +50,31 @@ object MenuPerDayPerPersonTable {
     }
   }
 
-  def getMenuPerDayPerPersonByMenuPerDayUuid(menuPerDayUuid: UUID)(implicit connection: DBConnection): Future[Seq[MenuPerDayPerPerson]] = {
+  def getByMenuPerDayUuid(menuPerDayUuid: UUID)(implicit connection: DBConnection): Future[Seq[MenuPerDayPerPerson]] = {
     val query = menuPerDayPerPersonTable.filter(_.menuPerDayUuid === menuPerDayUuid)
     connection.db.run(query.result)
   }
 
-  def getMenuPerDayPerPersonByUserUuid(userUuid: UUID)(implicit connection: DBConnection): Future[Seq[MenuPerDayPerPerson]] = {
+  def getByUserUuid(userUuid: UUID)(implicit connection: DBConnection): Future[Seq[MenuPerDayPerPerson]] = {
     val query = menuPerDayPerPersonTable.filter(_.userUuid === userUuid)
     connection.db.run(query.result)
   }
 
-  def getMenuPerDayPerPersonByUserUuidAndMenuPerDayUuid(userUuid: UUID, menuPerDayUuid: UUID)(implicit connection: DBConnection): Future[Option[MenuPerDayPerPerson]] = {
+  def getByUserUuidAndMenuPerDayUuid(userUuid: UUID, menuPerDayUuid: UUID)(implicit connection: DBConnection): Future[Option[MenuPerDayPerPerson]] = {
     val query = menuPerDayPerPersonTable.filter(_.userUuid === userUuid).filter(_.menuPerDayUuid === menuPerDayUuid)
     connection.db.run(query.result.headOption)
   }
 
-  def getAllMenuPerDayPerPersons(implicit connection: DBConnection): Future[Seq[MenuPerDayPerPerson]] = {
+  def getAll(implicit connection: DBConnection): Future[Seq[MenuPerDayPerPerson]] = {
     connection.db.run(menuPerDayPerPersonTable.result)
   }
 
-  def removeMenuPerDayPerPerson(uuid: UUID)(implicit connection: DBConnection): Future[Int]  = {
+  def remove(uuid: UUID)(implicit connection: DBConnection): Future[Int]  = {
       val query = menuPerDayPerPersonTable.filter(x => x.uuid === uuid).delete
       connection.db.run(query)
   }
 
-  def removeMenuPerDayPerPersonByMenuPerDayUuid(menuUuid: UUID)(implicit connection: DBConnection): Future[Int]  = {
+  def removeByMenuPerDayUuid(menuUuid: UUID)(implicit connection: DBConnection): Future[Int]  = {
     val query = menuPerDayPerPersonTable.filter(x => x.menuPerDayUuid === menuUuid).delete
     connection.db.run(query)
   }

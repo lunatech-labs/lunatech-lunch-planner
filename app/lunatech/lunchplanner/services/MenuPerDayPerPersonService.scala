@@ -17,9 +17,9 @@ class MenuPerDayPerPersonService  @Inject() (
   implicit val connection: DBConnection) {
 
   def addNewMenusPerDayPerPerson(menuPerDayPerPerson: MenuPerDayPerPerson): Future[MenuPerDayPerPerson] =
-    MenuPerDayPerPersonTable.addMenuPerDayPerPerson(menuPerDayPerPerson)
+    MenuPerDayPerPersonTable.add(menuPerDayPerPerson)
 
-  def getAllMenusPerDayPerPersonByUserUuid(userUuid: UUID): Future[Seq[MenuPerDayPerPerson]] = MenuPerDayPerPersonTable.getMenuPerDayPerPersonByUserUuid(userUuid)
+  def getAllMenusPerDayPerPersonByUserUuid(userUuid: UUID): Future[Seq[MenuPerDayPerPerson]] = MenuPerDayPerPersonTable.getByUserUuid(userUuid)
 
   def getAllMenuWithNamePerDayPerPerson(userUuid: UUID): Future[Seq[MenuWithNamePerDayPerPerson]]  = {
     val allMenusWithNamePerDay = getAllMenuWithNamePerDay
@@ -38,7 +38,7 @@ class MenuPerDayPerPersonService  @Inject() (
 
     allMenusWithNamePerDay.flatMap {
       Future.traverse(_) { menuWithNamePerDay =>
-        MenuDishTable.getMenuDishByMenuUuid(menuWithNamePerDay.menuUuid)
+        MenuDishTable.getByMenuUuid(menuWithNamePerDay.menuUuid)
           .flatMap(Future.traverse(_)(dish =>
             dishService.getDishByUuid(dish.dishUuid)).map(_.flatten))
           .flatMap { dishes =>
@@ -51,13 +51,13 @@ class MenuPerDayPerPersonService  @Inject() (
   }
 
   def isMenuPerDaySelectedForPerson(userUuid: UUID, menuPerDayUuid: UUID): Future[Boolean] =
-    MenuPerDayPerPersonTable.getMenuPerDayPerPersonByUserUuidAndMenuPerDayUuid(userUuid, menuPerDayUuid).map(_.isDefined)
+    MenuPerDayPerPersonTable.getByUserUuidAndMenuPerDayUuid(userUuid, menuPerDayUuid).map(_.isDefined)
 
   def removeMenuPerDayPerPerson(menuPerDayPerPersonUuid: UUID): Future[Int] =
-    MenuPerDayPerPersonTable.removeMenuPerDayPerPerson(menuPerDayPerPersonUuid)
+    MenuPerDayPerPersonTable.remove(menuPerDayPerPersonUuid)
 
   def getNumberOfMenusPerDayPerPersonForMenuPerDay(menuPerDayUuid: UUID): Future[Int] =
-    MenuPerDayPerPersonTable.getMenuPerDayPerPersonByMenuPerDayUuid(menuPerDayUuid).map(_.length)
+    MenuPerDayPerPersonTable.getByMenuPerDayUuid(menuPerDayUuid).map(_.length)
 
   def getAllMenuWithNamePerDay: Future[Seq[MenuWithNamePerDay]] = {
     val allMenusPerDay = menuPerDayService.getAllMenusPerDay
@@ -78,5 +78,5 @@ class MenuPerDayPerPersonService  @Inject() (
   }
 
   def deleteMenusPerDayPerPersonByMenuPerPersonUuid(menuPerDayUuid: UUID): Future[Int] =
-    MenuPerDayPerPersonTable.removeMenuPerDayPerPersonByMenuPerDayUuid(menuPerDayUuid)
+    MenuPerDayPerPersonTable.removeByMenuPerDayUuid(menuPerDayUuid)
 }
