@@ -1,14 +1,15 @@
 package lunatech.lunchplanner.services
 
 import java.sql.Date
+import java.util.UUID
 import javax.inject.Inject
 
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.{ MenuPerDay, MenuWithNamePerDay }
 import lunatech.lunchplanner.persistence.MenuPerDayTable
 import lunatech.lunchplanner.viewModels.MenuPerDayForm
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class MenuPerDayService @Inject() (
@@ -21,4 +22,7 @@ class MenuPerDayService @Inject() (
   }
 
   def getAllMenusPerDay: Future[Seq[MenuPerDay]] = MenuPerDayTable.getAllMenuPerDays
+
+  def deleteMenuPerDayByMenuUuid(menuUuid: UUID): Future[Int] =
+    MenuPerDayTable.removeMenuPerDayByMenuUuid(menuUuid)
 }
