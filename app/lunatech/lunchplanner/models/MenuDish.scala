@@ -7,3 +7,15 @@ case class MenuDish(
   menuUuid: UUID,
   dishUuid: UUID
 )
+
+case class MenuWithDishes(
+  uuid: UUID,
+  name: String,
+  listOfDishes: Seq[Dish]
+)
+
+case class MenuWithAllDishesAndIsSelected(
+  uuid: UUID,
+  name: String,
+  listOfDishes: Seq[DishIsSelected]
+)

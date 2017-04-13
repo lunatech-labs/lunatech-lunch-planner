@@ -23,6 +23,9 @@ class MenuPerDayService @Inject() (
 
   def getAllMenusPerDay: Future[Seq[MenuPerDay]] = MenuPerDayTable.getAllMenuPerDays
 
+  def getAllMenusPerDayByMenuUuid(menuUuid: UUID): Future[Seq[MenuPerDay]] =
+    MenuPerDayTable.getMenuPerDayByMenuUuid(menuUuid)
+
   def deleteMenuPerDayByMenuUuid(menuUuid: UUID): Future[Int] =
     MenuPerDayTable.removeMenuPerDayByMenuUuid(menuUuid)
 }

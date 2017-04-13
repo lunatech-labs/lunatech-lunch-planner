@@ -18,6 +18,12 @@ case class Dish (
   remarks: Option[String] = None
 )
 
+case class DishIsSelected (
+  uuid: UUID = UUID.randomUUID(),
+  name: String,
+  isSelected: Boolean
+)
+
 object Dish {
   implicit val dishFormat: OFormat[Dish] = Json.format[Dish]
 }

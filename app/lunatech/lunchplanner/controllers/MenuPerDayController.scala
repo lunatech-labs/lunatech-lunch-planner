@@ -2,7 +2,7 @@ package lunatech.lunchplanner.controllers
 
 import com.google.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.services.{ DishService, MenuPerDayPerPersonService, MenuPerDayService, MenuService, UserService }
+import lunatech.lunchplanner.services.{ DishService, MenuDishService, MenuPerDayPerPersonService, MenuPerDayService, MenuService, UserService }
 import lunatech.lunchplanner.viewModels.{ DishForm, MenuForm, MenuPerDayForm }
 import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.mvc.Controller
@@ -14,6 +14,7 @@ import scala.concurrent.Future
 class MenuPerDayController  @Inject() (
   userService: UserService,
   menuService: MenuService,
+  menuDishService: MenuDishService,
   menuPerDayService: MenuPerDayService,
   menuPerDayPerPersonService: MenuPerDayPerPersonService,
   val environment: Environment,
@@ -26,7 +27,7 @@ class MenuPerDayController  @Inject() (
     implicit request => {
       for{
         currentUser <- userService.getUserByEmailAddress(username)
-        menus <- menuService.getAllMenusWithListOfDishes.map(_.toArray)
+        menus <- menuDishService.getAllMenusWithListOfDishes.map(_.toArray)
         menusUuidAndNames <- menuService.getAllMenusUuidAndNames
         menusPerDay <- menuPerDayPerPersonService.getAllMenuWithNamePerDay.map(_.toArray)
       } yield
@@ -45,7 +46,7 @@ class MenuPerDayController  @Inject() (
 
       for {
         user <- userService.getUserByEmailAddress(username)
-        menus <- menuService.getAllMenusWithListOfDishes.map(_.toArray)
+        menus <- menuDishService.getAllMenusWithListOfDishes.map(_.toArray)
         menusUuidAndNames <- menuService.getAllMenusUuidAndNames
         menusPerDay <- menuPerDayPerPersonService.getAllMenuWithNamePerDay.map(_.toArray)
         result <- MenuPerDayForm
