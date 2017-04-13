@@ -1,0 +1,28 @@
+@import b3.vertical.fieldConstructor
+@import lunatech.lunchplanner.models.User
+@import lunatech.lunchplanner.models.MenuWithDishes
+@import lunatech.lunchplanner.models.MenuWithNamePerDay
+@import lunatech.lunchplanner.viewModels.MenuPerDayForm
+
+@(admin: User, menuPerDayForm: Form[MenuPerDayForm], listOfMenus: Array[MenuWithDishes], listOfMenusPerDay: Array[MenuWithNamePerDay])(implicit messages: play.api.i18n.Messages)
+@main("New schedule", admin, isUserAdmin = true) {
+<!-- Nav tabs -->
+<ul class="nav nav-tabs">
+    <li role="presentation"><a  href="@lunatech.lunchplanner.controllers.routes.MenuPerDayController.getNewMenuPerDay">Create new</a></li>
+    <li role="presentation" class="active"><a data-toggle="tab" href="#list">All schedules</a></li>
+</ul>
+
+<!-- Tab panes -->
+<div class="tab-content">
+    <!-- Menus Per Day -->
+    <div role="tabpanel" class="tab-pane active" id="list">
+        <div>
+            <br>
+            <label>List of menus per day</label>
+            @for(index <- listOfMenusPerDay.indices) {
+                @b3.checkbox( menuPerDayForm("uuid[]"), '_text -> (listOfMenusPerDay(index).menuDateAndName + " (" + listOfMenusPerDay(index).numberOfPeopleSignedIn + " people attending)"), 'value -> listOfMenusPerDay(index).uuid)
+            }
+        </div>
+    </div>
+</div>
+}

@@ -3,7 +3,7 @@ package lunatech.lunchplanner.controllers
 import com.google.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.services.{ MenuDishService, MenuPerDayPerPersonService, MenuPerDayService, MenuService, UserService }
-import lunatech.lunchplanner.viewModels.MenuPerDayForm
+import lunatech.lunchplanner.viewModels.{ MenuForm, MenuPerDayForm }
 import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.mvc.Controller
 import play.api.{ Configuration, Environment }
@@ -22,25 +22,22 @@ class MenuPerDayController  @Inject() (
   implicit val connection: DBConnection)
   extends Controller with Secured with I18nSupport {
 
-  def getAllMenusPerDay(activePage: Int) = IsAdminAsync { username =>
+  def getAllMenusPerDay = IsAdminAsync { username =>
     implicit request => {
       for{
         currentUser <- userService.getByEmailAddress(username)
         menus <- menuDishService.getAllWithListOfDishes.map(_.toArray)
-        menusUuidAndNames <- menuService.getAllMenusUuidAndNames
         menusPerDay <- menuPerDayPerPersonService.getAllMenuWithNamePerDay.map(_.toArray)
       } yield
-        Ok(views.html.admin.menusPerDay(
-          activePage,
+        Ok(views.html.admin.menuPerDay.menusPerDay(
           currentUser.get,
           MenuPerDayForm.menuPerDayForm,
           menus,
-          menusUuidAndNames,
           menusPerDay))
     }
   }
 
-  def createNewMenuPerDay() = IsAdminAsync { username =>
+  def createNewMenuPerDay = IsAdminAsync { username =>
     implicit request => {
       MenuPerDayForm
         .menuPerDayForm
@@ -49,20 +46,25 @@ class MenuPerDayController  @Inject() (
           formWithErrors => {
             for {
               user <- userService.getByEmailAddress(username)
-              menus <- menuDishService.getAllWithListOfDishes.map(_.toArray)
               menusUuidAndNames <- menuService.getAllMenusUuidAndNames
-              menusPerDay <- menuPerDayPerPersonService.getAllMenuWithNamePerDay.map(_.toArray)
-            } yield BadRequest(views.html.admin.menusPerDay(
-              activeTab = 0,
+            } yield BadRequest(views.html.admin.menuPerDay.newMenuPerDay(
               user.get,
               formWithErrors,
-              menus,
-              menusUuidAndNames,
-              menusPerDay))},
+              menusUuidAndNames))},
           menuPerDayData => {
             menuPerDayService.add(menuPerDayData).map(_ =>
               Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay()))
           })
+    }
+  }
+
+  def getNewMenuPerDay = IsAdminAsync { username =>
+    implicit request => {
+      for{
+        currentUser <- userService.getByEmailAddress(username)
+        menusUuidAndNames <- menuService.getAllMenusUuidAndNames
+      } yield
+        Ok(views.html.admin.menuPerDay.newMenuPerDay(currentUser.get, MenuPerDayForm.menuPerDayForm, menusUuidAndNames))
     }
   }
 

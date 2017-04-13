@@ -28,8 +28,9 @@ GET         /menu/:menuUuid                    lunatech.lunchplanner.controllers
 POST        /menu/:menuUuid                    lunatech.lunchplanner.controllers.MenuController.saveMenuDetails(menuUuid: java.util.UUID)
 
 # Menu per day
-GET        /menuPerDay/all                     lunatech.lunchplanner.controllers.MenuPerDayController.getAllMenusPerDay(activePage: Int ?= 0)
-POST       /menuPerDay/add                     lunatech.lunchplanner.controllers.MenuPerDayController.createNewMenuPerDay
+GET         /menuPerDay/all                    lunatech.lunchplanner.controllers.MenuPerDayController.getAllMenusPerDay
+GET         /menuPerDay/new                    lunatech.lunchplanner.controllers.MenuPerDayController.getNewMenuPerDay
+POST        /menuPerDay/add                    lunatech.lunchplanner.controllers.MenuPerDayController.createNewMenuPerDay
 
 # Menu per day per person
 POST        /menuPerDayPerPerson/add           lunatech.lunchplanner.controllers.MenuPerDayPerPersonController.createNewMenuPerDayPerPerson
