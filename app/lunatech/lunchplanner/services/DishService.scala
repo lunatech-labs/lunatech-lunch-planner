@@ -59,8 +59,5 @@ class DishService @Inject() (implicit val connection: DBConnection){
         }
       }
 
-  def deleteMany(listDishes: ListDishesForm): Future[List[Int]] =
-    Future.sequence(listDishes.listUuids.map(DishTable.remove))
-
   def delete(uuid: UUID): Future[Int] = DishTable.remove(uuid)
 }

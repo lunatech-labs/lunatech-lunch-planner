@@ -35,6 +35,9 @@ class MenuDishService @Inject() (
   def deleteByMenuUuid(menuUuid: UUID): Future[Int] =
     MenuDishTable.removeByMenuUuid(menuUuid)
 
+  def deleteByDishUuid(dishUuid: UUID): Future[Int] =
+    MenuDishTable.removeByDishUuid(dishUuid)
+
   def getByUuidWithSelectedDishes(menuUuid: UUID): Future[Option[MenuWithAllDishesAndIsSelected]] = {
     for{
       menuOption <- menuService.getByUuid(menuUuid)
