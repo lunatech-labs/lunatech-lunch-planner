@@ -84,15 +84,21 @@ class MenuDishTableSpec extends AcceptanceSpec with TestDatabaseProvider {
       result mustBe 1
     }
 
+    "not fail when trying to remove a menu that does not exist" in {
+      val result = Await.result(MenuDishTable.remove(UUID.randomUUID()), defaultTimeout)
+      result mustBe 0
+    }
+
     "remove an existing menu dish by menu uuid" in {
       Await.result(MenuDishTable.add(newMenuDish), defaultTimeout)
       val result = Await.result(MenuDishTable.removeByMenuUuid(newMenu.uuid), defaultTimeout)
       result mustBe 2
     }
 
-    "not fail when trying to remove a menu that does not exist" in {
-      val result = Await.result(MenuDishTable.remove(UUID.randomUUID()), defaultTimeout)
-      result mustBe 0
+    "remove an existing menu dish by dish uuid" in {
+      Await.result(MenuDishTable.add(newMenuDish), defaultTimeout)
+      val result = Await.result(MenuDishTable.removeByDishUuid(newMenuDish.dishUuid), defaultTimeout)
+      result mustBe 1
     }
   }
 }

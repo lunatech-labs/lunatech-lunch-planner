@@ -65,5 +65,10 @@ object MenuDishTable {
     val query = menuDishTable.filter(x => x.menuUuid === menuUuid).delete
     connection.db.run(query)
   }
+
+  def removeByDishUuid(dishUuid: UUID)(implicit connection: DBConnection) = {
+    val query = menuDishTable.filter(x => x.dishUuid === dishUuid).delete
+    connection.db.run(query)
+  }
 }
 
