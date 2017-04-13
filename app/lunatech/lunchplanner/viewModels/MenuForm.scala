@@ -22,3 +22,13 @@ object MenuForm {
     )(MenuForm.apply)(MenuForm.unapply)
   )
 }
+
+case class ListMenusForm(listUuids: List[UUID])
+
+object ListMenusForm {
+  val listMenusForm = Form(
+    mapping(
+      "uuid" -> list(of[UUID])
+    )(ListMenusForm.apply)(ListMenusForm.unapply)
+  )
+}

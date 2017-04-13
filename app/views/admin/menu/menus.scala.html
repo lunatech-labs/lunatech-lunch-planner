@@ -2,9 +2,9 @@
 @import lunatech.lunchplanner.models.Dish
 @import lunatech.lunchplanner.models.User
 @import lunatech.lunchplanner.models.MenuWithDishes
-@import lunatech.lunchplanner.viewModels.MenuForm
+@import lunatech.lunchplanner.viewModels.ListMenusForm
 
-@(admin: User, menuForm: Form[MenuForm], listOfMenus: Array[MenuWithDishes])(implicit messages: play.api.i18n.Messages)
+@(admin: User, listMenusForm: Form[ListMenusForm], listOfMenus: Array[MenuWithDishes])(implicit messages: play.api.i18n.Messages)
 @main("Menus", admin, isUserAdmin = true) {
 <!-- Nav tabs -->
 <ul class="nav nav-tabs">
@@ -16,22 +16,26 @@
         <div>
             <br>
             <label>List of menus</label>
-            @for(index <- listOfMenus.indices) {
-                <div class="form-group" id="uuid">
-                    <div class="checkbox">
-                        <label for="@listOfMenus(index).uuid">
-                            <input type="checkbox" id="uuid" name="uuid[]" value="@listOfMenus(index).uuid">
-                            <a href="@lunatech.lunchplanner.controllers.routes.MenuController.getMenuDetails(listOfMenus(index).uuid)">@listOfMenus(index).name
-                                <span class="glyphicon glyphicon-pencil"></span>
-                            </a>
-                        </label>
+            @b3.form(lunatech.lunchplanner.controllers.routes.MenuController.deleteMenus) {
+                @for(index <- listOfMenus.indices) {
+                    <div class="form-group" id="uuid">
+                        <div class="checkbox">
+                            <label for="@listOfMenus(index).uuid">
+                                <input type="checkbox" id="uuid" name="uuid[]" value="@listOfMenus(index).uuid">
+                                <a href="@lunatech.lunchplanner.controllers.routes.MenuController.getMenuDetails(listOfMenus(index).uuid)">@listOfMenus(index).name
+                                    <span class="glyphicon glyphicon-pencil"></span>
+                                </a>
+                            </label>
+                        </div>
                     </div>
-                </div>
-                <div style="margin-left: 20px; margin-top: -10px">
-                    @for(dishIndex <- listOfMenus(index).listOfDishes.indices) {
-                        <label style="font-weight: normal; font-size: 12px">@listOfMenus(index).listOfDishes(dishIndex).name</label> <br>
-                    }
-                </div>
+                    <div style="margin-left: 20px; margin-top: -10px">
+                        @for(dishIndex <- listOfMenus(index).listOfDishes.indices) {
+                            <label style="font-weight: normal; font-size: 12px">@listOfMenus(index).listOfDishes(dishIndex).name</label> <br>
+                        }
+                    </div>
+                }
+                <br>
+                @b3.submit('class -> "btn btn-primary"){ <span class="glyphicon glyphicon-remove"></span> Delete selected }
             }
         </div>
     </div>
