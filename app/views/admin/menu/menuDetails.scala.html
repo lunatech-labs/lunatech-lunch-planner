@@ -1,0 +1,48 @@
+@import b3.vertical.fieldConstructor
+@import lunatech.lunchplanner.models.MenuWithAllDishesAndIsSelected
+@import lunatech.lunchplanner.models.User
+@import lunatech.lunchplanner.viewModels.MenuForm
+
+@(admin: User, menuForm: Form[MenuForm], menuDishOption: Option[MenuWithAllDishesAndIsSelected])(implicit messages: play.api.i18n.Messages)
+@main("Menu details", admin, isUserAdmin = true) {
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs">
+        <li role="presentation"><a href="@lunatech.lunchplanner.controllers.routes.MenuController.getNewMenu">Create new</a></li>
+        <li role="presentation"><a href="@lunatech.lunchplanner.controllers.routes.MenuController.getAllMenus">All menus</a></li>
+        <li role="presentation" class="active"><a data-toggle="tab" href="#menuDetail">Menu details</a></li>
+    </ul>
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="menuDetail">
+            <br>
+            @menuDishOption match {
+                case None => { <label>Error retrieving the menu!!</label> }
+                case Some(menuDish) => {
+                    @b3.form(lunatech.lunchplanner.controllers.routes.MenuController.saveMenuDetails(menuDish.uuid)) {
+                        <div class="row">
+                            <div class="col col-lg-6">
+                                @b3.text( menuForm("menuName"), '_label -> "Name", 'placeholder -> "Short menu name", 'value -> menuDish.name)
+
+                                @for(index <- menuDish.listOfDishes.indices) {
+                                    @b3.checkbox(menuForm("dishesUuid[]"), '_text -> menuDish.listOfDishes(index).name, 'value -> menuDish.listOfDishes(index).uuid, 'checked -> menuDish.listOfDishes(index).isSelected)
+                                }
+                                <div class="col col-lg-2" style="padding-left: 0px">
+                                    <a href="@lunatech.lunchplanner.controllers.routes.MenuController.getAllMenus" type="button" class="btn btn-default">
+                                        <span class="glyphicon glyphicon-arrow-left"></span> Cancel
+                                    </a>
+                                </div>
+                                <div class="col col-lg-2">
+                                    @b3.submit('class -> "btn btn-primary"){ <span class="glyphicon glyphicon-ok"></span> Save }
+                                </div>
+                                <div class="col col-lg-2">
+                                    <button type="submit" class="btn btn-danger" formaction="/menu/delete/@menuDish.uuid">
+                                        <span class="glyphicon glyphicon-remove"></span> Delete </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            }
+        </div>
+    </div>
+}
+
