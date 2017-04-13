@@ -9,7 +9,6 @@ import play.api.mvc.Controller
 import play.api.{ Configuration, Environment }
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 class MenuPerDayController  @Inject() (
   userService: UserService,
@@ -43,28 +42,27 @@ class MenuPerDayController  @Inject() (
 
   def createNewMenuPerDay() = IsAdminAsync { username =>
     implicit request => {
-
-      for {
-        user <- userService.getByEmailAddress(username)
-        menus <- menuDishService.getAllWithListOfDishes.map(_.toArray)
-        menusUuidAndNames <- menuService.getAllMenusUuidAndNames
-        menusPerDay <- menuPerDayPerPersonService.getAllMenuWithNamePerDay.map(_.toArray)
-        result <- MenuPerDayForm
-          .menuPerDayForm
-          .bindFromRequest
-          .fold(
-            formWithErrors => Future.successful(BadRequest(views.html.admin.menusPerDay(
+      MenuPerDayForm
+        .menuPerDayForm
+        .bindFromRequest
+        .fold(
+          formWithErrors => {
+            for {
+              user <- userService.getByEmailAddress(username)
+              menus <- menuDishService.getAllWithListOfDishes.map(_.toArray)
+              menusUuidAndNames <- menuService.getAllMenusUuidAndNames
+              menusPerDay <- menuPerDayPerPersonService.getAllMenuWithNamePerDay.map(_.toArray)
+            } yield BadRequest(views.html.admin.menusPerDay(
               activeTab = 0,
               user.get,
               formWithErrors,
               menus,
               menusUuidAndNames,
-              menusPerDay))),
-            menuPerDayData => {
-              menuPerDayService.add(menuPerDayData).map(_ =>
-                Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay()))
-            })
-      } yield result
+              menusPerDay))},
+          menuPerDayData => {
+            menuPerDayService.add(menuPerDayData).map(_ =>
+              Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay()))
+          })
     }
   }
 
