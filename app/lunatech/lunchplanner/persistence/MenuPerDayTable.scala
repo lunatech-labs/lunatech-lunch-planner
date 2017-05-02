@@ -76,5 +76,10 @@ object MenuPerDayTable {
     connection.db.run(query)
   }
 
+  def insertOrUpdate(menuPerDay: MenuPerDay)(implicit connection: DBConnection): Future[Boolean] = {
+    val query = menuPerDayTable.insertOrUpdate(menuPerDay)
+    connection.db.run(query).map(_ == 1)
+  }
+
 }
 
