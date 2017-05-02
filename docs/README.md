@@ -47,3 +47,24 @@ In this separator you can:
 `Details of a menu`
 When you press a menu to see its details, a new separator called `Menu details` opens. There you can make modifications to the details of the menu, delete it or just cancel and go back to the list of menus.
 
+#####Management of scheduling of menus
+To create a new menu schedule select `Schedule` in the side navigation bar. Two separators will be available:
+- Create new
+- All schedules
+
+`Create a new schedule`:
+
+In the `Create new` separator, fill in the form fields. All fields are mandatory.
+Press Create. After creation of a new schedule you will be taken to the list of all schedules, where you can see the new created schedule.
+
+`All schedules`
+
+In this separator you can:
+- see the list of menu names and the day the menu will be served (schedule)
+- see the detail of a schedule by clicking in a specific date
+- select one or more schedules and delete them
+
+`Details of a schedule`
+
+When you press a date to see its details, a new separator called `Menu schedule details` opens. There you can make modifications to the details of the schedule, delete it or just cancel and go back to the list of schedules.
+
