@@ -1,10 +1,51 @@
-.form-error {
-	font-size: small;
-	padding-left: 5px;
-	color: #E73535;
-	line-height: 10px;
-}
-
 .glyphicon.glyphicon-pencil {
 	font-size: 12px;
+}
+
+.extra-info {
+	height: 0;
+}
+
+.no-left-padding {
+	padding-left: 0;
+}
+
+.font-normal {
+	font-weight: normal;
+}
+
+.font-size-12 {
+	font-size: 12px
+}
+
+.logo {
+	padding-left: 20px;
+	width:150px;
+}
+
+.logo-login {
+	width:150px
+}
+
+.login-form {
+	padding: 20px;
+	margin-top: 100px;
+	text-align: center;
+	min-height: 400px
+}
+
+.login-presentation {
+	font-size:x-small;
+	color: #BBB;
+	font-family: Arial;
+	text-shadow: 0px 1px 0px white;
+}
+
+.full-width {
+	width: 100%
+}
+
+.list {
+	margin-left: 20px;
+	margin-top: -10px
 }

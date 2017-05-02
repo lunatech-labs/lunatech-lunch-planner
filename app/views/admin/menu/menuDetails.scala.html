@@ -25,7 +25,7 @@
                                 @for(index <- menuDish.listOfDishes.indices) {
                                     @b3.checkbox(menuForm("dishesUuid[]"), '_text -> menuDish.listOfDishes(index).name, 'value -> menuDish.listOfDishes(index).uuid, 'checked -> menuDish.listOfDishes(index).isSelected)
                                 }
-                                <div class="col col-lg-2" style="padding-left: 0px">
+                                <div class="col col-lg-2 no-left-padding">
                                     <a href="@lunatech.lunchplanner.controllers.routes.MenuController.getAllMenus" type="button" class="btn btn-default">
                                         <span class="glyphicon glyphicon-arrow-left"></span> Cancel
                                     </a>
