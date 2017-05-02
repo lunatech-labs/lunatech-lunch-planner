@@ -1,6 +1,6 @@
 @(startField: Field, startArgs: (Symbol,Any)*)(globalArgs: (Symbol,Any)*)(implicit fc: b3.B3FieldConstructor, messages: Messages)
 @b3.multifield( startField )(globalArgs, startArgs) { implicit cfc =>
-  <div class="input-daterange input-group" @toHtmlArgs(bs.Args.inner(globalArgs).toMap)>
+  <div style="text-align: left" class="input-daterange input-group" @toHtmlArgs(bs.Args.inner(globalArgs).toMap)>
     @b3.text(startField, startArgs:_*)
   </div>
 }
@@ -8,7 +8,9 @@
   <script>
   $(function(){
     $('.input-daterange').datepicker({
-      format: 'mm-dd-yyyy'
+      format: 'dd-mm-yyyy',
+      todayBtn: true,
+      todayHighlight: true
     });
   });
   </script>

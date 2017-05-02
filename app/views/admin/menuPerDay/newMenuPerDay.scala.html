@@ -1,8 +1,8 @@
 @import b3.vertical.fieldConstructor
 @import lunatech.lunchplanner.models.User
-@import lunatech.lunchplanner.models.MenuWithDishes
-@import lunatech.lunchplanner.models.MenuWithNamePerDay
 @import lunatech.lunchplanner.viewModels.MenuPerDayForm
+@import java.text.SimpleDateFormat
+@import java.util.Date
 
 @(admin: User, menuPerDayForm: Form[MenuPerDayForm], menuOptions: Seq[(String,String)])(implicit messages: play.api.i18n.Messages)
 @main("Menu scheduling", admin, isUserAdmin = true) {
@@ -18,10 +18,8 @@
     <div role="tabpanel" class="tab-pane active" id="newSchedule">
         <div>
             <br>
-            <label>Associate a menu to a date</label>
             @helper.form(lunatech.lunchplanner.controllers.routes.MenuPerDayController.createNewMenuPerDay) {
-                @datepicker(menuPerDayForm("date"), 'value -> "2017-05-01")(
-                    '_label -> "Date")
+                @datepicker(menuPerDayForm("date"), 'value -> new SimpleDateFormat("dd-MM-yyyy").format(new Date()))('_label -> "Date" )
                 @b3.select(menuPerDayForm("menuUuid"), options = menuOptions, '_label -> "Select menu", '_default -> "Select an option")
                 @b3.submit('class -> "btn btn-primary") { Associate menu with date }
             }

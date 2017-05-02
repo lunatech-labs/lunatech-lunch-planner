@@ -26,9 +26,9 @@ class MenuPerDayPerPersonService  @Inject() (
 
     allMenusWithNamePerDay.flatMap {
       Future.traverse(_) { menuWithNamePerDay =>
-        val isMenuSelected = isMenuPerDaySelectedForPerson(userUuid, menuWithNamePerDay.uuid)
-        isMenuSelected.map( isSelected =>
-        MenuWithNamePerDayPerPerson(menuWithNamePerDay.uuid, menuWithNamePerDay.menuDateAndName, userUuid, isSelected))
+        isMenuPerDaySelectedForPerson(userUuid, menuWithNamePerDay.uuid)
+          .map(isSelected =>
+        MenuWithNamePerDayPerPerson(menuWithNamePerDay.uuid, menuWithNamePerDay.menuDate,menuWithNamePerDay.menuName, userUuid, isSelected))
       }
     }
   }
@@ -44,7 +44,7 @@ class MenuPerDayPerPersonService  @Inject() (
           .flatMap { dishes =>
             val isMenuSelected = isMenuPerDaySelectedForPerson(userUuid, menuWithNamePerDay.uuid)
             isMenuSelected.map(isSelected =>
-              MenuWithNameWithDishesPerPerson(menuWithNamePerDay.uuid, menuWithNamePerDay.menuDateAndName, dishes, userUuid, isSelected))
+              MenuWithNameWithDishesPerPerson(menuWithNamePerDay.uuid, menuWithNamePerDay.menuDate,  menuWithNamePerDay.menuName, dishes, userUuid, isSelected))
           }
       }
     }
@@ -57,18 +57,14 @@ class MenuPerDayPerPersonService  @Inject() (
     MenuPerDayPerPersonTable.remove(menuPerDayPerPersonUuid)
 
   def getAllMenuWithNamePerDay: Future[Seq[MenuWithNamePerDay]] = {
-    val allMenusPerDay = menuPerDayService.getAll
-
-    allMenusPerDay.flatMap {
+    menuPerDayService.getAllOrderedByDateAscending.flatMap {
       Future.traverse(_) { menuPerDay =>
-        val menu = menuService.getByUuid(menuPerDay.menuUuid)
-        menu.flatMap {
-          case Some(menuData) => {
+        menuService.getByUuid(menuPerDay.menuUuid).flatMap {
+          case Some(menuData) =>
               getNumberOfMenusPerDayPerPersonForMenuPerDay(menuPerDay.uuid)
               .map(count =>
-                MenuWithNamePerDay(menuPerDay.uuid, menuData.uuid, menuPerDay.date.toString + "  " + menuData.name, numberOfPeopleSignedIn = count))
-            }
-          case None => ???
+                MenuWithNamePerDay(menuPerDay.uuid, menuData.uuid, menuPerDay.date.toString, menuData.name, numberOfPeopleSignedIn = count))
+          case None => ??? // TODO
         }
       }
     }
