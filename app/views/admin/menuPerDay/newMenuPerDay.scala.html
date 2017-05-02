@@ -19,9 +19,13 @@
         <div>
             <br>
             @b3.form(lunatech.lunchplanner.controllers.routes.MenuPerDayController.createNewMenuPerDay) {
-                @datepicker(menuPerDayForm("date"), 'value -> date)('_label -> "Date" )
-                @b3.select(menuPerDayForm("menuUuid"), options = menuOptions, '_label -> "Select menu", '_default -> "Select an option")
-                @b3.submit('class -> "btn btn-primary") { Associate menu with date }
+                <div class="row">
+                    <div class="col col-lg-6">
+                        @datepicker(menuPerDayForm("date"), 'value -> date)('_label -> "Date" )
+                        @b3.select(menuPerDayForm("menuUuid"), options = menuOptions, '_label -> "Select menu", '_default -> "Select an option")
+                        @b3.submit('class -> "btn btn-primary") { Associate menu with date }
+                    </div>
+                </div>
             }
         </div>
     </div>
