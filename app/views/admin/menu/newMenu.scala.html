@@ -7,8 +7,8 @@
 @main("New menu", admin, isUserAdmin = true) {
     <!-- Nav tabs -->
     <ul class="nav nav-tabs">
-        <li role="presentation" class="active"><a data-toggle="tab" href="#newMenu">Create new</a></li>
         <li role="presentation"><a href="@lunatech.lunchplanner.controllers.routes.MenuController.getAllMenus">All menus</a></li>
+        <li role="presentation" class="active"><a data-toggle="tab" href="#newMenu">Create new</a></li>
     </ul>
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="newMenu">
@@ -17,7 +17,7 @@
                 @b3.text( menuForm("menuName"), '_label -> "Name", 'placeholder -> "Short menu name" )
 
                 @for(index <- listOfDishes.indices) {
-                    @b3.checkbox( menuForm("dishesUuid[]"), '_text -> listOfDishes(index).name, 'value -> listOfDishes(index).uuid)
+                    @b3.checkbox( menuForm("dishesUuid[" + index + "]"), '_text -> listOfDishes(index).name, 'value -> listOfDishes(index).uuid)
                 }
                 @b3.submit('class -> "btn btn-primary"){ <span class="glyphicon glyphicon-plus"></span> Create }
             }

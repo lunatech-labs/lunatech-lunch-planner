@@ -7,8 +7,8 @@
 @main("Menus", admin, isUserAdmin = true) {
 <!-- Nav tabs -->
 <ul class="nav nav-tabs">
-    <li role="presentation"><a href="@lunatech.lunchplanner.controllers.routes.MenuController.getNewMenu">Create new</a></li>
     <li role="presentation" class="active"><a data-toggle="tab" href="#list">All menus</a></li>
+    <li role="presentation"><a href="@lunatech.lunchplanner.controllers.routes.MenuController.getNewMenu">Create new</a></li>
 </ul>
 <div class="tab-content">
     <div role="tabpanel" class="tab-pane active" id="list">
@@ -20,7 +20,7 @@
                     <div class="form-group" id="uuid">
                         <div class="checkbox">
                             <label for="@listOfMenus(index).uuid">
-                                <input type="checkbox" id="uuid" name="uuid[]" value="@listOfMenus(index).uuid">
+                                <input type="checkbox" id="uuid" name="uuid[@index]" value="@listOfMenus(index).uuid">
                                 <a href="@lunatech.lunchplanner.controllers.routes.MenuController.getMenuDetails(listOfMenus(index).uuid)">@listOfMenus(index).name
                                     <span class="glyphicon glyphicon-pencil"></span>
                                 </a>
