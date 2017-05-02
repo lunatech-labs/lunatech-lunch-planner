@@ -1,0 +1,53 @@
+@import b3.vertical.fieldConstructor
+@import lunatech.lunchplanner.models.User
+@import lunatech.lunchplanner.viewModels.MenuPerDayForm
+@import lunatech.lunchplanner.models.MenuPerDay
+@import java.text.SimpleDateFormat
+@import java.util.Date
+
+@(admin: User, menuPerDayForm: Form[MenuPerDayForm], menuOptions: Seq[(String,String)], menuPerDayOption: Option[MenuPerDay])(implicit messages: play.api.i18n.Messages)
+@main("Menu scheduling", admin, isUserAdmin = true) {
+<!-- Nav tabs -->
+<ul class="nav nav-tabs">
+    <li role="presentation" class="active"><a data-toggle="tab" href="#newSchedule">Create new</a></li>
+    <li role="presentation" ><a href="@lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay">All schedules</a></li>
+</ul>
+
+<!-- Tab panes -->
+<div class="tab-content">
+    <!-- Menus Per Day -->
+    <div role="tabpanel" class="tab-pane active" id="newSchedule">
+        <div>
+            <br>
+            @menuPerDayOption match {
+                case None => {
+                    <label>Error retrieving the menu per day!!</label>
+                }
+                case Some(menuPerDay) => {
+                    @b3.form(lunatech.lunchplanner.controllers.routes.MenuPerDayController.saveMenuPerDayDetails(menuPerDay.uuid)) {
+                        <div class="row">
+                            <div class="col col-lg-6">
+                                @datepicker(menuPerDayForm("date"), 'value -> new SimpleDateFormat("dd-MM-yyyy").format(new Date()))('_label -> "Date")
+                                @b3.select(menuPerDayForm("menuUuid"), options = menuOptions, '_label -> "Select menu", '_default -> "Select an option", 'value -> menuPerDay.menuUuid)
+                                <div class="col col-lg-2" style="padding-left: 0px">
+                                    <a href="@lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay" type="button" class="btn btn-default">
+                                        <span class="glyphicon glyphicon-arrow-left"></span> Cancel
+                                    </a>
+                                </div>
+                                <div class="col col-lg-2">
+                                @b3.submit('class -> "btn btn-primary") {
+                                    <span class="glyphicon glyphicon-ok"></span> Save }
+                                </div>
+                                <div class="col col-lg-2">
+                                    <button type="submit" class="btn btn-danger" formaction="/menuPerDay/delete/@menuPerDay.uuid">
+                                        <span class="glyphicon glyphicon-remove"></span> Delete </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            }
+        </div>
+    </div>
+</div>
+}

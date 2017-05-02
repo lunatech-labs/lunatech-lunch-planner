@@ -17,7 +17,7 @@
     <div role="tabpanel" class="tab-pane active" id="list">
         <div>
             <br>
-            <label>List of menus serviced by day </label>
+            <label>List of menus served by day </label>
             @b3.form(lunatech.lunchplanner.controllers.routes.MenuPerDayController.deleteMenusPerDay) {
                 <table class="table" >
                     <thead>
@@ -31,7 +31,10 @@
                     @for(index <- listOfMenusPerDay.indices) {
                         <tr>
                             <td><input type="checkbox" value="@listOfMenusPerDay(index).uuid" name="uuid[]"></td>
-                            <td><span>@listOfMenusPerDay(index).menuDate</span></td>
+                            <td><a href="@lunatech.lunchplanner.controllers.routes.MenuPerDayController.getMenuPerDayDetails(listOfMenusPerDay(index).uuid)">
+                                <span>@listOfMenusPerDay(index).menuDate</span>
+                                <span class="glyphicon glyphicon-pencil"></span></a>
+                            </td>
                             <td><span>@listOfMenusPerDay(index).menuName</span></td>
                             <td><span>@listOfMenusPerDay(index).numberOfPeopleSignedIn</span></td>
                         </tr>

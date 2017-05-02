@@ -24,8 +24,15 @@ class MenuPerDayService @Inject() (
 
   def getAllOrderedByDateAscending: Future[Seq[MenuPerDay]] = MenuPerDayTable.getAllOrderedByDateAscending
 
+  def getMenuPerDayByUuid(uuid: UUID): Future[Option[MenuPerDay]] = MenuPerDayTable.getByUUID(uuid)
+
   def getAllByMenuUuid(menuUuid: UUID): Future[Seq[MenuPerDay]] =
     MenuPerDayTable.getByMenuUuid(menuUuid)
+
+  def insertOrUpdate(uuid: UUID, menuPerDayForm: MenuPerDayForm): Future[Boolean] = {
+    val menuPerDay = MenuPerDay(uuid, menuPerDayForm.menuUuid, new Date(menuPerDayForm.date.getTime))
+    MenuPerDayTable.insertOrUpdate(menuPerDay)
+  }
 
   def deleteByMenuUuid(menuUuid: UUID): Future[Int] =
     MenuPerDayTable.removeByMenuUuid(menuUuid)
