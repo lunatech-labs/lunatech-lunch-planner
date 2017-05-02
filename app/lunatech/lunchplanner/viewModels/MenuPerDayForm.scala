@@ -18,7 +18,7 @@ object MenuPerDayForm {
   val menuPerDayForm = Form(
     mapping(
       "menuUuid" -> of[UUID],
-      "date" -> date(pattern = "dd-mm-yyyy")
+      "date" -> date(pattern = "dd-MM-yyyy")
     )(MenuPerDayForm.apply)(MenuPerDayForm.unapply)
 //      verifying("Date cannot be earlier than today", f => f.date.after(new Date()))
   )

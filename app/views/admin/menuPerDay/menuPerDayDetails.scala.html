@@ -27,7 +27,7 @@
                     @b3.form(lunatech.lunchplanner.controllers.routes.MenuPerDayController.saveMenuPerDayDetails(menuPerDay.uuid)) {
                         <div class="row">
                             <div class="col col-lg-6">
-                                @datepicker(menuPerDayForm("date"), 'value -> new SimpleDateFormat("dd-MM-yyyy").format(new Date()))('_label -> "Date")
+                                @datepicker(menuPerDayForm("date"), 'value -> menuPerDay.date)('_label -> "Date")
                                 @b3.select(menuPerDayForm("menuUuid"), options = menuOptions, '_label -> "Select menu", '_default -> "Select an option", 'value -> menuPerDay.menuUuid)
                                 <div class="col col-lg-2" style="padding-left: 0px">
                                     <a href="@lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay" type="button" class="btn btn-default">

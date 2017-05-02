@@ -1,6 +1,8 @@
 package lunatech.lunchplanner.controllers
 
+import java.text.SimpleDateFormat
 import java.util.UUID
+import java.util.Date
 
 import com.google.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
@@ -39,6 +41,7 @@ class MenuPerDayController  @Inject() (
   }
 
   def createNewMenuPerDay = IsAdminAsync { username =>
+    val currentDate =  new SimpleDateFormat("dd-MM-yyyy").format(new Date())
     implicit request => {
       MenuPerDayForm
         .menuPerDayForm
@@ -50,22 +53,24 @@ class MenuPerDayController  @Inject() (
               menusUuidAndNames <- menuService.getAllMenusUuidAndNames
             } yield BadRequest(views.html.admin.menuPerDay.newMenuPerDay(
               user.get,
+              currentDate,
               formWithErrors,
               menusUuidAndNames))},
           menuPerDayData => {
             menuPerDayService.add(menuPerDayData).map(_ =>
-              Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay()))
+              Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay))
           })
     }
   }
 
   def getNewMenuPerDay = IsAdminAsync { username =>
+    val currentDate = new SimpleDateFormat("dd-MM-yyyy").format(new Date())
     implicit request => {
       for{
         currentUser <- userService.getByEmailAddress(username)
         menusUuidAndNames <- menuService.getAllMenusUuidAndNames
       } yield
-        Ok(views.html.admin.menuPerDay.newMenuPerDay(currentUser.get, MenuPerDayForm.menuPerDayForm, menusUuidAndNames))
+        Ok(views.html.admin.menuPerDay.newMenuPerDay(currentUser.get, currentDate, MenuPerDayForm.menuPerDayForm, menusUuidAndNames))
     }
   }
 
