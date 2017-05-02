@@ -15,7 +15,7 @@ import play.api.{ Configuration, Environment }
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class MenuPerDayController  @Inject() (
+class MenuPerDayController @Inject() (
   userService: UserService,
   menuService: MenuService,
   menuDishService: MenuDishService,
@@ -87,7 +87,7 @@ class MenuPerDayController  @Inject() (
             } yield BadRequest(
               views.html.admin.menuPerDay.menusPerDay(currentUser.get, formWithErrors, menusPerDay))},
           menusPerDayData =>
-            delete(menusPerDayData).map( _ =>
+            deleteSeveral(menusPerDayData).map( _ =>
               Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay))
         )
     }
@@ -125,7 +125,7 @@ class MenuPerDayController  @Inject() (
               menusUuidAndNames,
               menuPerDayOption))},
           _ => {
-            menuPerDayService.delete(uuid).map(_ =>
+            delete(uuid).map(_ =>
               Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay))
           })
     }
@@ -150,7 +150,12 @@ class MenuPerDayController  @Inject() (
     }
   }
 
-  private def delete(form: ListMenusPerDayForm) =
-    Future.sequence(form.listUuids.map(uuid => menuPerDayService.delete(uuid)))
+  private def deleteSeveral(form: ListMenusPerDayForm) =
+    Future.sequence(form.listUuids.map(uuid => delete(uuid)))
 
+  private def delete(uuid: UUID) =
+    for{
+      _ <- menuPerDayPerPersonService.deleteByMenuPerPersonUuid(uuid)
+      result <- menuPerDayService.delete(uuid)
+    } yield result
 }

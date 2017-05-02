@@ -66,6 +66,6 @@ class MenuPerDayPerPersonController @Inject() (
 
   private def menusPerDayToRemove(allMenusPerDayPerPerson: Seq[MenuPerDayPerPerson], userUuid: UUID, form: MenuPerDayPerPersonForm) =
     allMenusPerDayPerPerson.filter(menu => !form.menuPerDayUuid.contains(menu.menuPerDayUuid))
-      .foreach(menu => menuPerDayPerPersonService.remove(menu.uuid))
+      .foreach(menu => menuPerDayPerPersonService.delete(menu.uuid))
 
 }

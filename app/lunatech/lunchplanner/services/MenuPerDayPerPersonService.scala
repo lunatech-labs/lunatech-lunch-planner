@@ -53,7 +53,7 @@ class MenuPerDayPerPersonService  @Inject() (
   def isMenuPerDaySelectedForPerson(userUuid: UUID, menuPerDayUuid: UUID): Future[Boolean] =
     MenuPerDayPerPersonTable.getByUserUuidAndMenuPerDayUuid(userUuid, menuPerDayUuid).map(_.isDefined)
 
-  def remove(menuPerDayPerPersonUuid: UUID): Future[Int] =
+  def delete(menuPerDayPerPersonUuid: UUID): Future[Int] =
     MenuPerDayPerPersonTable.remove(menuPerDayPerPersonUuid)
 
   def getAllMenuWithNamePerDay: Future[Seq[MenuWithNamePerDay]] = {
