@@ -14,12 +14,16 @@
         <div role="tabpanel" class="tab-pane active" id="newMenu">
             <br>
             @helper.form(lunatech.lunchplanner.controllers.routes.MenuController.createNewMenu) {
-                @b3.text( menuForm("menuName"), '_label -> "Name", 'placeholder -> "Short menu name" )
+                <div class="row">
+                    <div class="col col-lg-6">
+                        @b3.text( menuForm("menuName"), '_label -> "Name", 'placeholder -> "Short menu name" )
 
-                @for(index <- listOfDishes.indices) {
-                    @b3.checkbox( menuForm("dishesUuid[" + index + "]"), '_text -> listOfDishes(index).name, 'value -> listOfDishes(index).uuid)
-                }
-                @b3.submit('class -> "btn btn-primary"){ <span class="glyphicon glyphicon-plus"></span> Create }
+                        @for(index <- listOfDishes.indices) {
+                            @b3.checkbox( menuForm("dishesUuid[" + index + "]"), '_text -> listOfDishes(index).name, 'value -> listOfDishes(index).uuid)
+                        }
+                        @b3.submit('class -> "btn btn-primary"){ <span class="glyphicon glyphicon-plus"></span> Create }
+                    </div>
+                </div>
             }
         </div>
     </div>
