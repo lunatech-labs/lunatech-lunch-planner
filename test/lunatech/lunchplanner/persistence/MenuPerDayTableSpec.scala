@@ -14,7 +14,8 @@ class MenuPerDayTableSpec extends AcceptanceSpec with TestDatabaseProvider {
   private val defaultTimeout = 10.seconds
 
   private val newMenu = Menu(name = "Main menu")
-  private val newMenuPerDay = MenuPerDay(menuUuid = newMenu.uuid, date = new Date(10000))
+  private val newMenuPerDay = MenuPerDay(menuUuid = newMenu.uuid, date = new Date(99999999))
+  private val newMenuPerDay2 = MenuPerDay(menuUuid = newMenu.uuid, date = new Date(10000))
 
   override def beforeAll {
     cleanDatabase()
@@ -37,12 +38,12 @@ class MenuPerDayTableSpec extends AcceptanceSpec with TestDatabaseProvider {
 
     "query for menus per day by uuid" in {
       val result = Await.result(MenuPerDayTable.getByUUID(newMenuPerDay.uuid), defaultTimeout)
-      result.foreach(_.date.toString) mustBe Some(newMenuPerDay).foreach(_.date.toString)
+      result.map(_.date.toString) mustBe Some(newMenuPerDay).map(_.date.toString)
     }
 
     "query for menus per day by menu uuid" in {
       val result = Await.result(MenuPerDayTable.getByMenuUuid(newMenu.uuid), defaultTimeout)
-      result.foreach(_.date.toString) mustBe Vector(newMenuPerDay).foreach(_.date.toString)
+      result.map(_.date.toString) mustBe Vector(newMenuPerDay).map(_.date.toString)
     }
 
     "query for menus per day by non existent menu uuid" in {
@@ -51,8 +52,8 @@ class MenuPerDayTableSpec extends AcceptanceSpec with TestDatabaseProvider {
     }
 
     "query for menus per day by date" in {
-      val result = Await.result(MenuPerDayTable.getByDate(new Date(10000)), defaultTimeout)
-      result.foreach(_.date.toString) mustBe Vector(newMenuPerDay).foreach(_.date.toString)
+      val result = Await.result(MenuPerDayTable.getByDate(new Date(99999999)), defaultTimeout)
+      result.map(_.date.toString) mustBe Vector(newMenuPerDay).map(_.date.toString)
     }
 
     "query for menus per day by date that does not exist in table" in {
@@ -62,7 +63,17 @@ class MenuPerDayTableSpec extends AcceptanceSpec with TestDatabaseProvider {
 
     "query all menus per day" in {
       val result = Await.result(MenuPerDayTable.getAll, defaultTimeout)
-      result.foreach(_.date.toString) mustBe Vector(newMenuPerDay).foreach(_.date.toString)
+      result.map(_.date.toString) mustBe Vector(newMenuPerDay).map(_.date.toString)
+    }
+
+    "query all menus per day ordered by date ascending" in {
+      Await.result(MenuPerDayTable.add(newMenuPerDay2), defaultTimeout)
+      val result = Await.result(MenuPerDayTable.getAllOrderedByDateAscending, defaultTimeout)
+
+      val resultString = result.map(_.date.toString)
+      val expectedString = Vector(newMenuPerDay2, newMenuPerDay).map(_.date.toString)
+
+      resultString mustBe expectedString
     }
 
     "remove an existing menu per day by uuid" in {
@@ -78,7 +89,7 @@ class MenuPerDayTableSpec extends AcceptanceSpec with TestDatabaseProvider {
     "remove an existing menu per day by menu uuid" in {
       Await.result(MenuPerDayTable.add(newMenuPerDay), defaultTimeout)
       val result = Await.result(MenuPerDayTable.removeByMenuUuid(newMenuPerDay.menuUuid), defaultTimeout)
-      result mustBe 1
+      result mustBe 2
     }
   }
 }
