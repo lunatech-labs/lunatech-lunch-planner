@@ -61,11 +61,8 @@ class MenuPerDayControllerSpec extends ControllerSpec {
       val result = call(controller.getAllMenusPerDay, request)
 
       status(result) mustBe 200
-      contentAsString(result).contains("Menu 1")
-      contentAsString(result).contains("Menu 2")
-      contentAsString(result).contains("Prosciutto crudo di Parma e melone")
-      contentAsString(result).contains("Insalata tricolore")
-      contentAsString(result).contains("Gamberoni all aglio")
+      contentAsString(result).contains("Menu 1") mustBe true
+      contentAsString(result).contains("Menu 2") mustBe true
     }
   }
 
