@@ -55,7 +55,6 @@ class MenuPerDayControllerSpec extends ControllerSpec {
     connection)
 
   "Menu per day controller" should {
-
     "display list of menus per day (schedules)" in {
       val request = FakeRequest().withSession("email" -> "developer@lunatech.com")
       val result = call(controller.getAllMenusPerDay, request)
