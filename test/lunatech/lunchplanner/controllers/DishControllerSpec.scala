@@ -56,11 +56,11 @@ class DishControllerSpec extends ControllerSpec {
       val result = call(controller.getAllDishes, request)
 
       status(result) mustBe 200
-      contentAsString(result).contains("Antipasto misto all italiana")
-      contentAsString(result).contains("Prosciutto crudo di Parma e melone")
-      contentAsString(result).contains("Insalata tricolore")
-      contentAsString(result).contains("Avocado al forno")
-      contentAsString(result).contains("Gamberoni all aglio")
+      contentAsString(result).contains("Antipasto misto all italiana") mustBe true
+      contentAsString(result).contains("Prosciutto crudo di Parma e melone") mustBe true
+      contentAsString(result).contains("Insalata tricolore") mustBe true
+      contentAsString(result).contains("Avocado al forno") mustBe true
+      contentAsString(result).contains("Gamberoni all aglio") mustBe true
     }
   }
 
