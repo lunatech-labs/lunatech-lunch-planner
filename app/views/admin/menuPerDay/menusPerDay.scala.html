@@ -32,10 +32,10 @@
                         <tr>
                             <td class="list-select"><input type="checkbox" value="@listOfMenusPerDay(index).uuid" name="uuid[@index]"></td>
                             <td class="list-date"><a href="@lunatech.lunchplanner.controllers.routes.MenuPerDayController.getMenuPerDayDetails(listOfMenusPerDay(index).uuid)">
-                                <span>@listOfMenusPerDay(index).menuDate</span></a>
+                                @listOfMenusPerDay(index).menuDate</a>
                             </td>
-                            <td><span>@listOfMenusPerDay(index).menuName</span></td>
-                            <td><span>@listOfMenusPerDay(index).numberOfPeopleSignedIn</span></td>
+                            <td>@listOfMenusPerDay(index).menuName</td>
+                            <td>@listOfMenusPerDay(index).numberOfPeopleSignedIn</td>
                         </tr>
                     }
                 </table>
