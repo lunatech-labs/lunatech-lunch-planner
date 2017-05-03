@@ -4,7 +4,7 @@
 @import lunatech.lunchplanner.viewModels.DishForm
 
 @(admin: User, dishForm: Form[DishForm], dishOption: Option[Dish])(implicit messages: play.api.i18n.Messages)
-@main("Dish detail", admin, isUserAdmin = true) {
+@main("Dish details", admin, isUserAdmin = true) {
 <!-- Nav tabs -->
 <ul class="nav nav-tabs">
     <li role="presentation" ><a href="@lunatech.lunchplanner.controllers.routes.DishController.getAllDishes">All dishes</a></li>
@@ -24,7 +24,7 @@
                         @b3.text( dishForm("name"), '_label -> "Name", 'placeholder -> "Short dish name", 'value -> dish.name)
                         @b3.textarea( dishForm("description"), '_label -> "Description",  'placeholder -> "Dish description", 'rows -> 4, 'value -> dish.description)
                         @b3.text( dishForm("remarks"), '_label -> "Additional remarks", 'placeholder -> "Optional", 'value -> dish.remarks.getOrElse(""))
-                        <div class="col col-lg-2 no-left-padding">
+                        <div class="col col-lg-2" style="padding-left: 0">
                             <a href="@lunatech.lunchplanner.controllers.routes.DishController.getAllDishes" type="button" class="btn btn-default">
                                 <span class="glyphicon glyphicon-arrow-left"></span> Cancel </a>
                         </div>
