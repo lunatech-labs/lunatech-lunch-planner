@@ -11,7 +11,7 @@ case class MenuPerDayPerPerson(
 case class MenuWithNamePerDayPerPerson(
   menuPerDayUuid: UUID,
   menuDate: String,
-  menuName: String, // TODO handle new field name
+  menuName: String,
   userUuid: UUID,
   isSelected: Boolean
 )
@@ -19,7 +19,7 @@ case class MenuWithNamePerDayPerPerson(
 case class MenuWithNameWithDishesPerPerson(
   menuPerDayUuid: UUID,
   menuDate: String,
-  menuName: String, // TODO handle new field name
+  menuName: String,
   listOfDishes: Seq[Dish],
   userUuid: UUID,
   isSelected: Boolean

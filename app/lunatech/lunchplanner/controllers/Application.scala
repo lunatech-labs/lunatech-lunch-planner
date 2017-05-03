@@ -24,16 +24,20 @@ class Application @Inject() (
   def index = IsAuthenticatedAsync { username =>
     implicit request =>
       userService.getByEmailAddress(username).flatMap(currentUser =>
-        getIndexPage(currentUser))
+        showMenuPerDayPerPerson(currentUser))
   }
 
-  private def getIndexPage(normalUser: Option[User]) =
+  private def showMenuPerDayPerPerson(normalUser: Option[User]) =
     normalUser match {
       case Some(user) =>
         val userIsAdmin = userService.isAdminUser(user.emailAddress)
-        val allMenusPerDayPerPersonAndSelected = menuPerDayPerPersonService.getAllMenuWithNamePerDayWithDishesPerPerson(user.uuid).map(_.toArray)
-        allMenusPerDayPerPersonAndSelected.map(menusPerDayPerPerson =>
-          Ok(views.html.index(user, userIsAdmin, menusPerDayPerPerson, MenuPerDayPerPersonForm.menuPerDayPerPersonForm)))
+        menuPerDayPerPersonService.getAllMenuWithNamePerDayWithDishesPerPerson(user.uuid).map(_.toArray)
+        .map(menusPerDayPerPerson =>
+          Ok(views.html.menuPerDayPerPerson(
+            user,
+            userIsAdmin,
+            menusPerDayPerPerson,
+            MenuPerDayPerPersonForm.menuPerDayPerPersonForm)))
       case None => Future.successful(Unauthorized)
     }
 

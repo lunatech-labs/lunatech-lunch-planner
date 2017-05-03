@@ -12,7 +12,6 @@ import play.api.mvc.Controller
 import play.api.{ Configuration, Environment }
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 class MenuPerDayPerPersonController @Inject() (
   userService: UserService,
@@ -35,9 +34,9 @@ class MenuPerDayPerPersonController @Inject() (
               formWithErrors =>
                 menuPerDayPerPersonService.getAllMenuWithNamePerDayWithDishesPerPerson(user.get.uuid)
                   .map( menusPerDayPerPerson =>
-                    BadRequest(views.html.index(
+                    BadRequest(views.html.menuPerDayPerPerson(
                       user.get,
-                      isUserAdmin = userService.isAdminUser(user.get.emailAddress),
+                      userService.isAdminUser(user.get.emailAddress),
                       menusPerDayPerPerson.toArray,
                       formWithErrors))),
               menuPerDayPerPersonData => {
