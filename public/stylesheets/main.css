@@ -1,7 +1,3 @@
-.glyphicon.glyphicon-pencil {
-	font-size: 12px;
-}
-
 .extra-info {
 	height: 0;
 }
@@ -19,7 +15,6 @@
 }
 
 .logo {
-	padding-left: 20px;
 	width:150px;
 }
 
@@ -56,4 +51,9 @@
 
 .list-date {
 	width: 130px
+}
+
+.sidebar-nav li.active {
+	border-bottom: 3px solid #338ecf;
+	background: #eee
 }
