@@ -14,19 +14,52 @@
     <div role="tabpanel" class="tab-pane active" id="list">
         <div>
             <br>
-            <label>List of dishes</label>
             @b3.form(lunatech.lunchplanner.controllers.routes.DishController.deleteDishes) {
-                @for(index <- listOfDishes.indices) {
-                    <div class="form-group" id="uuid">
-                        <div class="checkbox">
-                            <label for="@listOfDishes(index).uuid">
-                                <input type="checkbox" id="uuid" name="uuid[uuid[@index]" value="@listOfDishes(index).uuid">
-                                <a href="@lunatech.lunchplanner.controllers.routes.DishController.getDishDetails(listOfDishes(index).uuid)">@listOfDishes(index).name
-                                </a>
-                            </label>
-                        </div>
-                    </div>
-                }
+                <table class="table" >
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Extra info</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    @for(index <- listOfDishes.indices) {
+                        <tr>
+                            <td class="list-select"><input type="checkbox" value="@listOfDishes(index).uuid" name="uuid[@index]"></td>
+                            <td>
+                                <a href="@lunatech.lunchplanner.controllers.routes.DishController.getDishDetails(listOfDishes(index).uuid)">@listOfDishes(index).name</a>
+                            </td>
+                            <td>@listOfDishes(index).description</td>
+
+                            <td>
+                                @if(listOfDishes(index).isVegetarian) {
+                                    <label class="font-normal">Vegetarian</label> <br>
+                                }
+                                @if(listOfDishes(index).hasSeaFood) {
+                                    <label class="font-normal">Sea food</label> <br>
+                                }
+                                @if(listOfDishes(index).hasPork) {
+                                    <label class="font-normal">Pork</label> <br>
+                                }
+                                @if(listOfDishes(index).hasBeef) {
+                                    <label class="font-normal">Beef</label> <br>
+                                }
+                                @if(listOfDishes(index).hasChicken) {
+                                    <label class="font-normal">Chicken</label> <br>
+                                }
+                                @if(listOfDishes(index).isGlutenFree) {
+                                    <label class="font-normal">Gluten free</label> <br>
+                                }
+                                @if(listOfDishes(index).hasLactose) {
+                                    <label class="font-normal">Lactose</label> <br>
+                                }
+                            </td>
+                            <td>@listOfDishes(index).remarks</td>
+                        </tr>
+                    }
+                </table>
                 @b3.submit('class -> "btn btn-primary"){ <span class="glyphicon glyphicon-remove"></span> Delete selected }
             }
         </div>
