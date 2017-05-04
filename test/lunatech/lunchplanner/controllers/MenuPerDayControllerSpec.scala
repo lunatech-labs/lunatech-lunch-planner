@@ -8,7 +8,7 @@ import lunatech.lunchplanner.common.{ ControllerSpec, DBConnection }
 import lunatech.lunchplanner.data.ControllersData._
 import lunatech.lunchplanner.models.User
 import lunatech.lunchplanner.persistence.DishTable
-import lunatech.lunchplanner.services.{ DishService, MenuDishService, UserService }
+import lunatech.lunchplanner.services.{ DishService, MenuDishService, MenuPerDayPerPersonService, MenuPerDayService, MenuService, UserService }
 import org.mockito.Mockito._
 import play.api.i18n.MessagesApi
 import play.api.test.FakeRequest
@@ -18,14 +18,17 @@ import slick.lifted.TableQuery
 
 import scala.concurrent.Future
 
-class DishControllerSpec extends ControllerSpec {
+class MenuPerDayControllerSpec extends ControllerSpec {
   implicit lazy val materializer: Materializer = app.materializer
 
   private val developer = User(UUID.randomUUID(), "Developer", "developer@lunatech.com")
 
   val userService = mock[UserService]
   val dishService = mock[DishService]
+  val menuService = mock[MenuService]
   val menuDishService = mock[MenuDishService]
+  val menuPerDayService = mock[MenuPerDayService]
+  val menuPerDayPerPersonService = mock[MenuPerDayPerPersonService]
   val environment = mock[Environment]
   val messagesApi = mock[MessagesApi]
   val configuration = mock[Configuration]
@@ -38,29 +41,27 @@ class DishControllerSpec extends ControllerSpec {
 
   when(configuration.getStringList("administrators")).thenReturn(Some(adminList))
   when(userService.getByEmailAddress("developer@lunatech.com")).thenReturn(Future.successful(Some(developer)))
-  when(dishService.getAll).thenReturn(Future.successful(Seq(dish1, dish2, dish3, dish4, dish5)))
+  when(menuPerDayPerPersonService.getAllMenuWithNamePerDay).thenReturn(Future.successful(Seq(schedule1, schedule2)))
 
-  val controller = new DishController(
+  val controller = new MenuPerDayController(
     userService,
-    dishService,
+    menuService,
     menuDishService,
+    menuPerDayService,
+    menuPerDayPerPersonService,
     environment,
     messagesApi,
     configuration,
     connection)
 
-  "Dish controller" should {
-
-    "display list of dishes" in {
+  "Menu per day controller" should {
+    "display list of menus per day (schedules)" in {
       val request = FakeRequest().withSession("email" -> "developer@lunatech.com")
-      val result = call(controller.getAllDishes, request)
+      val result = call(controller.getAllMenusPerDay, request)
 
       status(result) mustBe 200
-      contentAsString(result).contains("Antipasto misto all italiana") mustBe true
-      contentAsString(result).contains("Prosciutto crudo di Parma e melone") mustBe true
-      contentAsString(result).contains("Insalata tricolore") mustBe true
-      contentAsString(result).contains("Avocado al forno") mustBe true
-      contentAsString(result).contains("Gamberoni all aglio") mustBe true
+      contentAsString(result).contains("Menu 1") mustBe true
+      contentAsString(result).contains("Menu 2") mustBe true
     }
   }
 

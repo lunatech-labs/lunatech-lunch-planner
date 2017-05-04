@@ -62,11 +62,11 @@ class MenuControllerSpec extends ControllerSpec {
       val result = call(controller.getAllMenus, request)
 
       status(result) mustBe 200
-      contentAsString(result).contains("Menu 1")
-      contentAsString(result).contains("Menu 2")
-      contentAsString(result).contains("Prosciutto crudo di Parma e melone")
-      contentAsString(result).contains("Insalata tricolore")
-      contentAsString(result).contains("Gamberoni all aglio")
+      contentAsString(result).contains("Menu 1") mustBe true
+      contentAsString(result).contains("Menu 2") mustBe true
+      contentAsString(result).contains("Prosciutto crudo di Parma e melone") mustBe true
+      contentAsString(result).contains("Insalata tricolore") mustBe true
+      contentAsString(result).contains("Gamberoni all aglio") mustBe true
     }
   }
 
