@@ -32,7 +32,7 @@
               <td><label class="font-normal">@listOfMenusPerDayPerPerson(index).menuName</label></td>
               <td>
                 @for(dishIndex <- listOfMenusPerDayPerPerson(index).listOfDishes.indices) {
-                  <label class="font-normal">@listOfMenusPerDayPerPerson(index).listOfDishes(dishIndex).name</label> <br>
+                  <label class="font-normal">@listOfMenusPerDayPerPerson(index).listOfDishes(dishIndex).name: @listOfMenusPerDayPerPerson(index).listOfDishes(dishIndex).description </label> <br>
                   }
               </td>
               <td>
