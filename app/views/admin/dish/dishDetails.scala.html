@@ -4,11 +4,11 @@
 @import lunatech.lunchplanner.viewModels.DishForm
 
 @(admin: User, dishForm: Form[DishForm], dishOption: Option[Dish])(implicit messages: play.api.i18n.Messages)
-@main("Dish detail", admin, isUserAdmin = true) {
+@main("Dish details", admin, isUserAdmin = true) {
 <!-- Nav tabs -->
 <ul class="nav nav-tabs">
-    <li role="presentation" ><a href="@lunatech.lunchplanner.controllers.routes.DishController.getNewDish">Create new</a></li>
     <li role="presentation" ><a href="@lunatech.lunchplanner.controllers.routes.DishController.getAllDishes">All dishes</a></li>
+    <li role="presentation" ><a href="@lunatech.lunchplanner.controllers.routes.DishController.getNewDish">Create new</a></li>
     <li role="presentation" class="active"><a data-toggle="tab" href="#dishDetails">Dish details</a></li>
 </ul>
 
@@ -24,7 +24,7 @@
                         @b3.text( dishForm("name"), '_label -> "Name", 'placeholder -> "Short dish name", 'value -> dish.name)
                         @b3.textarea( dishForm("description"), '_label -> "Description",  'placeholder -> "Dish description", 'rows -> 4, 'value -> dish.description)
                         @b3.text( dishForm("remarks"), '_label -> "Additional remarks", 'placeholder -> "Optional", 'value -> dish.remarks.getOrElse(""))
-                        <div class="col col-lg-2" style="padding-left: 0px">
+                        <div class="col col-lg-2" style="padding-left: 0">
                             <a href="@lunatech.lunchplanner.controllers.routes.DishController.getAllDishes" type="button" class="btn btn-default">
                                 <span class="glyphicon glyphicon-arrow-left"></span> Cancel </a>
                         </div>
@@ -37,7 +37,7 @@
                         </div>
                     </div>
                     <div class="col col-lg-6">
-                        <label style="height: 0">Extra info: </label>
+                        <label class="extra-info">Extra info: </label>
                         @b3.checkbox( dishForm("isVegetarian"), '_text -> "Vegetarian", 'checked -> dish.isVegetarian)
                         @b3.checkbox( dishForm("hasSeaFood"), '_text -> "Sea food", 'checked -> dish.hasSeaFood)
                         @b3.checkbox( dishForm("hasPork"), '_text -> "Pork", 'checked -> dish.hasPork)

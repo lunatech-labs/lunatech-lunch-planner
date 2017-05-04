@@ -6,8 +6,8 @@
 @main("New dish", admin, isUserAdmin = true) {
     <!-- Nav tabs -->
     <ul class="nav nav-tabs">
-        <li role="presentation" class="active"><a data-toggle="tab" href="#newDish">Create new</a></li>
         <li role="presentation" ><a href="@lunatech.lunchplanner.controllers.routes.DishController.getAllDishes">All dishes</a></li>
+        <li role="presentation" class="active"><a data-toggle="tab" href="#newDish">Create new</a></li>
     </ul>
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="newDish">
@@ -22,7 +22,7 @@
                         @b3.submit('class -> "btn btn-primary"){ <span class="glyphicon glyphicon-plus"></span> Create }
                     </div>
                     <div class="col col-lg-6">
-                        <label style="height: 0">Extra info: </label>
+                        <label class="extra-info">Extra info: </label>
                         @b3.checkbox( dishForm("isVegetarian"), '_text -> "Vegetarian" )
                         @b3.checkbox( dishForm("hasSeaFood"), '_text -> "Sea food")
                         @b3.checkbox( dishForm("hasPork"), '_text -> "Pork")

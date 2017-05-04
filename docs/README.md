@@ -48,7 +48,7 @@ In this separator you can:
 When you press a menu to see its details, a new separator called `Menu details` opens. There you can make modifications to the details of the menu, delete it or just cancel and go back to the list of menus.
 
 #####Management of scheduling of menus
-To create a new menu schedule select `Schedule` in the side navigation bar. Two separators will be available:
+To create a new menu schedule select `Schedules` in the side navigation bar. Two separators will be available:
 - Create new
 - All schedules
 

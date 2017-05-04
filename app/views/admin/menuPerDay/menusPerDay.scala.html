@@ -7,8 +7,8 @@
 @main("New schedule", admin, isUserAdmin = true) {
 <!-- Nav tabs -->
 <ul class="nav nav-tabs">
-    <li role="presentation"><a  href="@lunatech.lunchplanner.controllers.routes.MenuPerDayController.getNewMenuPerDay">Create new</a></li>
     <li role="presentation" class="active"><a data-toggle="tab" href="#list">All schedules</a></li>
+    <li role="presentation"><a  href="@lunatech.lunchplanner.controllers.routes.MenuPerDayController.getNewMenuPerDay">Create new</a></li>
 </ul>
 
 <!-- Tab panes -->
@@ -30,8 +30,8 @@
                     </thead>
                     @for(index <- listOfMenusPerDay.indices) {
                         <tr>
-                            <td><input type="checkbox" value="@listOfMenusPerDay(index).uuid" name="uuid[]"></td>
-                            <td><a href="@lunatech.lunchplanner.controllers.routes.MenuPerDayController.getMenuPerDayDetails(listOfMenusPerDay(index).uuid)">
+                            <td class="list-select"><input type="checkbox" value="@listOfMenusPerDay(index).uuid" name="uuid[@index]"></td>
+                            <td class="list-date"><a href="@lunatech.lunchplanner.controllers.routes.MenuPerDayController.getMenuPerDayDetails(listOfMenusPerDay(index).uuid)">
                                 <span>@listOfMenusPerDay(index).menuDate</span>
                                 <span class="glyphicon glyphicon-pencil"></span></a>
                             </td>

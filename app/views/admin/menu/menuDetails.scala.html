@@ -7,8 +7,8 @@
 @main("Menu details", admin, isUserAdmin = true) {
     <!-- Nav tabs -->
     <ul class="nav nav-tabs">
-        <li role="presentation"><a href="@lunatech.lunchplanner.controllers.routes.MenuController.getNewMenu">Create new</a></li>
         <li role="presentation"><a href="@lunatech.lunchplanner.controllers.routes.MenuController.getAllMenus">All menus</a></li>
+        <li role="presentation"><a href="@lunatech.lunchplanner.controllers.routes.MenuController.getNewMenu">Create new</a></li>
         <li role="presentation" class="active"><a data-toggle="tab" href="#menuDetail">Menu details</a></li>
     </ul>
     <div class="tab-content">
@@ -25,7 +25,7 @@
                                 @for(index <- menuDish.listOfDishes.indices) {
                                     @b3.checkbox(menuForm("dishesUuid[]"), '_text -> menuDish.listOfDishes(index).name, 'value -> menuDish.listOfDishes(index).uuid, 'checked -> menuDish.listOfDishes(index).isSelected)
                                 }
-                                <div class="col col-lg-2" style="padding-left: 0px">
+                                <div class="col col-lg-2" style="padding-left: 0" >
                                     <a href="@lunatech.lunchplanner.controllers.routes.MenuController.getAllMenus" type="button" class="btn btn-default">
                                         <span class="glyphicon glyphicon-arrow-left"></span> Cancel
                                     </a>
