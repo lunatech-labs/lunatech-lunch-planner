@@ -15,7 +15,7 @@ class UserService @Inject() (configuration: Configuration, implicit val connecti
   def getUserByEmailAddress(emailAddress: String): Future[Option[User]] = UserTable.getUserByEmailAddress(emailAddress)
 
   def isAdminUser(emailAddress: String): Boolean =
-    configuration.getString("administrator").getOrElse("").contains(emailAddress)
+    configuration.getStringList("administrators").get.contains(emailAddress)
 
   def addIfNewUser(emailAddress: String): Future[User] = {
     val name = getUserNameFromEmail(emailAddress)

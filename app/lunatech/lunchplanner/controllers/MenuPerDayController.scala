@@ -2,7 +2,6 @@ package lunatech.lunchplanner.controllers
 
 import com.google.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.persistence.UserTable
 import lunatech.lunchplanner.services.{ DishService, MenuPerDayPerPersonService, MenuPerDayService, MenuService, UserService }
 import lunatech.lunchplanner.viewModels.{ DishForm, MenuForm, MenuPerDayForm }
 import play.api.i18n.{ I18nSupport, MessagesApi }
@@ -26,7 +25,7 @@ class MenuPerDayController  @Inject() (
   def getAllMenusPerDay(activePage: Int) = IsAdminAsync { username =>
     implicit request => {
       for{
-        currentUser <- UserTable.getUserByEmailAddress(username)
+        currentUser <- userService.getUserByEmailAddress(username)
         menus <- menuService.getAllMenusWithListOfDishes.map(_.toArray)
         menusUuidAndNames <- menuService.getAllMenusUuidAndNames
         menusPerDay <- menuPerDayPerPersonService.getAllMenuWithNamePerDay.map(_.toArray)

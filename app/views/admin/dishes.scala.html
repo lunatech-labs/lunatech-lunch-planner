@@ -1,43 +1,34 @@
 @import b3.vertical.fieldConstructor
 @import lunatech.lunchplanner.models.Dish
 @import lunatech.lunchplanner.models.User
-@import lunatech.lunchplanner.viewModels.DishForm
+@import lunatech.lunchplanner.viewModels.ListDishesForm
 
-@(activeTab: Int, admin: User, dishForm: Form[DishForm], listOfDishes: Array[Dish])(implicit messages: play.api.i18n.Messages)
-@main("Overview", admin, isUserAdmin = true) {
-<h2>Dishes</h2>
-
-    <!-- Nav tabs -->
+@(admin: User, listOfDishes: Array[Dish], listDishesForm: Form[ListDishesForm])(implicit messages: play.api.i18n.Messages)
+@main("Dishes", admin, isUserAdmin = true) {
+<!-- Nav tabs -->
 <ul class="nav nav-tabs">
-    <li role="presentation" class="@if(activeTab == 0){ active }"><a data-toggle="tab" href="#newDish">Create new</a></li>
-    <li role="presentation" class="@if(activeTab == 1){ active }"><a data-toggle="tab" href="#list">All dishes</a></li>
+    <li role="presentation" ><a href="@lunatech.lunchplanner.controllers.routes.DishController.getNewDish">Create new</a></li>
+    <li role="presentation" class="active"><a data-toggle="tab" href="#list">All dishes</a></li>
 </ul>
 <div class="tab-content">
-    <div role="tabpanel" class="tab-pane @if(activeTab == 0){ active }" id="newDish">
-        <div>
-            <br>
-            <label>Create new dish</label>
-            @helper.form(lunatech.lunchplanner.controllers.routes.DishController.createNewDish) {
-                @b3.text( dishForm("name"), '_label -> "Name", 'placeholder -> "Short dish name" )
-                @b3.text( dishForm("description"), '_label -> "Description",  'placeholder -> "Dish description")
-                @b3.checkbox( dishForm("isVegetarian"), '_text -> "Is vegetarian" )
-                @b3.checkbox( dishForm("hasSeaFood"), '_text -> "Has sea food")
-                @b3.checkbox( dishForm("hasPork"), '_text -> "Has pork")
-                @b3.checkbox( dishForm("hasBeef"), '_text -> "Has beef")
-                @b3.checkbox( dishForm("hasChicken"), '_text -> "Has Chicken")
-                @b3.checkbox( dishForm("isGlutenFree"), '_text -> "Is gluten free")
-                @b3.checkbox( dishForm("hasLactose"), '_text -> "Has lactose")
-                @b3.text( dishForm("remarks"), '_label -> "Additional remarks", 'placeholder -> "Optional" )
-                @b3.submit('class -> "btn btn-primary"){ Create dish }
-            }
-        </div>
-    </div>
-    <div role="tabpanel" class="tab-pane @if(activeTab == 1){ active }" id="list">
+    <div role="tabpanel" class="tab-pane active" id="list">
         <div>
             <br>
             <label>List of dishes</label>
-            @for(index <- listOfDishes.indices) {
-                @b3.checkbox( dishForm("dishesUuid[]"), '_text -> listOfDishes(index).name, 'value -> listOfDishes(index).uuid)
+            @b3.form(lunatech.lunchplanner.controllers.routes.DishController.deleteDishes) {
+                @for(index <- listOfDishes.indices) {
+                    <div class="form-group" id="uuid">
+                        <div class="checkbox">
+                            <label for="@listOfDishes(index).uuid">
+                                <input type="checkbox" id="uuid" name="uuid[]" value="@listOfDishes(index).uuid">
+                                <a href="@lunatech.lunchplanner.controllers.routes.DishController.getDishDetails(listOfDishes(index).uuid)">@listOfDishes(index).name
+                                <span class="glyphicon glyphicon-pencil"></span>
+                                </a>
+                            </label>
+                        </div>
+                    </div>
+                }
+                @b3.submit('class -> "btn btn-primary"){ <span class="glyphicon glyphicon-remove"></span> Delete selected }
             }
         </div>
     </div>

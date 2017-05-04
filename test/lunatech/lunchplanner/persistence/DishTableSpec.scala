@@ -123,5 +123,16 @@ class DishTableSpec extends AcceptanceSpec with TestDatabaseProvider {
       val result = Await.result(DishTable.removeDish(UUID.randomUUID()), defaultTimeout)
       result mustBe 0
     }
+
+    "update an existing dish by uuid" in {
+      val updatedPastaBologneseDish = pastaBologneseDish.copy(
+        description = "updated description")
+
+      val result = Await.result(DishTable.insertOrUpdate(updatedPastaBologneseDish), defaultTimeout)
+      result mustBe true
+
+      val updatedDish = Await.result(DishTable.getDishByUUID(updatedPastaBologneseDish.uuid), defaultTimeout)
+      updatedDish.get.description mustBe "updated description"
+    }
   }
 }
