@@ -1,4 +1,4 @@
-@(title: String, currentUser: lunatech.lunchplanner.models.User, isUserAdmin: Boolean, tab: String = "index")(content: Html)
+@(title: String, currentUser: lunatech.lunchplanner.models.User, isUserAdmin: Boolean)(content: Html)
 
 <!DOCTYPE html>
 
@@ -6,39 +6,66 @@
     <head>
         <title>@title</title>
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
-        <link href="@routes.Assets.at("stylesheets/screen.css")" media="all" rel="stylesheet" type="text/css" />
-  		  <link href="@routes.Assets.at("stylesheets/blue.css")" media="screen" rel="stylesheet" title="Theme" type="text/css" />
         <link href="@routes.Assets.at("stylesheets/main.css")" media="screen" rel="stylesheet" type="text/css" />
         <link href="@routes.Assets.at("stylesheets/bootstrap.min.css")" media="screen" rel="stylesheet" type="text/css" />
+        <link href="@routes.Assets.at("stylesheets/simple-sidebar.css")" media="screen" rel="stylesheet" type="text/css" />
         <script src="@routes.Assets.at("javascripts/jquery-1.10.1.min.js")" type="text/javascript"></script>
   		  <script src="@routes.Assets.at("javascripts/bootstrap.min.js")" type="text/javascript"></script>
         <script src="https://apis.google.com/js/client:platform.js?onload=start" async defer></script>
         <script src="@routes.Assets.at("javascripts/googleCallback.js")"></script>
-
     </head>
 
-<body style="background: #E5E5E5">
-    <div id="corner_logo">
-        <div style="font-size:x-small;color: #BBB; font-family: Arial; text-shadow: 0px 1px 0px white;">
-            Brought to you by
-        </div>
-    <img style="width:150px" src="@routes.Assets.at("images/lunatech_logo.png")"/>
-    </div>
-
-     <div id="Header">
-        <div id="Tabs">
-            <ul id="MainTabs">
-                <li><a href="@lunatech.lunchplanner.controllers.routes.Application.index()" class="@if(tab == "index") {current} chat">Lunch planner</a></li>
+<body>
+    <div id="wrapper" class="toggled">
+            <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <ul class="sidebar-nav">
+                <div id="corner_logo">
+                    <div style="padding-left: 20px; font-size:x-small;color: #BBB; font-family: Arial;text-shadow: 0px 1px 0px black;">Brought to you by</div>
+                    <img style="padding-left: 20px; width:150px" src="@routes.Assets.at("images/lunatech_logo.png")"/>
+                </div>
+                <li>
+                    <a href="#">Logged in as @currentUser.name</a>
+                </li>
+                <li class="sidebar-brand">
+                    <a href="#">Meal Planner</a>
+                </li>
+                <li>
+                    <a href="@lunatech.lunchplanner.controllers.routes.Application.index">Planned meals</a>
+                </li>
+                <li>
+                    <a href="#">Profile</a>
+                </li>
                 @if(isUserAdmin) {
-                  <li><a href="@lunatech.lunchplanner.controllers.routes.Application.admin()" class="@if(tab == "admin") {current}  chat">Admin</a></li>
+                    <li>
+                        <a href="#">Admin</a>
+                    </li>
+                    <li>
+                        <a href="@lunatech.lunchplanner.controllers.routes.DishController.getAllDishes(0)">Dishes</a>
+                    </li>
+                    <li>
+                        <a href="@lunatech.lunchplanner.controllers.routes.MenuController.getAllMenus(0)">Menus</a>
+                    </li>
+                    <li>
+                        <a href="@lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay(0)">Schedule</a>
+                    </li>
                 }
-                <li style="float: right;" class="logout"><a href="@lunatech.lunchplanner.controllers.routes.Authentication.logout()">Sign out</a></li>
-                <li style="float: right;color: #7F99B1;font-size: 11px;background: none;border: none;padding-top: 6px;padding-right: 0;text-decoration: none;" class="logout">Logged in as @currentUser.name</li>
+                <li class="logout">
+                    <a href="@lunatech.lunchplanner.controllers.routes.Authentication.logout">Log out</a>
+                </li>
             </ul>
         </div>
+            <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <div>
+                <div class="row">
+                    <div>
+                    @content
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
-   	 @content
 
 </body>
 

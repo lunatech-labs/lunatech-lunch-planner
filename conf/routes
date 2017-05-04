@@ -4,22 +4,22 @@
 
 GET         /                                  lunatech.lunchplanner.controllers.Application.index
 
-GET         /admin                             lunatech.lunchplanner.controllers.Application.admin(activePage: Int ?= 0)
-
 # redirect to google authentication
 GET         /login                             lunatech.lunchplanner.controllers.Authentication.login
 GET         /authenticate                      lunatech.lunchplanner.controllers.Authentication.authenticate(code: String, id_token: String, access_token: String)
 GET         /logout                            lunatech.lunchplanner.controllers.Authentication.logout
 
 # Dish
-GET         /dish/all                          lunatech.lunchplanner.controllers.DishController.getAllDishes
+GET         /dish/all                          lunatech.lunchplanner.controllers.DishController.getAllDishes(activePage: Int ?= 0)
 POST        /dish/add                          lunatech.lunchplanner.controllers.DishController.createNewDish
 
 # Menu
+GET         /menu/all                          lunatech.lunchplanner.controllers.MenuController.getAllMenus(activePage: Int ?= 0)
 POST        /menu/add                          lunatech.lunchplanner.controllers.MenuController.createNewMenu
 
 # Menu per day
-POST        /menuPerDay/add                    lunatech.lunchplanner.controllers.MenuPerDayController.createNewMenuPerDay
+GET        /menuPerDay/all                     lunatech.lunchplanner.controllers.MenuPerDayController.getAllMenusPerDay(activePage: Int ?= 0)
+POST       /menuPerDay/add                     lunatech.lunchplanner.controllers.MenuPerDayController.createNewMenuPerDay
 
 # Menu per day per person
 POST        /menuPerDayPerPerson/add           lunatech.lunchplanner.controllers.MenuPerDayPerPersonController.createNewMenuPerDayPerPerson

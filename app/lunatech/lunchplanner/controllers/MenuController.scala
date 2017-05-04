@@ -1,16 +1,11 @@
 package lunatech.lunchplanner.controllers
 
-import java.util.UUID
-
 import com.google.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.{ Menu, MenuDish, MenuWithNamePerDay }
-import lunatech.lunchplanner.persistence.{ MenuDishTable, MenuTable }
+import lunatech.lunchplanner.models.{ MenuDish, MenuWithNamePerDay }
+import lunatech.lunchplanner.persistence.{ MenuDishTable, UserTable }
 import lunatech.lunchplanner.services.{ DishService, MenuService, UserService }
-import lunatech.lunchplanner.viewModels.MenuForm
-import play.api.data.Form
-import play.api.data.Forms._
-import play.api.data.format.Formats._
+import lunatech.lunchplanner.viewModels.{ DishForm, MenuForm, MenuPerDayForm }
 import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.mvc.Controller
 import play.api.{ Configuration, Environment }
@@ -28,30 +23,38 @@ class MenuController  @Inject() (
   implicit val connection: DBConnection)
   extends Controller with Secured with I18nSupport {
 
-  def createNewMenu() = IsAdminAsync { username =>
+  def getAllMenus(activePage: Int) = IsAdminAsync { username =>
+    implicit request => {
+      for{
+        currentUser <- UserTable.getUserByEmailAddress(username)
+        dishes <- dishService.getAllDishes.map(_.toArray)
+        menus <- menuService.getAllMenusWithListOfDishes.map(_.toArray)
+      } yield
+        Ok(views.html.admin.menus(activePage, currentUser.get, MenuForm.menuForm, dishes, menus))
+    }
+  }
+
+  def createNewMenu = IsAdminAsync { username =>
     implicit request => {
 
       for {
         user <- userService.getUserByEmailAddress(username)
         dishes <- dishService.getAllDishes.map(_.toArray)
         menus <- menuService.getAllMenusWithListOfDishes.map(_.toArray)
-        result <- MenuController
+        result <- MenuForm
           .menuForm
           .bindFromRequest
           .fold(
-            formWithErrors => Future.successful(BadRequest(views.html.admin(
-              activeTab = 1,
+            formWithErrors => Future.successful(BadRequest(views.html.admin.menus(
+              activeTab = 0,
               user.get,
-              DishController.dishForm,
               formWithErrors,
               dishes,
-              menus,
-              MenuPerDayController.menuPerDayForm,
-              Seq.empty[(String, String)],
-              Array.empty[MenuWithNamePerDay]))),
+              menus
+            ))),
             menuData => {
               addNewMenuDishes(menuData).map(_ =>
-                Redirect(lunatech.lunchplanner.controllers.routes.Application.admin(activePage = 1)))
+                Redirect(lunatech.lunchplanner.controllers.routes.MenuController.getAllMenus()))
             })
       } yield result
     }
@@ -74,14 +77,4 @@ class MenuController  @Inject() (
   def filterDishByMenuName = ???
   def filterDishByUUID = ???
   def filterDishByMenuUUID = ???
-}
-
-object MenuController {
-  val menuForm = Form(
-    mapping(
-      "menuName" -> nonEmptyText,
-      "dishesUuid" -> list(of[UUID])
-    )(MenuForm.apply)(MenuForm.unapply)
-  )
-
 }
