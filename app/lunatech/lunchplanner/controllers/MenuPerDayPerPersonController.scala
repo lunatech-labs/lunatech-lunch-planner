@@ -27,18 +27,19 @@ class MenuPerDayPerPersonController @Inject() (
     implicit request => {
 
       for{
-        user <- userService.getUserByEmailAddress(username)
-        menusPerDayPerPerson <- menuPerDayPerPersonService.getAllMenuWithNamePerDayWithDishesPerPerson(user.get.uuid).map(_.toArray)
+        user <- userService.getByEmailAddress(username)
         result <- MenuPerDayPerPersonForm
             .menuPerDayPerPersonForm
             .bindFromRequest
             .fold(
-              formWithErrors => Future.successful(
-                BadRequest(views.html.index(
-                  user.get,
-                  isUserAdmin = userService.isAdminUser(user.get.emailAddress),
-                  menusPerDayPerPerson,
-                  formWithErrors))),
+              formWithErrors =>
+                menuPerDayPerPersonService.getAllMenuWithNamePerDayWithDishesPerPerson(user.get.uuid)
+                  .map( menusPerDayPerPerson =>
+                    BadRequest(views.html.index(
+                      user.get,
+                      isUserAdmin = userService.isAdminUser(user.get.emailAddress),
+                      menusPerDayPerPerson.toArray,
+                      formWithErrors))),
               menuPerDayPerPersonData => {
                 updateMenusPerDayPerPerson(user.get.uuid, menuPerDayPerPersonData).map(_ =>
                   Redirect(lunatech.lunchplanner.controllers.routes.Application.index()))
@@ -49,7 +50,7 @@ class MenuPerDayPerPersonController @Inject() (
     }
 
   private def updateMenusPerDayPerPerson(userUuid: UUID, form: MenuPerDayPerPersonForm) = {
-    menuPerDayPerPersonService.getAllMenusPerDayPerPersonByUserUuid(userUuid).map(allMenusPerDayPerPerson => {
+    menuPerDayPerPersonService.getAllByUserUuid(userUuid).map(allMenusPerDayPerPerson => {
       menusPerDayToAdd(allMenusPerDayPerPerson, userUuid, form)
       menusPerDayToRemove(allMenusPerDayPerPerson, userUuid, form)
     })
@@ -60,11 +61,11 @@ class MenuPerDayPerPersonController @Inject() (
       .filter(!menusChosen.map(_.menuPerDayUuid).contains(_))
       .foreach{ uuid =>
       val newMenuPerDayPerPerson = MenuPerDayPerPerson(menuPerDayUuid = uuid, userUuid = userUuid)
-      menuPerDayPerPersonService.addNewMenusPerDayPerPerson(newMenuPerDayPerPerson)
+      menuPerDayPerPersonService.add(newMenuPerDayPerPerson)
     }
 
   private def menusPerDayToRemove(allMenusPerDayPerPerson: Seq[MenuPerDayPerPerson], userUuid: UUID, form: MenuPerDayPerPersonForm) =
     allMenusPerDayPerPerson.filter(menu => !form.menuPerDayUuid.contains(menu.menuPerDayUuid))
-      .foreach(menu => menuPerDayPerPersonService.removeMenuPerDayPerPerson(menu.uuid))
+      .foreach(menu => menuPerDayPerPersonService.remove(menu.uuid))
 
 }

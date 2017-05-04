@@ -19,65 +19,65 @@ class MenuPerDayTableSpec extends AcceptanceSpec with TestDatabaseProvider {
   override def beforeAll {
     cleanDatabase()
 
-    Await.result(MenuTable.addMenu(newMenu), defaultTimeout)
+    Await.result(MenuTable.add(newMenu), defaultTimeout)
   }
 
   "A MenuPerDay table" must {
     "add a new menu per day" in {
-      val result = Await.result(MenuPerDayTable.addMenuPerDay(newMenuPerDay), defaultTimeout)
+      val result = Await.result(MenuPerDayTable.add(newMenuPerDay), defaultTimeout)
       result.uuid mustBe newMenuPerDay.uuid
       result.menuUuid mustBe newMenuPerDay.menuUuid
       result.date.toString mustBe newMenuPerDay.date.toString
     }
 
     "query for existing menus per day successfully" in {
-      val result = Await.result(MenuPerDayTable.menuPerDayExists(newMenuPerDay.uuid), defaultTimeout)
+      val result = Await.result(MenuPerDayTable.exists(newMenuPerDay.uuid), defaultTimeout)
       result mustBe true
     }
 
     "query for menus per day by uuid" in {
-      val result = Await.result(MenuPerDayTable.getMenuPerDayByUUID(newMenuPerDay.uuid), defaultTimeout)
+      val result = Await.result(MenuPerDayTable.getByUUID(newMenuPerDay.uuid), defaultTimeout)
       result.foreach(_.date.toString) mustBe Some(newMenuPerDay).foreach(_.date.toString)
     }
 
     "query for menus per day by menu uuid" in {
-      val result = Await.result(MenuPerDayTable.getMenuPerDayByMenuUuid(newMenu.uuid), defaultTimeout)
+      val result = Await.result(MenuPerDayTable.getByMenuUuid(newMenu.uuid), defaultTimeout)
       result.foreach(_.date.toString) mustBe Vector(newMenuPerDay).foreach(_.date.toString)
     }
 
     "query for menus per day by non existent menu uuid" in {
-      val result = Await.result(MenuPerDayTable.getMenuPerDayByMenuUuid(UUID.randomUUID()), defaultTimeout)
+      val result = Await.result(MenuPerDayTable.getByMenuUuid(UUID.randomUUID()), defaultTimeout)
       result mustBe Vector()
     }
 
     "query for menus per day by date" in {
-      val result = Await.result(MenuPerDayTable.getMenuPerDayByDate(new Date(10000)), defaultTimeout)
+      val result = Await.result(MenuPerDayTable.getByDate(new Date(10000)), defaultTimeout)
       result.foreach(_.date.toString) mustBe Vector(newMenuPerDay).foreach(_.date.toString)
     }
 
     "query for menus per day by date that does not exist in table" in {
-      val result = Await.result(MenuPerDayTable.getMenuPerDayByDate(new Date(900000000)), defaultTimeout)
+      val result = Await.result(MenuPerDayTable.getByDate(new Date(900000000)), defaultTimeout)
       result mustBe Vector()
     }
 
     "query all menus per day" in {
-      val result = Await.result(MenuPerDayTable.getAllMenuPerDays, defaultTimeout)
+      val result = Await.result(MenuPerDayTable.getAll, defaultTimeout)
       result.foreach(_.date.toString) mustBe Vector(newMenuPerDay).foreach(_.date.toString)
     }
 
     "remove an existing menu per day by uuid" in {
-      val result = Await.result(MenuPerDayTable.removeMenuPerDay(newMenuPerDay.uuid), defaultTimeout)
+      val result = Await.result(MenuPerDayTable.remove(newMenuPerDay.uuid), defaultTimeout)
       result mustBe 1
     }
 
     "not fail when trying to remove a menu per day that does not exist" in {
-      val result = Await.result(MenuPerDayTable.removeMenuPerDay(UUID.randomUUID()), defaultTimeout)
+      val result = Await.result(MenuPerDayTable.remove(UUID.randomUUID()), defaultTimeout)
       result mustBe 0
     }
 
     "remove an existing menu per day by menu uuid" in {
-      Await.result(MenuPerDayTable.addMenuPerDay(newMenuPerDay), defaultTimeout)
-      val result = Await.result(MenuPerDayTable.removeMenuPerDayByMenuUuid(newMenuPerDay.menuUuid), defaultTimeout)
+      Await.result(MenuPerDayTable.add(newMenuPerDay), defaultTimeout)
+      val result = Await.result(MenuPerDayTable.removeByMenuUuid(newMenuPerDay.menuUuid), defaultTimeout)
       result mustBe 1
     }
   }

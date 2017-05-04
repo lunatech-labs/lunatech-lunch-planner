@@ -21,17 +21,17 @@ class MenuTable(tag: Tag) extends Table[Menu](tag, "Menu") {
 object MenuTable {
   val menuTable: TableQuery[MenuTable] = TableQuery[MenuTable]
 
-  def addMenu(menu: Menu)(implicit connection: DBConnection): Future[Menu] = {
+  def add(menu: Menu)(implicit connection: DBConnection): Future[Menu] = {
     val query = menuTable returning menuTable += menu
     connection.db.run(query)
   }
 
-  def menuExists(uuid: UUID)(implicit connection: DBConnection): Future[Boolean] = {
+  def exists(uuid: UUID)(implicit connection: DBConnection): Future[Boolean] = {
     connection.db.run(menuTable.filter(_.uuid === uuid).exists.result)
   }
 
-  def getMenuByUUID(uuid: UUID)(implicit connection: DBConnection): Future[Option[Menu]] = {
-    menuExists(uuid).flatMap {
+  def getByUUID(uuid: UUID)(implicit connection: DBConnection): Future[Option[Menu]] = {
+    exists(uuid).flatMap {
       case true =>
         val query = menuTable.filter(x => x.uuid === uuid)
         connection.db.run(query.result.headOption)
@@ -39,17 +39,17 @@ object MenuTable {
     }
   }
 
-  def getMenuByName(name: String)(implicit connection: DBConnection): Future[Option[Menu]] = {
+  def getByName(name: String)(implicit connection: DBConnection): Future[Option[Menu]] = {
     val query = menuTable.filter(_.name === name)
     connection.db.run(query.result.headOption)
   }
 
-  def getAllMenus(implicit connection: DBConnection): Future[Seq[Menu]] = {
+  def getAll(implicit connection: DBConnection): Future[Seq[Menu]] = {
     connection.db.run(menuTable.result)
   }
 
-  def removeMenu(uuid: UUID)(implicit connection: DBConnection): Future[Int]  = {
-    menuExists(uuid).flatMap {
+  def remove(uuid: UUID)(implicit connection: DBConnection): Future[Int]  = {
+    exists(uuid).flatMap {
       case true =>
         val query = menuTable.filter(x => x.uuid === uuid).delete
         connection.db.run(query)

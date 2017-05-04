@@ -21,32 +21,32 @@ class MenuTableSpec extends AcceptanceSpec with TestDatabaseProvider {
 
   "A Menu table" must {
     "add a new menu" in {
-      val result = Await.result(MenuTable.addMenu(newMenu), defaultTimeout)
+      val result = Await.result(MenuTable.add(newMenu), defaultTimeout)
       result mustBe newMenu
     }
 
     "query for existing menus successfully" in {
-      val result = Await.result(MenuTable.menuExists(newMenu.uuid), defaultTimeout)
+      val result = Await.result(MenuTable.exists(newMenu.uuid), defaultTimeout)
       result mustBe true
     }
 
     "query for menus by uuid" in {
-      val result = Await.result(MenuTable.getMenuByUUID(newMenu.uuid), defaultTimeout)
+      val result = Await.result(MenuTable.getByUUID(newMenu.uuid), defaultTimeout)
       result mustBe Some(newMenu)
     }
 
     "query all menus" in {
-      val result = Await.result(MenuTable.getAllMenus, defaultTimeout)
+      val result = Await.result(MenuTable.getAll, defaultTimeout)
       result mustBe Vector(newMenu)
     }
 
     "remove an existing menu by uuid" in {
-      val result = Await.result(MenuTable.removeMenu(newMenu.uuid), defaultTimeout)
+      val result = Await.result(MenuTable.remove(newMenu.uuid), defaultTimeout)
       result mustBe 1
     }
 
     "not fail when trying to remove a menu that does not exist" in {
-      val result = Await.result(MenuTable.removeMenu(UUID.randomUUID()), defaultTimeout)
+      val result = Await.result(MenuTable.remove(UUID.randomUUID()), defaultTimeout)
       result mustBe 0
     }
 
@@ -56,7 +56,7 @@ class MenuTableSpec extends AcceptanceSpec with TestDatabaseProvider {
       val result = Await.result(MenuTable.insertOrUpdate(newMenuUpdated), defaultTimeout)
       result mustBe true
 
-      val updatedMenu = Await.result(MenuTable.getMenuByUUID(newMenuUpdated.uuid), defaultTimeout)
+      val updatedMenu = Await.result(MenuTable.getByUUID(newMenuUpdated.uuid), defaultTimeout)
       updatedMenu.get.name mustBe "updated name"
     }
   }
