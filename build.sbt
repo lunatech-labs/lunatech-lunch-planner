@@ -21,7 +21,9 @@ libraryDependencies ++= Seq(
   "com.google.api-client" % "google-api-client" % "1.22.0",
   "com.google.http-client" % "google-http-client-jackson" % "1.22.0",
   "com.lunatech" %% "play-googleopenconnect" % "1.3-SNAPSHOT",
+  "com.adrianhurt" %% "play-bootstrap" % "1.1.1-P25-B3-SNAPSHOT",
   "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % Test
 )
 
 resolvers += "Lunatech Artifactory" at "http://artifactory.lunatech.com/artifactory/snapshots-public"
+resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
