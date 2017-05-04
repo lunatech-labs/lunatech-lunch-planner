@@ -49,5 +49,15 @@ class MenuTableSpec extends AcceptanceSpec with TestDatabaseProvider {
       val result = Await.result(MenuTable.removeMenu(UUID.randomUUID()), defaultTimeout)
       result mustBe 0
     }
+
+    "update an existing menu by uuid" in {
+      val newMenuUpdated = newMenu.copy(name = "updated name")
+
+      val result = Await.result(MenuTable.insertOrUpdate(newMenuUpdated), defaultTimeout)
+      result mustBe true
+
+      val updatedMenu = Await.result(MenuTable.getMenuByUUID(newMenuUpdated.uuid), defaultTimeout)
+      updatedMenu.get.name mustBe "updated name"
+    }
   }
 }

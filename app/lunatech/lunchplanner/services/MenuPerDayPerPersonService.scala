@@ -76,4 +76,7 @@ class MenuPerDayPerPersonService  @Inject() (
       }
     }
   }
+
+  def deleteMenusPerDayPerPersonByMenuPerPersonUuid(menuPerDayUuid: UUID): Future[Int] =
+    MenuPerDayPerPersonTable.removeMenuPerDayPerPersonByMenuPerDayUuid(menuPerDayUuid)
 }

@@ -9,15 +9,15 @@
 <ul class="nav nav-tabs">
     <li role="presentation" ><a href="@lunatech.lunchplanner.controllers.routes.DishController.getNewDish">Create new</a></li>
     <li role="presentation" ><a href="@lunatech.lunchplanner.controllers.routes.DishController.getAllDishes">All dishes</a></li>
-    <li role="presentation" class="active"><a data-toggle="tab" href="#dishDetail">Dish Detail</a></li>
+    <li role="presentation" class="active"><a data-toggle="tab" href="#dishDetails">Dish Details</a></li>
 </ul>
 
 <div class="tab-content">
-    <div role="tabpanel" class="tab-pane active" id="dishDetail">
+    <div role="tabpanel" class="tab-pane active" id="dishDetails">
+        <br>
         @dishOption match {
             case None => { <label>Error retrieving the dish!!</label> }
             case Some(dish) => {
-                <br>
                 @b3.form(lunatech.lunchplanner.controllers.routes.DishController.saveDishDetails(dish.uuid)) {
                 <div class="row">
                     <div class="col col-lg-6">
@@ -26,13 +26,12 @@
                         @b3.text( dishForm("remarks"), '_label -> "Additional remarks", 'placeholder -> "Optional", 'value -> dish.remarks.getOrElse(""))
                         <div class="col col-lg-2" style="padding-left: 0px">
                             <a href="@lunatech.lunchplanner.controllers.routes.DishController.getAllDishes" type="button" class="btn btn-default">
-                                <span class="glyphicon glyphicon-arrow-left"></span> Cancel
-                            </a>
+                                <span class="glyphicon glyphicon-arrow-left"></span> Cancel </a>
                         </div>
-                        <div class="col col-lg-2" style="padding-left: 0px">
+                        <div class="col col-lg-2">
                         @b3.submit('class -> "btn btn-primary"){ <span class="glyphicon glyphicon-ok"></span> Save }
                         </div>
-                        <div class="col col-lg-2" style="padding-left: 0px">
+                        <div class="col col-lg-2">
                             <button type="submit" class="btn btn-danger" formaction="/dish/delete/@dish.uuid">
                                 <span class="glyphicon glyphicon-remove"></span> Delete </button>
                         </div>

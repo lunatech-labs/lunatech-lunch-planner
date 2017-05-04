@@ -70,12 +70,13 @@ object MenuPerDayPerPersonTable {
   }
 
   def removeMenuPerDayPerPerson(uuid: UUID)(implicit connection: DBConnection): Future[Int]  = {
-    menuPerDayPerPersonExists(uuid).flatMap {
-      case true =>
-        val query = menuPerDayPerPersonTable.filter(x => x.uuid === uuid).delete
-        connection.db.run(query)
-      case false => Future(0)
-    }
+      val query = menuPerDayPerPersonTable.filter(x => x.uuid === uuid).delete
+      connection.db.run(query)
+  }
+
+  def removeMenuPerDayPerPersonByMenuPerDayUuid(menuUuid: UUID)(implicit connection: DBConnection): Future[Int]  = {
+    val query = menuPerDayPerPersonTable.filter(x => x.menuPerDayUuid === menuUuid).delete
+    connection.db.run(query)
   }
 
 }

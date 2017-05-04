@@ -3,7 +3,7 @@ package lunatech.lunchplanner.persistence
 import java.util.UUID
 
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.{ Menu, Dish, MenuDish }
+import lunatech.lunchplanner.models.{ Dish, Menu, MenuDish }
 import slick.driver.PostgresDriver.api._
 import slick.lifted.{ ForeignKeyQuery, ProvenShape, TableQuery }
 
@@ -38,7 +38,7 @@ object MenuDishTable {
     connection.db.run(menuDishTable.filter(_.uuid === uuid).exists.result)
   }
 
-  def getMenuDishByUUID(uuid: UUID)(implicit connection: DBConnection): Future[Option[MenuDish]] = {
+  def getMenuDishByUuid(uuid: UUID)(implicit connection: DBConnection): Future[Option[MenuDish]] = {
     menuDishExists(uuid).flatMap {
       case true =>
         val query = menuDishTable.filter(x => x.uuid === uuid)
@@ -56,14 +56,14 @@ object MenuDishTable {
     connection.db.run(menuDishTable.result)
   }
 
-  def removeMenuDish(uuid: UUID)(implicit connection: DBConnection): Future[Int]  = {
-    menuDishExists(uuid).flatMap {
-      case true =>
-        val query = menuDishTable.filter(x => x.uuid === uuid).delete
-        connection.db.run(query)
-      case false => Future(0)
-    }
+  def removeMenuDish(uuid: UUID)(implicit connection: DBConnection): Future[Int] = {
+    val query = menuDishTable.filter(x => x.uuid === uuid).delete
+    connection.db.run(query)
   }
 
+  def removeMenuDishesByMenuUuid(menuUuid: UUID)(implicit connection: DBConnection) = {
+    val query = menuDishTable.filter(x => x.menuUuid === menuUuid).delete
+    connection.db.run(query)
+  }
 }
 

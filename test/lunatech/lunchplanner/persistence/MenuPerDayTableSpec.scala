@@ -74,5 +74,11 @@ class MenuPerDayTableSpec extends AcceptanceSpec with TestDatabaseProvider {
       val result = Await.result(MenuPerDayTable.removeMenuPerDay(UUID.randomUUID()), defaultTimeout)
       result mustBe 0
     }
+
+    "remove an existing menu per day by menu uuid" in {
+      Await.result(MenuPerDayTable.addMenuPerDay(newMenuPerDay), defaultTimeout)
+      val result = Await.result(MenuPerDayTable.removeMenuPerDayByMenuUuid(newMenuPerDay.menuUuid), defaultTimeout)
+      result mustBe 1
+    }
   }
 }

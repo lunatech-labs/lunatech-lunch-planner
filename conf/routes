@@ -14,13 +14,18 @@ GET         /dish/all                          lunatech.lunchplanner.controllers
 GET         /dish/new                          lunatech.lunchplanner.controllers.DishController.getNewDish
 POST        /dish/add                          lunatech.lunchplanner.controllers.DishController.createNewDish
 POST        /dish/delete                       lunatech.lunchplanner.controllers.DishController.deleteDishes
-POST        /dish/delete/:uuid                  lunatech.lunchplanner.controllers.DishController.deleteDish(uuid: java.util.UUID)
+POST        /dish/delete/:uuid                 lunatech.lunchplanner.controllers.DishController.deleteDish(uuid: java.util.UUID)
 GET         /dish/:uuid                        lunatech.lunchplanner.controllers.DishController.getDishDetails(uuid: java.util.UUID)
 POST        /dish/:uuid                        lunatech.lunchplanner.controllers.DishController.saveDishDetails(uuid: java.util.UUID)
 
 # Menu
-GET         /menu/all                          lunatech.lunchplanner.controllers.MenuController.getAllMenus(activePage: Int ?= 0)
+GET         /menu/all                          lunatech.lunchplanner.controllers.MenuController.getAllMenus
+GET         /menu/new                          lunatech.lunchplanner.controllers.MenuController.getNewMenu
 POST        /menu/add                          lunatech.lunchplanner.controllers.MenuController.createNewMenu
+POST        /menu/delete                       lunatech.lunchplanner.controllers.MenuController.deleteMenus
+POST        /menu/delete/:menuUuid             lunatech.lunchplanner.controllers.MenuController.deleteMenu(menuUuid: java.util.UUID)
+GET         /menu/:menuUuid                    lunatech.lunchplanner.controllers.MenuController.getMenuDetails(menuUuid: java.util.UUID)
+POST        /menu/:menuUuid                    lunatech.lunchplanner.controllers.MenuController.saveMenuDetails(menuUuid: java.util.UUID)
 
 # Menu per day
 GET        /menuPerDay/all                     lunatech.lunchplanner.controllers.MenuPerDayController.getAllMenusPerDay(activePage: Int ?= 0)

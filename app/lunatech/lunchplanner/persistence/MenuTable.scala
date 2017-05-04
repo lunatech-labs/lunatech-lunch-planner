@@ -57,4 +57,9 @@ object MenuTable {
     }
   }
 
+  def insertOrUpdate(menu: Menu)(implicit connection: DBConnection): Future[Boolean] = {
+    val query = menuTable.insertOrUpdate(menu)
+    connection.db.run(query).map(_ == 1)
+  }
+
 }
