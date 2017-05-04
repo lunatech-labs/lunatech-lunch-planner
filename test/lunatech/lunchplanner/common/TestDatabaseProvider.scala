@@ -23,9 +23,9 @@ trait TestDatabaseProvider {
     Await.result(db.run(menuPerDayPerPersonTable.delete), defaultTimeout)
     Await.result(db.run(menuPerDayTable.delete), defaultTimeout)
     Await.result(db.run(menuDishTable.delete), defaultTimeout)
-    Await.result(db.run(userTable.delete), defaultTimeout)
     Await.result(db.run(dishTable.delete), defaultTimeout)
     Await.result(db.run(menuTable.delete), defaultTimeout)
+    Await.result(db.run(userTable.delete), defaultTimeout)
   }
 
 }
