@@ -48,14 +48,14 @@ class MenuPerDayPerPersonController @Inject() (
     }
   }
 
-  private def updateMenusPerDayPerPerson(userUuid: UUID, form: MenuPerDayPerPersonForm) = {
-    menuPerDayPerPersonService.getAllByUserUuid(userUuid).map(allMenusPerDayPerPerson => {
+  private def updateMenusPerDayPerPerson(userUuid: UUID, form: MenuPerDayPerPersonForm): Future[Seq[Int]] = {
+    menuPerDayPerPersonService.getAllByUserUuid(userUuid).flatMap(allMenusPerDayPerPerson => {
       menusPerDayToAdd(allMenusPerDayPerPerson, userUuid, form).
-        map(_ => menusPerDayToRemove(allMenusPerDayPerPerson, userUuid, form))
+        flatMap(_ => menusPerDayToRemove(allMenusPerDayPerPerson, userUuid, form))
     })
   }
 
-  private def menusPerDayToAdd(menusChosen: Seq[MenuPerDayPerPerson], userUuid: UUID, form: MenuPerDayPerPersonForm) =
+  private def menusPerDayToAdd(menusChosen: Seq[MenuPerDayPerPerson], userUuid: UUID, form: MenuPerDayPerPersonForm): Future[List[MenuPerDayPerPerson]] =
     Future.sequence(
       form.menuPerDayUuid
       .filter(!menusChosen.map(_.menuPerDayUuid).contains(_))
@@ -64,8 +64,8 @@ class MenuPerDayPerPersonController @Inject() (
       menuPerDayPerPersonService.add(newMenuPerDayPerPerson)
     })
 
-  private def menusPerDayToRemove(allMenusPerDayPerPerson: Seq[MenuPerDayPerPerson], userUuid: UUID, form: MenuPerDayPerPersonForm) =
-    allMenusPerDayPerPerson.filter(menu => !form.menuPerDayUuid.contains(menu.menuPerDayUuid))
-      .map(menu => menuPerDayPerPersonService.delete(menu.uuid))
+  private def menusPerDayToRemove(allMenusPerDayPerPerson: Seq[MenuPerDayPerPerson], userUuid: UUID, form: MenuPerDayPerPersonForm): Future[Seq[Int]] =
+    Future.sequence(allMenusPerDayPerPerson.filter(menu => !form.menuPerDayUuid.contains(menu.menuPerDayUuid))
+      .map(menu => menuPerDayPerPersonService.delete(menu.uuid)))
 
 }
