@@ -8,3 +8,9 @@ case class MenuPerDay(
   menuUuid: UUID,
   date: Date
 )
+
+case class MenuWithNamePerDay(
+  uuid: UUID,
+  menuUuid: UUID,
+  menuDateAndName: String
+)

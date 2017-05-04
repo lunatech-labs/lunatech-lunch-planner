@@ -4,7 +4,7 @@ import java.util.UUID
 
 import com.google.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.{ Menu, MenuDish }
+import lunatech.lunchplanner.models.{ Menu, MenuDish, MenuWithNamePerDay }
 import lunatech.lunchplanner.persistence.{ MenuDishTable, MenuTable }
 import lunatech.lunchplanner.services.{ DishService, MenuService, UserService }
 import lunatech.lunchplanner.viewModels.MenuForm
@@ -31,7 +31,7 @@ class MenuController  @Inject() (
     implicit request => {
       val currentUser = userService.getUserByEmailAddress(username)
       val allDishes = dishService.getAllDishes.map(_.toArray)
-      val allMenus = menuService.getAllMenus().map(_.toArray)
+      val allMenus = menuService.getAllMenus.map(_.toArray)
       currentUser.flatMap(user =>
         allDishes.flatMap(dishes =>
           allMenus.map(menus =>
@@ -39,7 +39,15 @@ class MenuController  @Inject() (
             .menuForm
             .bindFromRequest
             .fold(
-              formWithErrors => BadRequest(views.html.admin(user.get, DishController.dishForm, formWithErrors, dishes, menus)),
+              formWithErrors => BadRequest(views.html.admin(
+                user.get,
+                DishController.dishForm,
+                formWithErrors,
+                dishes,
+                menus,
+                MenuPerDayController.menuPerDayForm,
+                Seq.empty[(String, String)],
+                Array.empty[MenuWithNamePerDay])),
               menuData => {
                 addNewMenuDishes(menuData)
                 Redirect(lunatech.lunchplanner.controllers.routes.Application.admin())
