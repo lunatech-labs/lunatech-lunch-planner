@@ -12,6 +12,7 @@ import play.api.mvc.Controller
 import play.api.{ Configuration, Environment }
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class MenuPerDayPerPersonController @Inject() (
   userService: UserService,
@@ -24,7 +25,6 @@ class MenuPerDayPerPersonController @Inject() (
 
   def createNewMenuPerDayPerPerson = IsAuthenticatedAsync { username =>
     implicit request => {
-
       for{
         user <- userService.getByEmailAddress(username)
         result <- MenuPerDayPerPersonForm
@@ -45,26 +45,27 @@ class MenuPerDayPerPersonController @Inject() (
               }
             )
       } yield result
-      }
     }
+  }
 
   private def updateMenusPerDayPerPerson(userUuid: UUID, form: MenuPerDayPerPersonForm) = {
     menuPerDayPerPersonService.getAllByUserUuid(userUuid).map(allMenusPerDayPerPerson => {
-      menusPerDayToAdd(allMenusPerDayPerPerson, userUuid, form)
-      menusPerDayToRemove(allMenusPerDayPerPerson, userUuid, form)
+      menusPerDayToAdd(allMenusPerDayPerPerson, userUuid, form).
+        map(_ => menusPerDayToRemove(allMenusPerDayPerPerson, userUuid, form))
     })
   }
 
   private def menusPerDayToAdd(menusChosen: Seq[MenuPerDayPerPerson], userUuid: UUID, form: MenuPerDayPerPersonForm) =
-    form.menuPerDayUuid
+    Future.sequence(
+      form.menuPerDayUuid
       .filter(!menusChosen.map(_.menuPerDayUuid).contains(_))
-      .foreach{ uuid =>
+      .map{ uuid =>
       val newMenuPerDayPerPerson = MenuPerDayPerPerson(menuPerDayUuid = uuid, userUuid = userUuid)
       menuPerDayPerPersonService.add(newMenuPerDayPerPerson)
-    }
+    })
 
   private def menusPerDayToRemove(allMenusPerDayPerPerson: Seq[MenuPerDayPerPerson], userUuid: UUID, form: MenuPerDayPerPersonForm) =
     allMenusPerDayPerPerson.filter(menu => !form.menuPerDayUuid.contains(menu.menuPerDayUuid))
-      .foreach(menu => menuPerDayPerPersonService.delete(menu.uuid))
+      .map(menu => menuPerDayPerPersonService.delete(menu.uuid))
 
 }

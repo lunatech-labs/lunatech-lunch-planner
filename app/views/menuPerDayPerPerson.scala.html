@@ -13,7 +13,7 @@
         <table class="table" >
           <thead>
             <tr>
-              <th>Attending</th>
+              <th><input type="checkbox" id="select-all" /> Attending<br/></th>
               <th class="list-date">Date</th>
               <th>Menu name</th>
               <th>Menu details</th>
@@ -22,8 +22,8 @@
           </thead>
           @for(index <- listOfMenusPerDayPerPerson.indices) {
             <tr>
-              <td class="list-select">
-                <input type="checkbox"
+              <td class="list-select-all">
+                <input type="checkbox" class="schedule"
                 value="@listOfMenusPerDayPerPerson(index).menuPerDayUuid"
                 name="menuPerDayUuid[@index]"
                 @if(listOfMenusPerDayPerPerson(index).isSelected) { checked } >
@@ -58,15 +58,12 @@
                 @if(listOfMenusPerDayPerPerson(index).listOfDishes(dishIndex).hasLactose) {
                   <label class="font-normal">Lactose</label> <br>
                 }
-                @if(listOfMenusPerDayPerPerson(index).listOfDishes(dishIndex).remarks.isDefined) {
-                  <label class="font-normal">@listOfMenusPerDayPerPerson(index).listOfDishes(dishIndex).remarks</label> <br>
-                }
               }
               </td>
             </tr>
           }
         </table>
-        @b3.submit('class -> "btn btn-primary"){ Save selected meals }
+        @b3.submit('class -> "btn btn-primary"){ <span class="glyphicon glyphicon-ok"></span> Save selected meals }
       }
     </div>
 }
