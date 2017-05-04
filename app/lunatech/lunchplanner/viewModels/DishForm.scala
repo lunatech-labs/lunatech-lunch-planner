@@ -1,7 +1,5 @@
 package lunatech.lunchplanner.viewModels
 
-import java.util.UUID
-
 import play.api.libs.json.{ Json, OFormat }
 
 case class DishForm (
@@ -18,5 +16,5 @@ case class DishForm (
 )
 
 object DishForm {
-  implicit val dishFormat: OFormat[DishForm] = Json.format[DishForm]
+  implicit val dishFormFormat: OFormat[DishForm] = Json.format[DishForm]
 }

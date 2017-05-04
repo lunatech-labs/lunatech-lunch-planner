@@ -60,10 +60,4 @@ object UserTable {
       case false => Future(0)
     }
   }
-
-  def isAdminUser(userEmailAddress: String)(implicit connection: DBConnection): Future[Boolean] =
-    getUserByEmailAddress(userEmailAddress)
-      .map(user => user.map(_.isAdmin))
-      .map(_.getOrElse(false))
-
 }

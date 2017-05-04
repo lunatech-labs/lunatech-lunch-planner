@@ -2,7 +2,7 @@ package lunatech.lunchplanner.controllers
 
 import com.lunatech.openconnect.GoogleSecured
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.persistence.UserTable
+import lunatech.lunchplanner.services.UserService
 import play.api.mvc.{ RequestHeader, Result, Results, _ }
 import play.api.{ Configuration, Environment }
 
@@ -16,11 +16,12 @@ trait Secured extends GoogleSecured {
 
   val configuration: Configuration
   val environment: Environment
-  implicit val connection: DBConnection
+  val connection: DBConnection
+  val userService: UserService = new UserService()(connection)
 
   override def IsAdminAsync(f: String => Request[AnyContent] => Future[Result]) = IsAuthenticatedAsync { userEmailAddress =>
     request =>
-      val isAdminResult = UserTable.isAdminUser(userEmailAddress)(connection)
+      val isAdminResult = userService.isAdminUser(userEmailAddress)
       isAdminResult.flatMap{ isUserAdmin =>
         if (isUserAdmin) {
           f(userEmailAddress)(request)
