@@ -1,5 +1,21 @@
 #Lunatech Luch Planner functionalities
 
+##Login
+To be able to log in the user must have a Lunatech email address and provide permissions to the application
+
+##Logout
+In the side bar navigation the user can perform the logout
+
+##Attending meals
+After login the user is taken to the list of schedule meals.
+In this list the user can see the date a meal is scheduled and all the menu detail: menu name, dishes name and the list of extra info associated to each meal like if the meal is a vegetarian meal, por example.
+
+
+To say you wish to attend a meal in a certain day, just select the checkbox in the corresponding meal line and press "save selected meals".
+You can remove attendance by unselecting the same checkbox and pressing "save selected meals".
+Using the checkbox at the top level is possible to select or unselect all meals.
+
+
 ##Administrator
 The administrator user can perform several actions:
 - Manage Dishes
