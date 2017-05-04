@@ -2,7 +2,7 @@ package lunatech.lunchplanner.controllers
 
 import com.google.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.{ Dish, Menu, MenuWithNamePerDay }
+import lunatech.lunchplanner.models.{ Dish, Menu, MenuWithDishes, MenuWithNamePerDay }
 import lunatech.lunchplanner.persistence.UserTable
 import lunatech.lunchplanner.services.DishService
 import lunatech.lunchplanner.viewModels.DishForm
@@ -46,7 +46,7 @@ class DishController @Inject() (
               formWithErrors,
               MenuController.menuForm,
               Array.empty[Dish],
-              Array.empty[Menu],
+              Array.empty[MenuWithDishes],
               MenuPerDayController.menuPerDayForm,
               Seq.empty[(String, String)],
               Array.empty[MenuWithNamePerDay]))),
