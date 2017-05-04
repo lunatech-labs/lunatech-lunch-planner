@@ -22,7 +22,7 @@ class MenuPerDayService @Inject() (
 
   def getAll: Future[Seq[MenuPerDay]] = MenuPerDayTable.getAll
 
-  def getAllOrderedByDateAscending: Future[Seq[MenuPerDay]] = MenuPerDayTable.getAllOrderedByDateAscending
+  def getAllOrderedByDateAscending: Future[Seq[MenuPerDay]] = MenuPerDayTable.getAllFutureAndOrderedByDateAscending
 
   def getMenuPerDayByUuid(uuid: UUID): Future[Option[MenuPerDay]] = MenuPerDayTable.getByUUID(uuid)
 

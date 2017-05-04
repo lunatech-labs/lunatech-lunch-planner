@@ -5,6 +5,7 @@ import java.util.UUID
 
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.{ Menu, MenuPerDay }
+import org.joda.time.DateTime
 import slick.driver.PostgresDriver.api._
 import slick.lifted.{ ForeignKeyQuery, ProvenShape, TableQuery }
 
@@ -63,6 +64,13 @@ object MenuPerDayTable {
 
   def getAllOrderedByDateAscending(implicit connection: DBConnection): Future[Seq[MenuPerDay]] = {
     val query = menuPerDayTable.sortBy(menu => menu.date)
+    connection.db.run(query.result)
+  }
+
+  def getAllFutureAndOrderedByDateAscending(implicit connection: DBConnection): Future[Seq[MenuPerDay]] = {
+    val query = menuPerDayTable
+      .filter(menu => menu.date >= new Date(DateTime.now.getMillis))
+      .sortBy(menu => menu.date)
     connection.db.run(query.result)
   }
 

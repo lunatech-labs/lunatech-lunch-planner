@@ -76,6 +76,12 @@ class MenuPerDayTableSpec extends AcceptanceSpec with TestDatabaseProvider {
       resultString mustBe expectedString
     }
 
+    "query all future menus per day ordered by date ascending" in {
+      val result = Await.result(MenuPerDayTable.getAllFutureAndOrderedByDateAscending, defaultTimeout)
+
+      result mustBe Vector()
+    }
+
     "remove an existing menu per day by uuid" in {
       val result = Await.result(MenuPerDayTable.remove(newMenuPerDay.uuid), defaultTimeout)
       result mustBe 1
