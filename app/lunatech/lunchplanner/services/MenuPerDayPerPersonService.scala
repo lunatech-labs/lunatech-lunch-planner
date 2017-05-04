@@ -58,14 +58,15 @@ class MenuPerDayPerPersonService  @Inject() (
   def getAllMenuWithNamePerDay: Future[Seq[MenuWithNamePerDay]] = {
     menuPerDayService.getAllOrderedByDateAscending.flatMap {
       Future.traverse(_) { menuPerDay =>
-        menuService.getByUuid(menuPerDay.menuUuid).filter(_.isDefined).flatMap {
+        menuService.getByUuid(menuPerDay.menuUuid).flatMap {
           case Some(menuData) =>
               getNumberOfMenusPerDayPerPersonForMenuPerDay(menuPerDay.uuid)
               .map(count =>
-                MenuWithNamePerDay(menuPerDay.uuid, menuData.uuid, menuPerDay.date.toString, menuData.name, numberOfPeopleSignedIn = count))
+                Some(MenuWithNamePerDay(menuPerDay.uuid, menuData.uuid, menuPerDay.date.toString, menuData.name, numberOfPeopleSignedIn = count)))
+          case None => Future.successful(None)
         }
       }
-    }
+    }.map(_.flatten)
   }
 
   def deleteByMenuPerPersonUuid(menuPerDayUuid: UUID): Future[Int] =
