@@ -2,8 +2,8 @@
 @import lunatech.lunchplanner.models.MenuWithNamePerDayWithDishesPerPerson
 @import lunatech.lunchplanner.viewModels.MenuPerDayPerPersonForm
 
-@(user: lunatech.lunchplanner.models.User, listOfMenusPerDayPerPerson: Array[MenuWithNamePerDayWithDishesPerPerson], form: Form[MenuPerDayPerPersonForm])(implicit messages: play.api.i18n.Messages)
-@main("Lunatech Lunch Planner", user) {
+@(user: lunatech.lunchplanner.models.User, isUserAdmin: Boolean, listOfMenusPerDayPerPerson: Array[MenuWithNamePerDayWithDishesPerPerson], form: Form[MenuPerDayPerPersonForm])(implicit messages: play.api.i18n.Messages)
+@main("Lunatech Lunch Planner", user, isUserAdmin) {
   <div id="Wrapper">
     <div id="Container">
       <div class="Left">

@@ -8,7 +8,7 @@
 @import lunatech.lunchplanner.viewModels.MenuPerDayForm
 
 @(activeTab: Int = 0, admin: User, dishForm: Form[DishForm], menuForm: Form[MenuForm], listOfDishes: Array[Dish], listOfMenus: Array[MenuWithDishes],  menuPerDayForm: Form[MenuPerDayForm], menuOptions: Seq[(String,String)], listOfMenusPerDay: Array[MenuWithNamePerDay])(implicit messages: play.api.i18n.Messages)
-@main("Overview", admin, "admin") {
+@main("Overview", admin, true, "admin") {
     <div id="Wrapper">
         <div id="Container">
             <div class="Left">

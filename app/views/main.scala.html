@@ -1,4 +1,4 @@
-@(title: String, currentUser: lunatech.lunchplanner.models.User, tab: String = "index")(content: Html)
+@(title: String, currentUser: lunatech.lunchplanner.models.User, isUserAdmin: Boolean, tab: String = "index")(content: Html)
 
 <!DOCTYPE html>
 
@@ -29,7 +29,7 @@
         <div id="Tabs">
             <ul id="MainTabs">
                 <li><a href="@lunatech.lunchplanner.controllers.routes.Application.index()" class="@if(tab == "index") {current} chat">Lunch planner</a></li>
-                @if(currentUser.isAdmin) {
+                @if(isUserAdmin) {
                   <li><a href="@lunatech.lunchplanner.controllers.routes.Application.admin()" class="@if(tab == "admin") {current}  chat">Admin</a></li>
                 }
                 <li style="float: right;" class="logout"><a href="@lunatech.lunchplanner.controllers.routes.Authentication.logout()">Sign out</a></li>

@@ -17,30 +17,18 @@ trait Secured extends GoogleSecured {
   val configuration: Configuration
   val environment: Environment
   val connection: DBConnection
-  val userService: UserService = new UserService()(connection)
+  val userService: UserService = new UserService(configuration, connection)
 
   override def IsAdminAsync(f: String => Request[AnyContent] => Future[Result]) = IsAuthenticatedAsync { userEmailAddress =>
     request =>
-      val isAdminResult = userService.isAdminUser(userEmailAddress)
-      isAdminResult.flatMap{ isUserAdmin =>
+      val isUserAdmin = userService.isAdminUser(userEmailAddress)
         if (isUserAdmin) {
           f(userEmailAddress)(request)
         } else {
           Future.successful(Results.Forbidden("you are not admin"))
         }
-      }
-
   }
 
-  /**
-    * Retrieve the connected user email.
-    */
-  private def username(request: RequestHeader) =
-    request.session.get("email")
-
-  /**
-    * Redirect to login if the user in not authorized.
-    */
   override def onUnauthorized(request: RequestHeader) =
     Results.Redirect(lunatech.lunchplanner.controllers.routes.Authentication.login())
 
