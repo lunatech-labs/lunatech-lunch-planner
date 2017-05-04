@@ -1,0 +1,72 @@
+@import b3.vertical.fieldConstructor
+@import lunatech.lunchplanner.models.MenuWithNameWithDishesPerPerson
+@import lunatech.lunchplanner.viewModels.MenuPerDayPerPersonForm
+@import lunatech.lunchplanner.models.User
+
+@(user: User, isUserAdmin: Boolean, listOfMenusPerDayPerPerson: Array[MenuWithNameWithDishesPerPerson], form: Form[MenuPerDayPerPersonForm])(implicit messages: play.api.i18n.Messages)
+@main("Lunatech Lunch Planner", user, isUserAdmin) {
+
+    <h2>What Lunatech will be feeding you</h2>
+    <div>
+      <br>
+      @helper.form(lunatech.lunchplanner.controllers.routes.MenuPerDayPerPersonController.createNewMenuPerDayPerPerson) {
+        <table class="table" >
+          <thead>
+            <tr>
+              <th>Attending</th>
+              <th class="list-date">Date</th>
+              <th>Menu name</th>
+              <th>Menu details</th>
+              <th>Extra info</th>
+            </tr>
+          </thead>
+          @for(index <- listOfMenusPerDayPerPerson.indices) {
+            <tr>
+              <td class="list-select">
+                <input type="checkbox"
+                value="@listOfMenusPerDayPerPerson(index).menuPerDayUuid"
+                name="menuPerDayUuid[@index]"
+                @if(listOfMenusPerDayPerPerson(index).isSelected) { checked } >
+              </td>
+              <td><label class="font-normal">@listOfMenusPerDayPerPerson(index).menuDate</label></td>
+              <td><label class="font-normal">@listOfMenusPerDayPerPerson(index).menuName</label></td>
+              <td>
+                @for(dishIndex <- listOfMenusPerDayPerPerson(index).listOfDishes.indices) {
+                  <label class="font-normal">@listOfMenusPerDayPerPerson(index).listOfDishes(dishIndex).name</label> <br>
+                  }
+              </td>
+              <td>
+              @for(dishIndex <- listOfMenusPerDayPerPerson(index).listOfDishes.indices) {
+                @if(listOfMenusPerDayPerPerson(index).listOfDishes(dishIndex).isVegetarian) {
+                  <label class="font-normal">Vegetarian</label> <br>
+                }
+                @if(listOfMenusPerDayPerPerson(index).listOfDishes(dishIndex).hasSeaFood) {
+                  <label class="font-normal">Sea food</label> <br>
+                }
+                @if(listOfMenusPerDayPerPerson(index).listOfDishes(dishIndex).hasPork) {
+                  <label class="font-normal">Pork</label> <br>
+                }
+                @if(listOfMenusPerDayPerPerson(index).listOfDishes(dishIndex).hasBeef) {
+                  <label class="font-normal">Beef</label> <br>
+                }
+                @if(listOfMenusPerDayPerPerson(index).listOfDishes(dishIndex).hasChicken) {
+                  <label class="font-normal">Chicken</label> <br>
+                }
+                @if(listOfMenusPerDayPerPerson(index).listOfDishes(dishIndex).isGlutenFree) {
+                  <label class="font-normal">Gluten free</label> <br>
+                }
+                @if(listOfMenusPerDayPerPerson(index).listOfDishes(dishIndex).hasLactose) {
+                  <label class="font-normal">Lactose</label> <br>
+                }
+                @if(listOfMenusPerDayPerPerson(index).listOfDishes(dishIndex).remarks.isDefined) {
+                  <label class="font-normal">@listOfMenusPerDayPerPerson(index).listOfDishes(dishIndex).remarks</label> <br>
+                }
+              }
+              </td>
+            </tr>
+          }
+        </table>
+        @b3.submit('class -> "btn btn-primary"){ Save selected meals }
+      }
+    </div>
+}

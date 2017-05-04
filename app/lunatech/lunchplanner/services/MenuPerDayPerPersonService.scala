@@ -28,23 +28,22 @@ class MenuPerDayPerPersonService  @Inject() (
       Future.traverse(_) { menuWithNamePerDay =>
         isMenuPerDaySelectedForPerson(userUuid, menuWithNamePerDay.uuid)
           .map(isSelected =>
-        MenuWithNamePerDayPerPerson(menuWithNamePerDay.uuid, menuWithNamePerDay.menuDate,menuWithNamePerDay.menuName, userUuid, isSelected))
+        MenuWithNamePerDayPerPerson(menuWithNamePerDay.uuid, menuWithNamePerDay.menuDate, menuWithNamePerDay.menuName, userUuid, isSelected))
       }
     }
   }
 
   def getAllMenuWithNamePerDayWithDishesPerPerson(userUuid: UUID): Future[Seq[MenuWithNameWithDishesPerPerson]]  = {
-    val allMenusWithNamePerDay = getAllMenuWithNamePerDay
-
-    allMenusWithNamePerDay.flatMap {
+    getAllMenuWithNamePerDay
+    .flatMap {
       Future.traverse(_) { menuWithNamePerDay =>
         MenuDishTable.getByMenuUuid(menuWithNamePerDay.menuUuid)
           .flatMap(Future.traverse(_)(dish =>
             dishService.getByUuid(dish.dishUuid)).map(_.flatten))
           .flatMap { dishes =>
-            val isMenuSelected = isMenuPerDaySelectedForPerson(userUuid, menuWithNamePerDay.uuid)
-            isMenuSelected.map(isSelected =>
-              MenuWithNameWithDishesPerPerson(menuWithNamePerDay.uuid, menuWithNamePerDay.menuDate,  menuWithNamePerDay.menuName, dishes, userUuid, isSelected))
+            isMenuPerDaySelectedForPerson(userUuid, menuWithNamePerDay.uuid)
+            .map(isSelected =>
+              MenuWithNameWithDishesPerPerson(menuWithNamePerDay.uuid, menuWithNamePerDay.menuDate, menuWithNamePerDay.menuName, dishes, userUuid, isSelected))
           }
       }
     }
@@ -59,12 +58,11 @@ class MenuPerDayPerPersonService  @Inject() (
   def getAllMenuWithNamePerDay: Future[Seq[MenuWithNamePerDay]] = {
     menuPerDayService.getAllOrderedByDateAscending.flatMap {
       Future.traverse(_) { menuPerDay =>
-        menuService.getByUuid(menuPerDay.menuUuid).flatMap {
+        menuService.getByUuid(menuPerDay.menuUuid).filter(_.isDefined).flatMap {
           case Some(menuData) =>
               getNumberOfMenusPerDayPerPersonForMenuPerDay(menuPerDay.uuid)
               .map(count =>
                 MenuWithNamePerDay(menuPerDay.uuid, menuData.uuid, menuPerDay.date.toString, menuData.name, numberOfPeopleSignedIn = count))
-          case None => ??? // TODO
         }
       }
     }
