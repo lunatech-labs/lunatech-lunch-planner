@@ -21,9 +21,12 @@ class UserService @Inject() (configuration: Configuration, implicit val connecti
     val name = getUserNameFromEmail(emailAddress)
     val newUser = User(name = name, emailAddress = emailAddress)
 
-    UserTable.existsByEmail(emailAddress).map(exist => {
-      if (!exist) UserTable.add(newUser)
-      newUser
+    UserTable.existsByEmail(emailAddress).flatMap(exist => {
+      if (!exist)
+        UserTable.add(newUser)
+      else {
+        Future.successful(newUser)
+      }
     })
   }
 
