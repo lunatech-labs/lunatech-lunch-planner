@@ -7,7 +7,7 @@
 @import lunatech.lunchplanner.viewModels.MenuForm
 @import lunatech.lunchplanner.viewModels.MenuPerDayForm
 
-@(admin: User, dishForm: Form[DishForm], menuForm: Form[MenuForm], listOfDishes: Array[Dish], listOfMenus: Array[Menu],  menuPerDayForm: Form[MenuPerDayForm], menuOptions: Seq[(String,String)], listOfMenusPerDay: Array[MenuWithNamePerDay])(implicit messages: play.api.i18n.Messages)
+@(activeTab: Int = 0, admin: User, dishForm: Form[DishForm], menuForm: Form[MenuForm], listOfDishes: Array[Dish], listOfMenus: Array[Menu],  menuPerDayForm: Form[MenuPerDayForm], menuOptions: Seq[(String,String)], listOfMenusPerDay: Array[MenuWithNamePerDay])(implicit messages: play.api.i18n.Messages)
 @main("Overview", admin, "admin") {
     <div id="Wrapper">
         <div id="Container">
@@ -18,15 +18,15 @@
 
                     <!-- Nav tabs -->
                     <ul class="nav nav-tabs">
-                        <li role="presentation" class="active"><a data-toggle="tab" href="#dishes">Dishes</a></li>
-                        <li role="presentation"><a data-toggle="tab" href="#menus">Menus</a></li>
-                        <li role="presentation"><a data-toggle="tab" href="#menuPerDay">Scheduling of menus</a></li>
+                        <li role="presentation" class="@if(activeTab == 0){ active }"><a data-toggle="tab" href="#dishes">Dishes</a></li>
+                        <li role="presentation" class="@if(activeTab == 1){ active }"><a data-toggle="tab" href="#menus">Menus</a></li>
+                        <li role="presentation" class="@if(activeTab == 2){ active }"><a data-toggle="tab" href="#menuPerDay">Scheduling of menus</a></li>
                     </ul>
 
                         <!-- Tab panes -->
                     <div class="tab-content">
                         <!-- Dishes -->
-                        <div role="tabpanel" class="tab-pane active" id="dishes">
+                        <div role="tabpanel" class="tab-pane @if(activeTab == 0){ active } " id="dishes">
                             <div>
                                 <br>
                                 <label>Create new dish</label>
@@ -54,7 +54,7 @@
                         </div>
 
                         <!-- Menus -->
-                        <div role="tabpanel" class="tab-pane" id="menus">
+                        <div role="tabpanel" class="tab-pane @if(activeTab == 1){ active }" id="menus">
                             <div>
                                 <br>
                                 <label>Create new menu</label>
@@ -77,7 +77,7 @@
                         </div>
 
                             <!-- Menus -->
-                        <div role="tabpanel" class="tab-pane" id="menuPerDay">
+                        <div role="tabpanel" class="tab-pane @if(activeTab == 2){ active }" id="menuPerDay">
                             <div>
                                 <br>
                                 <label>Associate a menu to a date</label>
@@ -92,7 +92,7 @@
                                 <br>
                                 <label>List of menus per day</label>
                                 @for(index <- listOfMenusPerDay.indices) {
-                                    @b3.checkbox( menuPerDayForm("uuid[]"), '_text -> listOfMenusPerDay(index).menuDateAndName, 'value -> listOfDishes(index).uuid)
+                                    @b3.checkbox( menuPerDayForm("uuid[]"), '_text -> (listOfMenusPerDay(index).menuDateAndName + " (" + listOfMenusPerDay(index).numberOfPeopleSignedIn + " people attending)"), 'value -> listOfMenusPerDay(index).uuid)
                                 }
                             </div>
                         </div>

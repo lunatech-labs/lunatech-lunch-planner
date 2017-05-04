@@ -16,6 +16,7 @@ import play.api.mvc.Controller
 import play.api.{ Configuration, Environment }
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class MenuController  @Inject() (
   userService: UserService,
@@ -29,29 +30,30 @@ class MenuController  @Inject() (
 
   def createNewMenu() = IsAdminAsync { username =>
     implicit request => {
-      val currentUser = userService.getUserByEmailAddress(username)
-      val allDishes = dishService.getAllDishes.map(_.toArray)
-      val allMenus = menuService.getAllMenus.map(_.toArray)
-      currentUser.flatMap(user =>
-        allDishes.flatMap(dishes =>
-          allMenus.map(menus =>
-          MenuController
-            .menuForm
-            .bindFromRequest
-            .fold(
-              formWithErrors => BadRequest(views.html.admin(
-                user.get,
-                DishController.dishForm,
-                formWithErrors,
-                dishes,
-                menus,
-                MenuPerDayController.menuPerDayForm,
-                Seq.empty[(String, String)],
-                Array.empty[MenuWithNamePerDay])),
-              menuData => {
-                addNewMenuDishes(menuData)
-                Redirect(lunatech.lunchplanner.controllers.routes.Application.admin())
-              }))))
+
+      for {
+        user <- userService.getUserByEmailAddress(username)
+        dishes <- dishService.getAllDishes.map(_.toArray)
+        menus <- menuService.getAllMenus.map(_.toArray)
+        result <- MenuController
+          .menuForm
+          .bindFromRequest
+          .fold(
+            formWithErrors => Future.successful(BadRequest(views.html.admin(
+              activeTab = 1,
+              user.get,
+              DishController.dishForm,
+              formWithErrors,
+              dishes,
+              menus,
+              MenuPerDayController.menuPerDayForm,
+              Seq.empty[(String, String)],
+              Array.empty[MenuWithNamePerDay]))),
+            menuData => {
+              addNewMenuDishes(menuData).map(_ =>
+                Redirect(lunatech.lunchplanner.controllers.routes.Application.admin(activePage = 1)))
+            })
+      } yield result
     }
   }
 

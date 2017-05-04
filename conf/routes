@@ -4,7 +4,7 @@
 
 GET         /                                  lunatech.lunchplanner.controllers.Application.index
 
-GET         /admin                             lunatech.lunchplanner.controllers.Application.admin
+GET         /admin                             lunatech.lunchplanner.controllers.Application.admin(activePage: Int ?= 0)
 
 # redirect to google authentication
 GET         /login                             lunatech.lunchplanner.controllers.Authentication.login
@@ -20,6 +20,9 @@ POST        /menu/add                          lunatech.lunchplanner.controllers
 
 # Menu per day
 POST        /menuPerDay/add                    lunatech.lunchplanner.controllers.MenuPerDayController.createNewMenuPerDay
+
+# Menu per day per person
+POST        /menuPerDayPerPerson/add           lunatech.lunchplanner.controllers.MenuPerDayPerPersonController.createNewMenuPerDayPerPerson
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                      controllers.Assets.at(path="/public", file)

@@ -60,6 +60,11 @@ object MenuPerDayPerPersonTable {
     connection.db.run(query.result)
   }
 
+  def getMenuPerDayPerPersonByUserUuidAndMenuPerDayUuid(userUuid: UUID, menuPerDayUuid: UUID)(implicit connection: DBConnection): Future[Option[MenuPerDayPerPerson]] = {
+    val query = menuPerDayPerPersonTable.filter(_.userUuid === userUuid).filter(_.menuPerDayUuid === menuPerDayUuid)
+    connection.db.run(query.result.headOption)
+  }
+
   def getAllMenuPerDayPerPersons(implicit connection: DBConnection): Future[Seq[MenuPerDayPerPerson]] = {
     connection.db.run(menuPerDayPerPersonTable.result)
   }

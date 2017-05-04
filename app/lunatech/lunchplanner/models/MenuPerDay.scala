@@ -12,5 +12,6 @@ case class MenuPerDay(
 case class MenuWithNamePerDay(
   uuid: UUID,
   menuUuid: UUID,
-  menuDateAndName: String
+  menuDateAndName: String,
+  numberOfPeopleSignedIn: Int
 )

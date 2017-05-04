@@ -3,7 +3,7 @@ package lunatech.lunchplanner.controllers
 import com.google.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.User
-import lunatech.lunchplanner.services.{ DishService, MenuPerDayService, MenuService, UserService }
+import lunatech.lunchplanner.services.{ DishService, MenuPerDayPerPersonService, MenuPerDayService, MenuService, UserService }
 import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.mvc.{ Controller, Result }
 import play.api.{ Configuration, Environment }
@@ -15,7 +15,7 @@ class Application @Inject() (
   userService: UserService,
   dishService: DishService,
   menuService: MenuService,
-  menuPerDayService: MenuPerDayService,
+  menuPerDayPerPersonService: MenuPerDayPerPersonService,
   val connection: DBConnection,
   val environment: Environment,
   val messagesApi: MessagesApi,
@@ -28,41 +28,47 @@ class Application @Inject() (
       getIndexPage(currentUser)
   }
 
-  def admin =
+  def admin(activePage: Int) =
     IsAdminAsync { username =>
       implicit request =>
         val userAdmin = userService.getUserByEmailAddress(username)
-        getAdminPage(userAdmin)
+        getAdminPage(userAdmin, activePage)
     }
 
-  private def getAdminPage(adminUser: Future[Option[User]]): Future[Result] =
+  private def getAdminPage(adminUser: Future[Option[User]], activePage: Int): Future[Result] =
     adminUser.flatMap {
       case Some(user) =>
         val allDishes = dishService.getAllDishes.map(_.toArray)
         val allMenus = menuService.getAllMenus.map(_.toArray)
         val allMenusUuidsAndNames = menuService.getAllMenusUuidAndNames
-        val allMenusPerDay = menuPerDayService.getAllMenuWithNamePerDay.map(_.toArray)
+        val allMenusPerDay = menuPerDayPerPersonService.getAllMenuWithNamePerDay.map(_.toArray)
 
-        allDishes.flatMap(dishes =>
-          allMenus.flatMap(menus =>
-            allMenusUuidsAndNames.flatMap(menusUuidAndNames =>
-              allMenusPerDay.map(menusPerDay =>
-                Ok(views.html.admin(
-                  user,
-                  DishController.dishForm,
-                  MenuController.menuForm,
-                  dishes,
-                  menus,
-                  MenuPerDayController.menuPerDayForm,
-                  menusUuidAndNames,
-                  menusPerDay))))))
+        for {
+          dishes <- allDishes
+          menus <- allMenus
+          menusUuidAndNames <- allMenusUuidsAndNames
+          menusPerDay <- allMenusPerDay
+        } yield
+          Ok(views.html.admin(
+            activePage,
+            user,
+            DishController.dishForm,
+            MenuController.menuForm,
+            dishes,
+            menus,
+            MenuPerDayController.menuPerDayForm,
+            menusUuidAndNames,
+            menusPerDay))
       case None => Future.successful(Unauthorized)
     }
 
   private def getIndexPage(normalUser: Future[Option[User]]) =
-    normalUser.map {
-      case Some(user) => Ok(views.html.index(user))
-      case None => Unauthorized
+    normalUser.flatMap {
+      case Some(user) =>
+        val allMenusPerDayPerPersonAndSelected = menuPerDayPerPersonService.getAllMenuWithNamePerDayPerPerson(user.uuid).map(_.toArray)
+        allMenusPerDayPerPersonAndSelected.map(menusPerDayPerPerson =>
+          Ok(views.html.index(user, menusPerDayPerPerson, MenuPerDayPerPersonController.menuPerDayPerPersonForm)))
+      case None => Future.successful(Unauthorized)
     }
 
 }
