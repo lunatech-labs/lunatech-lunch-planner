@@ -11,7 +11,7 @@
       <div role="tabpanel" class="tab-pane active" id="meals">
         @helper.form(lunatech.lunchplanner.controllers.routes.MenuPerDayPerPersonController.createNewMenuPerDayPerPerson) {
           @for(index <- listOfMenusPerDayPerPerson.indices) {
-            @b3.checkbox( form("menuPerDayUuid[]"), '_text -> listOfMenusPerDayPerPerson(index).menuDateAndName, 'value -> listOfMenusPerDayPerPerson(index).menuPerDayUuid, 'checked -> listOfMenusPerDayPerPerson(index).isSelected)
+            @b3.checkbox( form("menuPerDayUuid[]"), '_text -> (listOfMenusPerDayPerPerson(index).menuDate + " " +listOfMenusPerDayPerPerson(index).menuName), 'value -> listOfMenusPerDayPerPerson(index).menuPerDayUuid, 'checked -> listOfMenusPerDayPerPerson(index).isSelected)
             @for(dishIndex <- listOfMenusPerDayPerPerson(index).listOfDishes.indices) {
               <label style="font-weight: normal">@listOfMenusPerDayPerPerson(index).listOfDishes(dishIndex).name</label> <br>
             }

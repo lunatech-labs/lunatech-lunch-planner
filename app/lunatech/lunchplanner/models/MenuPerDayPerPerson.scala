@@ -10,14 +10,16 @@ case class MenuPerDayPerPerson(
 
 case class MenuWithNamePerDayPerPerson(
   menuPerDayUuid: UUID,
-  menuDateAndName: String,
+  menuDate: String,
+  menuName: String, // TODO handle new field name
   userUuid: UUID,
   isSelected: Boolean
 )
 
 case class MenuWithNameWithDishesPerPerson(
   menuPerDayUuid: UUID,
-  menuDateAndName: String,
+  menuDate: String,
+  menuName: String, // TODO handle new field name
   listOfDishes: Seq[Dish],
   userUuid: UUID,
   isSelected: Boolean

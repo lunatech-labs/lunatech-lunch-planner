@@ -1,0 +1,33 @@
+@import b3.vertical.fieldConstructor
+@import lunatech.lunchplanner.models.User
+@import lunatech.lunchplanner.viewModels.MenuPerDayForm
+@import java.text.SimpleDateFormat
+@import java.util.Date
+
+@(admin: User, date: String, menuPerDayForm: Form[MenuPerDayForm], menuOptions: Seq[(String,String)])(implicit messages: play.api.i18n.Messages)
+@main("Menu scheduling", admin, isUserAdmin = true) {
+<!-- Nav tabs -->
+<ul class="nav nav-tabs">
+    <li role="presentation" class="active"><a data-toggle="tab" href="#newSchedule">Create new</a></li>
+    <li role="presentation" ><a href="@lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay">All schedules</a></li>
+</ul>
+
+<!-- Tab panes -->
+<div class="tab-content">
+    <!-- Menus Per Day -->
+    <div role="tabpanel" class="tab-pane active" id="newSchedule">
+        <div>
+            <br>
+            @b3.form(lunatech.lunchplanner.controllers.routes.MenuPerDayController.createNewMenuPerDay) {
+                <div class="row">
+                    <div class="col col-lg-6">
+                        @datepicker(menuPerDayForm("date"), 'value -> date)('_label -> "Date" )
+                        @b3.select(menuPerDayForm("menuUuid"), options = menuOptions, '_label -> "Select menu", '_default -> "Select an option")
+                        @b3.submit('class -> "btn btn-primary") { Associate menu with date }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+}

@@ -1,0 +1,48 @@
+@import b3.vertical.fieldConstructor
+@import lunatech.lunchplanner.models.User
+@import lunatech.lunchplanner.models.MenuWithNamePerDay
+@import lunatech.lunchplanner.viewModels.ListMenusPerDayForm
+
+@(admin: User, listMenusPerDayForm: Form[ListMenusPerDayForm],  listOfMenusPerDay: Array[MenuWithNamePerDay])(implicit messages: play.api.i18n.Messages)
+@main("New schedule", admin, isUserAdmin = true) {
+<!-- Nav tabs -->
+<ul class="nav nav-tabs">
+    <li role="presentation"><a  href="@lunatech.lunchplanner.controllers.routes.MenuPerDayController.getNewMenuPerDay">Create new</a></li>
+    <li role="presentation" class="active"><a data-toggle="tab" href="#list">All schedules</a></li>
+</ul>
+
+<!-- Tab panes -->
+<div class="tab-content">
+    <!-- Menus Per Day -->
+    <div role="tabpanel" class="tab-pane active" id="list">
+        <div>
+            <br>
+            <label>List of menus served by day </label>
+            @b3.form(lunatech.lunchplanner.controllers.routes.MenuPerDayController.deleteMenusPerDay) {
+                <table class="table" >
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Date</th>
+                            <th>Menu name</th>
+                            <th>Number attendees</th>
+                        </tr>
+                    </thead>
+                    @for(index <- listOfMenusPerDay.indices) {
+                        <tr>
+                            <td><input type="checkbox" value="@listOfMenusPerDay(index).uuid" name="uuid[]"></td>
+                            <td><a href="@lunatech.lunchplanner.controllers.routes.MenuPerDayController.getMenuPerDayDetails(listOfMenusPerDay(index).uuid)">
+                                <span>@listOfMenusPerDay(index).menuDate</span>
+                                <span class="glyphicon glyphicon-pencil"></span></a>
+                            </td>
+                            <td><span>@listOfMenusPerDay(index).menuName</span></td>
+                            <td><span>@listOfMenusPerDay(index).numberOfPeopleSignedIn</span></td>
+                        </tr>
+                    }
+                </table>
+                @b3.submit('class -> "btn btn-primary"){ <span class="glyphicon glyphicon-remove"></span> Delete selected }
+            }
+        </div>
+    </div>
+</div>
+}
