@@ -20,16 +20,28 @@ object MenuPerDayForm {
       "menuUuid" -> of[UUID],
       "date" -> date(pattern = "dd-MM-yyyy")
     )(MenuPerDayForm.apply)(MenuPerDayForm.unapply)
-//      verifying("Date cannot be earlier than today", f => f.date.after(new Date()))
   )
 }
 
-case class ListMenusPerDayForm(listUuids: List[UUID])
+case class ListMenusPerDayForm(listUuids: List[UUID], dateStart: Date, dateEnd: Date)
 
 object ListMenusPerDayForm {
   val listMenusPerDayForm = Form(
     mapping(
-      "uuid" -> list(of[UUID])
+      "uuid" -> list(of[UUID]),
+      "dateStart" -> date(pattern = "dd-MM-yyyy"),
+      "dateEnd" -> date(pattern = "dd-MM-yyyy")
     )(ListMenusPerDayForm.apply)(ListMenusPerDayForm.unapply)
+  )
+}
+
+case class FilterMenusPerDayForm(dateStart: Date, dateEnd: Date)
+
+object FilterMenusPerDayForm {
+  val filterMenusPerDayForm = Form(
+    mapping(
+      "dateStart" -> date(pattern = "dd-MM-yyyy"),
+      "dateEnd" -> date(pattern = "dd-MM-yyyy")
+    )(FilterMenusPerDayForm.apply)(FilterMenusPerDayForm.unapply)
   )
 }

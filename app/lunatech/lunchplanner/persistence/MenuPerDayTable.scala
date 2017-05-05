@@ -74,6 +74,14 @@ object MenuPerDayTable {
     connection.db.run(query.result)
   }
 
+  def getAllFilteredDateRangeOrderedDateAscending(dateStart: Date, dateEnd: Date)
+    (implicit connection: DBConnection): Future[Seq[MenuPerDay]] = {
+    val query = menuPerDayTable
+      .filter(menu => menu.date >= dateStart && menu.date <= dateEnd)
+      .sortBy(menu => menu.date)
+    connection.db.run(query.result)
+  }
+
   def remove(uuid: UUID)(implicit connection: DBConnection): Future[Int]  = {
       val query = menuPerDayTable.filter(x => x.uuid === uuid).delete
       connection.db.run(query)

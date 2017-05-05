@@ -22,6 +22,17 @@ $(function(){
     });
 });
 
+$(function(defaultDateStart, defaultDateEnd){
+    $(".daterange").change(function(){
+        var dateStart = document.getElementById("dateStart").value;
+        var dateEnd = document.getElementById("dateEnd").value;
+
+        if(dateStart !== defaultDateStart || dateEnd !== defaultDateEnd) {
+            $('#filterDateRange').submit();
+        }
+    });
+});
+
 $(document).ready(function() {
     allSelected();
 });
