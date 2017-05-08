@@ -3,7 +3,7 @@ $(function(){
         if(this.checked) {
             // Iterate each checkbox
             $('.schedule:checkbox').each(function() {
-                this.checked = !this.checked;
+                this.checked = true;
             });
         }
         else {
