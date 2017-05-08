@@ -11,7 +11,6 @@ import scala.concurrent.duration._
 class UserTableSpec extends AcceptanceSpec with TestDatabaseProvider {
 
   implicit private val dbConnection = app.injector.instanceOf[DBConnection]
-  private val defaultTimeout = 10.seconds
 
   override def beforeAll {
     cleanDatabase()

@@ -10,7 +10,7 @@ import scala.concurrent.duration._
 trait TestDatabaseProvider {
   self: DBConnectionProvider =>
 
-  private val defaultTimeout = 10.seconds
+  val defaultTimeout = 10.seconds
 
   val userTable: TableQuery[UserTable] = TableQuery[UserTable]
   val dishTable: TableQuery[DishTable] = TableQuery[DishTable]

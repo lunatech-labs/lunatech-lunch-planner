@@ -11,7 +11,6 @@ import scala.concurrent.duration._
 class MenuDishTableSpec extends AcceptanceSpec with TestDatabaseProvider {
 
   implicit private val dbConnection = app.injector.instanceOf[DBConnection]
-  private val defaultTimeout = 10.seconds
 
   private val newMenu = Menu(name = "Main menu")
   private val pastaBologneseDish = Dish(
