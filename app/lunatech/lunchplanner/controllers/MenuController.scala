@@ -115,7 +115,7 @@ class MenuController  @Inject() (
     }
   }
 
-  def deleteMenus = IsAdminAsync { username =>
+  def deleteMenus() = IsAdminAsync { username =>
     implicit request => {
       ListMenusForm
         .listMenusForm

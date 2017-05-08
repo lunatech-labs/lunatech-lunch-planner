@@ -109,12 +109,8 @@ class DishController @Inject() (
 
   def deleteDish(uuid: UUID) = IsAdminAsync { username =>
     implicit request => {
-      for{
-        _ <- deleteDishAndDependencies(uuid)
-        currentUser <- userService.getByEmailAddress(username)
-        dishes <- dishService.getAll.map(_.toArray)
-      } yield
-        Ok(views.html.admin.dish.dishes(currentUser.get, ListDishesForm.listDishesForm, dishes))
+      deleteDishAndDependencies(uuid)
+      .map( _ => Redirect(lunatech.lunchplanner.controllers.routes.DishController.getAllDishes()))
     }
   }
 
