@@ -5,6 +5,7 @@ import java.util.{ Date, UUID }
 
 import com.google.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
+import lunatech.lunchplanner.models.MenuPerDay
 import lunatech.lunchplanner.services.{ MenuDishService, MenuPerDayPerPersonService, MenuPerDayService, MenuService, UserService }
 import lunatech.lunchplanner.viewModels.{ FilterMenusPerDayForm, ListMenusPerDayForm, MenuPerDayForm }
 import org.joda.time.DateTime
@@ -88,8 +89,8 @@ class MenuPerDayController @Inject() (
               currentDate,
               formWithErrors,
               menusUuidAndNames))},
-          menuPerDayData => {
-            menuPerDayService.add(menuPerDayData).map(_ =>
+          menuPerDayForm => {
+            menuPerDayService.add(getNewMenuPerDay(menuPerDayForm)).map(_ =>
               Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay()))
           })
     }
@@ -189,7 +190,7 @@ class MenuPerDayController @Inject() (
               menusUuidAndNames,
               menuPerDayOption))},
           menuPerDayData => {
-            menuPerDayService.insertOrUpdate(uuid, menuPerDayData).map(_ =>
+            menuPerDayService.insertOrUpdate(uuid, getNewMenuPerDay(menuPerDayData)).map(_ =>
               Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay()))
           })
     }
@@ -210,4 +211,7 @@ class MenuPerDayController @Inject() (
     val dateTime = new DateTime(new Date())
     new java.sql.Date(dateTime.plusDays(90).toDate.getTime)
   }
+
+  private def getNewMenuPerDay(menuPerDayForm: MenuPerDayForm) =
+    MenuPerDay(menuUuid = menuPerDayForm.menuUuid, date = new java.sql.Date(menuPerDayForm.date.getTime))
 }
