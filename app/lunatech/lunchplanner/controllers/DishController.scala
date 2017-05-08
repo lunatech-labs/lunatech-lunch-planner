@@ -29,7 +29,9 @@ class DishController @Inject() (
         currentUser <- userService.getByEmailAddress(username)
         dishes <- dishService.getAll.map(_.toArray)
       } yield
-        Ok(views.html.admin.dish.dishes(currentUser.get, ListDishesForm.listDishesForm, dishes))
+        Ok(views.html.admin.dish.dishes(
+          getCurrentUser(currentUser, isAdmin = true, username),
+          ListDishesForm.listDishesForm, dishes))
     }
   }
 
@@ -38,7 +40,9 @@ class DishController @Inject() (
       for{
         currentUser <- userService.getByEmailAddress(username)
       } yield
-        Ok(views.html.admin.dish.newDish(currentUser.get, DishForm.dishForm))
+        Ok(views.html.admin.dish.newDish(
+          getCurrentUser(currentUser, isAdmin = true, username),
+          DishForm.dishForm))
     }
   }
 
@@ -52,7 +56,9 @@ class DishController @Inject() (
           for {
             currentUser <- userService.getByEmailAddress(username)
           } yield BadRequest(
-          views.html.admin.dish.newDish(currentUser.get, formWithErrors))},
+          views.html.admin.dish.newDish(
+            getCurrentUser(currentUser, isAdmin = true, username),
+            formWithErrors))},
         dishData =>
           dishService.add(dishData).map( _ =>
             Redirect(lunatech.lunchplanner.controllers.routes.DishController.getAllDishes())))
@@ -65,7 +71,9 @@ class DishController @Inject() (
         currentUser <- userService.getByEmailAddress(username)
         dish <- dishService.getByUuid(uuid)
       } yield
-        Ok(views.html.admin.dish.dishDetails(currentUser.get, DishForm.dishForm, dish))
+        Ok(views.html.admin.dish.dishDetails(
+          getCurrentUser(currentUser, isAdmin = true, username),
+          DishForm.dishForm, dish))
     }
   }
 
@@ -80,7 +88,9 @@ class DishController @Inject() (
             currentUser <- userService.getByEmailAddress(username)
             dish <- dishService.getByUuid(uuid)
           } yield BadRequest(
-          views.html.admin.dish.dishDetails(currentUser.get, formWithErrors, dish))},
+          views.html.admin.dish.dishDetails(
+            getCurrentUser(currentUser, isAdmin = true, username),
+            formWithErrors, dish))},
         dishData =>
           dishService.insertOrUpdate(uuid, dishData).map( _ =>
             Redirect(lunatech.lunchplanner.controllers.routes.DishController.getAllDishes()))

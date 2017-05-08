@@ -38,8 +38,7 @@ class Application @Inject() (
     menuPerDayPerPersonService.getAllMenuWithNamePerDayWithDishesPerPerson(user.uuid).map(_.toArray)
       .map(menusPerDayPerPerson =>
         Ok(views.html.menuPerDayPerPerson(
-          user,
-          userIsAdmin,
+          user.copy(isAdmin = userIsAdmin),
           menusPerDayPerPerson,
           MenuPerDayPerPersonForm.menuPerDayPerPersonForm)))
   }

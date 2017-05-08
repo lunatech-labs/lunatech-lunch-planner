@@ -42,7 +42,7 @@ class MenuPerDayController @Inject() (
               .map(_.toArray)
         } yield
           Ok(views.html.admin.menuPerDay.menusPerDay(
-            currentUser.get,
+            getCurrentUser(currentUser, isAdmin = true, username),
             new SimpleDateFormat("dd-MM-yyyy").format(dStart),
             new SimpleDateFormat("dd-MM-yyyy").format(dEnd),
             ListMenusPerDayForm.listMenusPerDayForm,
@@ -81,10 +81,10 @@ class MenuPerDayController @Inject() (
         .fold(
           formWithErrors => {
             for {
-              user <- userService.getByEmailAddress(username)
+              currentUser <- userService.getByEmailAddress(username)
               menusUuidAndNames <- menuService.getAllMenusUuidAndNames
             } yield BadRequest(views.html.admin.menuPerDay.newMenuPerDay(
-              user.get,
+              getCurrentUser(currentUser, isAdmin = true, username),
               currentDate,
               formWithErrors,
               menusUuidAndNames))},
@@ -102,7 +102,11 @@ class MenuPerDayController @Inject() (
         currentUser <- userService.getByEmailAddress(username)
         menusUuidAndNames <- menuService.getAllMenusUuidAndNames
       } yield
-        Ok(views.html.admin.menuPerDay.newMenuPerDay(currentUser.get, currentDate, MenuPerDayForm.menuPerDayForm, menusUuidAndNames))
+        Ok(views.html.admin.menuPerDay.newMenuPerDay(
+          getCurrentUser(currentUser, isAdmin = true, username),
+          currentDate,
+          MenuPerDayForm.menuPerDayForm,
+          menusUuidAndNames))
     }
   }
 
@@ -118,7 +122,7 @@ class MenuPerDayController @Inject() (
               menusPerDay <- menuPerDayPerPersonService.getAllMenuWithNamePerDay.map(_.toArray)
             } yield BadRequest(
               views.html.admin.menuPerDay.menusPerDay(
-                currentUser.get,
+                getCurrentUser(currentUser, isAdmin = true, username),
                 new SimpleDateFormat("dd-MM-yyyy").format(getDateStart),
                 new SimpleDateFormat("dd-MM-yyyy").format(getDateEnd),
                 formWithErrors,
@@ -138,7 +142,7 @@ class MenuPerDayController @Inject() (
         menuPerDayOption <- menuPerDayService.getMenuPerDayByUuid(uuid)
       } yield
         Ok(views.html.admin.menuPerDay.menuPerDayDetails(
-          currentUser.get,
+          getCurrentUser(currentUser, isAdmin = true, username),
           MenuPerDayForm.menuPerDayForm,
           menusUuidAndNames,
           menuPerDayOption))
@@ -157,7 +161,7 @@ class MenuPerDayController @Inject() (
               menusUuidAndNames <- menuService.getAllMenusUuidAndNames
               menuPerDayOption <- menuPerDayService.getMenuPerDayByUuid(uuid)
             } yield BadRequest(views.html.admin.menuPerDay.menuPerDayDetails(
-              currentUser.get,
+              getCurrentUser(currentUser, isAdmin = true, username),
               formWithErrors,
               menusUuidAndNames,
               menuPerDayOption))},
@@ -179,7 +183,11 @@ class MenuPerDayController @Inject() (
               currentUser <- userService.getByEmailAddress(username)
               menusUuidAndNames <- menuService.getAllMenusUuidAndNames
               menuPerDayOption <- menuPerDayService.getMenuPerDayByUuid(uuid)
-            } yield BadRequest(views.html.admin.menuPerDay.menuPerDayDetails(currentUser.get, formWithErrors, menusUuidAndNames, menuPerDayOption))},
+            } yield BadRequest(views.html.admin.menuPerDay.menuPerDayDetails(
+              getCurrentUser(currentUser, isAdmin = true, username),
+              formWithErrors,
+              menusUuidAndNames,
+              menuPerDayOption))},
           menuPerDayData => {
             menuPerDayService.insertOrUpdate(uuid, menuPerDayData).map(_ =>
               Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay()))

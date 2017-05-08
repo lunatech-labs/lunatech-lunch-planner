@@ -4,7 +4,7 @@
 @import lunatech.lunchplanner.viewModels.ListMenusPerDayForm
 
 @(admin: User, defaultDateStart: String, defaultDateEnd: String, listMenusPerDayForm: Form[ListMenusPerDayForm], listOfMenusPerDay: Array[MenuWithNamePerDay])(implicit messages: play.api.i18n.Messages)
-@main("New schedule", admin, isUserAdmin = true) {
+@main("New schedule", admin) {
 <!-- Nav tabs -->
 <ul class="nav nav-tabs">
     <li role="presentation" class="active"><a data-toggle="tab" href="#list">All schedules</a></li>

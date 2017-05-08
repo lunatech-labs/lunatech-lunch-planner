@@ -1,4 +1,4 @@
-@(title: String, currentUser: lunatech.lunchplanner.models.User, isUserAdmin: Boolean)(content: Html)
+@(title: String, currentUser: lunatech.lunchplanner.models.User)(content: Html)
 
 <!DOCTYPE html>
 
@@ -28,7 +28,7 @@
                 <li>
                     <a href="@lunatech.lunchplanner.controllers.routes.Application.index">Planned meals</a>
                 </li>
-                @if(isUserAdmin) {
+                @if(currentUser.isAdmin) {
                     <li>
                         <a href="@lunatech.lunchplanner.controllers.routes.DishController.getAllDishes">Dishes</a>
                     </li>
