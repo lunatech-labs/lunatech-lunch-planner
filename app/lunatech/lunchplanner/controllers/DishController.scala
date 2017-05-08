@@ -4,6 +4,7 @@ import java.util.UUID
 
 import com.google.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
+import lunatech.lunchplanner.models.Dish
 import lunatech.lunchplanner.services.{ DishService, MenuDishService, UserService }
 import lunatech.lunchplanner.viewModels.{ DishForm, ListDishesForm }
 import play.api.i18n.{ I18nSupport, MessagesApi }
@@ -59,8 +60,8 @@ class DishController @Inject() (
           views.html.admin.dish.newDish(
             getCurrentUser(currentUser, isAdmin = true, username),
             formWithErrors))},
-        dishData =>
-          dishService.add(dishData).map( _ =>
+        dishForm =>
+          dishService.add(getDish(dishForm)).map( _ =>
             Redirect(lunatech.lunchplanner.controllers.routes.DishController.getAllDishes())))
     }
   }
@@ -91,14 +92,15 @@ class DishController @Inject() (
           views.html.admin.dish.dishDetails(
             getCurrentUser(currentUser, isAdmin = true, username),
             formWithErrors, dish))},
-        dishData =>
-          dishService.insertOrUpdate(uuid, dishData).map( _ =>
+        dishForm => {
+          dishService.insertOrUpdate(uuid, getDish(dishForm)).map(_ =>
             Redirect(lunatech.lunchplanner.controllers.routes.DishController.getAllDishes()))
+        }
       )
     }
   }
 
-  def deleteDishes = IsAdminAsync { username =>
+  def deleteDishes() = IsAdminAsync { username =>
     implicit request => {
       ListDishesForm
       .listDishesForm
@@ -130,4 +132,17 @@ class DishController @Inject() (
       result <- dishService.delete(uuid)
     } yield result
   }
+
+  private def getDish(dishForm: DishForm) =
+    Dish(
+      name = dishForm.name,
+      description = dishForm.description,
+      isVegetarian = dishForm.isVegetarian,
+      hasSeaFood = dishForm.hasSeaFood,
+      hasPork = dishForm.hasPork,
+      hasBeef = dishForm.hasBeef,
+      hasChicken = dishForm.hasChicken,
+      isGlutenFree = dishForm.isGlutenFree,
+      hasLactose = dishForm.hasLactose,
+      remarks = dishForm.remarks)
 }
