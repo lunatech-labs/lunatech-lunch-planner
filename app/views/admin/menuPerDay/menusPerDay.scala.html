@@ -19,7 +19,7 @@
 
             @b3.form(lunatech.lunchplanner.controllers.routes.MenuPerDayController.filterMenusPerDay, 'id -> "filterDateRange") {
                 @datepickerrange(listMenusPerDayForm("dateStart"), 'value -> defaultDateStart)(
-                    listMenusPerDayForm("dateEnd"), 'value -> defaultDateEnd)('_label -> "Configure a date range")
+                    listMenusPerDayForm("dateEnd"), 'value -> defaultDateEnd)('_label -> "Choose a date range")
             }
             <br>
             @b3.form(lunatech.lunchplanner.controllers.routes.MenuPerDayController.deleteMenusPerDay) {
@@ -49,5 +49,4 @@
             }
         </div>
     </div>
-</div>
 }
