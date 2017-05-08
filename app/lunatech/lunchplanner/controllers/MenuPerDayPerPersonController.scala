@@ -43,7 +43,8 @@ class MenuPerDayPerPersonController @Inject() (
                 updateMenusPerDayPerPerson(
                   getCurrentUser(currentUser, isAdmin = false, username).uuid,
                   menuPerDayPerPersonData).map(_ =>
-                    Redirect(lunatech.lunchplanner.controllers.routes.Application.index()))
+                    Redirect(lunatech.lunchplanner.controllers.routes.Application.index())
+                      .flashing("success" -> "Meals updated!"))
               }
             )
       } yield result

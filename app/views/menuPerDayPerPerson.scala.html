@@ -3,12 +3,18 @@
 @import lunatech.lunchplanner.viewModels.MenuPerDayPerPersonForm
 @import lunatech.lunchplanner.models.User
 
-@(user: User, listOfMenusPerDayPerPerson: Array[MenuWithNameWithDishesPerPerson], form: Form[MenuPerDayPerPersonForm])(implicit messages: play.api.i18n.Messages)
+@(user: User, listOfMenusPerDayPerPerson: Array[MenuWithNameWithDishesPerPerson], form: Form[MenuPerDayPerPersonForm])(implicit messages: play.api.i18n.Messages, flash: play.api.mvc.Flash)
 @main("Lunatech Lunch Planner", user) {
 
     <h2>What Lunatech will be feeding you</h2>
     <div>
       <br>
+      @flash.get("success").map { message =>
+
+        <div class="alert alert-info alert-dismissable">
+          @message
+        </div>
+      }
       @helper.form(lunatech.lunchplanner.controllers.routes.MenuPerDayPerPersonController.createNewMenuPerDayPerPerson) {
         <table class="table" >
           <thead>
