@@ -1,5 +1,6 @@
 package lunatech.lunchplanner.services
 
+import java.text.SimpleDateFormat
 import java.util.UUID
 import javax.inject.Inject
 
@@ -43,7 +44,13 @@ class MenuPerDayPerPersonService  @Inject() (
           .flatMap { dishes =>
             isMenuPerDaySelectedForPerson(userUuid, menuWithNamePerDay.uuid)
             .map(isSelected =>
-              MenuWithNameWithDishesPerPerson(menuWithNamePerDay.uuid, menuWithNamePerDay.menuDate, menuWithNamePerDay.menuName, dishes, userUuid, isSelected))
+              MenuWithNameWithDishesPerPerson(
+                menuWithNamePerDay.uuid,
+                menuWithNamePerDay.menuDate,
+                menuWithNamePerDay.menuName,
+                dishes,
+                userUuid,
+                isSelected))
           }
       }
     }
@@ -56,13 +63,38 @@ class MenuPerDayPerPersonService  @Inject() (
     MenuPerDayPerPersonTable.remove(menuPerDayPerPersonUuid)
 
   def getAllMenuWithNamePerDay: Future[Seq[MenuWithNamePerDay]] = {
-    menuPerDayService.getAllOrderedByDateAscending.flatMap {
+    menuPerDayService.getAllFutureAndOrderedByDate.flatMap {
       Future.traverse(_) { menuPerDay =>
         menuService.getByUuid(menuPerDay.menuUuid).flatMap {
           case Some(menuData) =>
               getNumberOfMenusPerDayPerPersonForMenuPerDay(menuPerDay.uuid)
               .map(count =>
-                Some(MenuWithNamePerDay(menuPerDay.uuid, menuData.uuid, menuPerDay.date.toString, menuData.name, numberOfPeopleSignedIn = count)))
+                Some(MenuWithNamePerDay(
+                  menuPerDay.uuid,
+                  menuData.uuid,
+                  new SimpleDateFormat("dd-MM-yyyy").format(menuPerDay.date),
+                  menuData.name,
+                  numberOfPeopleSignedIn = count)))
+          case None => Future.successful(None)
+        }
+      }
+    }.map(_.flatten)
+  }
+
+  def getAllMenuWithNamePerDayFilterDateRange(dateStart: java.sql.Date, dateEnd: java.sql.Date):
+  Future[Seq[MenuWithNamePerDay]] = {
+    menuPerDayService.getAllOrderedByDateFilterDateRange(dateStart, dateEnd).flatMap {
+      Future.traverse(_) { menuPerDay =>
+        menuService.getByUuid(menuPerDay.menuUuid).flatMap {
+          case Some(menuData) =>
+            getNumberOfMenusPerDayPerPersonForMenuPerDay(menuPerDay.uuid)
+              .map(count =>
+                Some(MenuWithNamePerDay(
+                  menuPerDay.uuid,
+                  menuData.uuid,
+                  new SimpleDateFormat("dd-MM-yyyy").format(menuPerDay.date),
+                  menuData.name,
+                  numberOfPeopleSignedIn = count)))
           case None => Future.successful(None)
         }
       }

@@ -5,10 +5,10 @@
 @import java.util.Date
 
 @(admin: User, date: String, menuPerDayForm: Form[MenuPerDayForm], menuOptions: Seq[(String,String)])(implicit messages: play.api.i18n.Messages)
-@main("Menu scheduling", admin, isUserAdmin = true) {
+@main("Menu scheduling", admin) {
 <!-- Nav tabs -->
 <ul class="nav nav-tabs">
-    <li role="presentation" ><a href="@lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay">All schedules</a></li>
+    <li role="presentation" ><a href="@lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay()">All schedules</a></li>
     <li role="presentation" class="active"><a data-toggle="tab" href="#newSchedule">Create new</a></li>
 </ul>
 

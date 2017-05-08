@@ -26,22 +26,24 @@ class MenuPerDayPerPersonController @Inject() (
   def createNewMenuPerDayPerPerson = IsAuthenticatedAsync { username =>
     implicit request => {
       for{
-        user <- userService.getByEmailAddress(username)
+        currentUser <- userService.getByEmailAddress(username)
         result <- MenuPerDayPerPersonForm
             .menuPerDayPerPersonForm
             .bindFromRequest
             .fold(
               formWithErrors =>
-                menuPerDayPerPersonService.getAllMenuWithNamePerDayWithDishesPerPerson(user.get.uuid)
+                menuPerDayPerPersonService.getAllMenuWithNamePerDayWithDishesPerPerson(
+                  getCurrentUser(currentUser, isAdmin = false, username).uuid)
                   .map( menusPerDayPerPerson =>
                     BadRequest(views.html.menuPerDayPerPerson(
-                      user.get,
-                      userService.isAdminUser(user.get.emailAddress),
+                      getCurrentUser(currentUser, isAdmin = userService.isAdminUser(currentUser.get.emailAddress), username),
                       menusPerDayPerPerson.toArray,
                       formWithErrors))),
               menuPerDayPerPersonData => {
-                updateMenusPerDayPerPerson(user.get.uuid, menuPerDayPerPersonData).map(_ =>
-                  Redirect(lunatech.lunchplanner.controllers.routes.Application.index()))
+                updateMenusPerDayPerPerson(
+                  getCurrentUser(currentUser, isAdmin = false, username).uuid,
+                  menuPerDayPerPersonData).map(_ =>
+                    Redirect(lunatech.lunchplanner.controllers.routes.Application.index()))
               }
             )
       } yield result
@@ -55,7 +57,8 @@ class MenuPerDayPerPersonController @Inject() (
     })
   }
 
-  private def menusPerDayToAdd(menusChosen: Seq[MenuPerDayPerPerson], userUuid: UUID, form: MenuPerDayPerPersonForm): Future[List[MenuPerDayPerPerson]] =
+  private def menusPerDayToAdd(menusChosen: Seq[MenuPerDayPerPerson], userUuid: UUID, form: MenuPerDayPerPersonForm):
+  Future[List[MenuPerDayPerPerson]] =
     Future.sequence(
       form.menuPerDayUuid
       .filter(!menusChosen.map(_.menuPerDayUuid).contains(_))
@@ -64,7 +67,8 @@ class MenuPerDayPerPersonController @Inject() (
       menuPerDayPerPersonService.add(newMenuPerDayPerPerson)
     })
 
-  private def menusPerDayToRemove(allMenusPerDayPerPerson: Seq[MenuPerDayPerPerson], userUuid: UUID, form: MenuPerDayPerPersonForm): Future[Seq[Int]] =
+  private def menusPerDayToRemove(allMenusPerDayPerPerson: Seq[MenuPerDayPerPerson], userUuid: UUID, form: MenuPerDayPerPersonForm):
+  Future[Seq[Int]] =
     Future.sequence(allMenusPerDayPerPerson.filter(menu => !form.menuPerDayUuid.contains(menu.menuPerDayUuid))
       .map(menu => menuPerDayPerPersonService.delete(menu.uuid)))
 

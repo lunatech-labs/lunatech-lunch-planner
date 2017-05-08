@@ -20,16 +20,15 @@ class MenuDishService @Inject() (
   }
 
   def getAllWithListOfDishes: Future[Seq[MenuWithDishes]] = {
-    val allMenus = menuService.getAll
-    allMenus.flatMap {
-      Future.traverse(_) { menu =>
-        MenuDishTable.getByMenuUuid(menu.uuid)
-          .flatMap(Future.traverse(_)(dish =>
-            dishService.getByUuid(dish.dishUuid)).map(_.flatten))
-          .map(dishes =>
-            MenuWithDishes(menu.uuid, menu.name, dishes))
-      }
-    }
+    for {
+      allMenus <- menuService.getAll
+      result  <- Future.sequence(allMenus.map { menu =>
+        for {
+          menuDishes <-  MenuDishTable.getByMenuUuid(menu.uuid)
+          dishes <- Future.sequence(menuDishes.map(dish => dishService.getByUuid(dish.dishUuid))).map(_.flatten)
+        } yield MenuWithDishes(menu.uuid, menu.name, dishes)
+      })
+    } yield result
   }
 
   def deleteByMenuUuid(menuUuid: UUID): Future[Int] =

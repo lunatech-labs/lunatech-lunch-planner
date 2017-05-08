@@ -3,7 +3,7 @@ $(function(){
         if(this.checked) {
             // Iterate each checkbox
             $('.schedule:checkbox').each(function() {
-                this.checked = !this.checked;
+                this.checked = true;
             });
         }
         else {
@@ -19,6 +19,17 @@ $(function(){
         format: 'dd-mm-yyyy',
         todayBtn: true,
         todayHighlight: true
+    });
+});
+
+$(function(defaultDateStart, defaultDateEnd){
+    $(".daterange").change(function(){
+        var dateStart = document.getElementById("dateStart").value;
+        var dateEnd = document.getElementById("dateEnd").value;
+
+        if(dateStart !== defaultDateStart || dateEnd !== defaultDateEnd) {
+            $('#filterDateRange').submit();
+        }
     });
 });
 

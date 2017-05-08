@@ -3,8 +3,8 @@
 @import lunatech.lunchplanner.models.MenuWithNamePerDay
 @import lunatech.lunchplanner.viewModels.ListMenusPerDayForm
 
-@(admin: User, listMenusPerDayForm: Form[ListMenusPerDayForm],  listOfMenusPerDay: Array[MenuWithNamePerDay])(implicit messages: play.api.i18n.Messages)
-@main("New schedule", admin, isUserAdmin = true) {
+@(admin: User, defaultDateStart: String, defaultDateEnd: String, listMenusPerDayForm: Form[ListMenusPerDayForm], listOfMenusPerDay: Array[MenuWithNamePerDay])(implicit messages: play.api.i18n.Messages)
+@main("New schedule", admin) {
 <!-- Nav tabs -->
 <ul class="nav nav-tabs">
     <li role="presentation" class="active"><a data-toggle="tab" href="#list">All schedules</a></li>
@@ -15,9 +15,16 @@
 <div class="tab-content">
     <!-- Menus Per Day -->
     <div role="tabpanel" class="tab-pane active" id="list">
-        <div>
+            <br>
+
+            @b3.form(lunatech.lunchplanner.controllers.routes.MenuPerDayController.filterMenusPerDay, 'id -> "filterDateRange") {
+                @datepickerrange(listMenusPerDayForm("dateStart"), 'value -> defaultDateStart)(
+                    listMenusPerDayForm("dateEnd"), 'value -> defaultDateEnd)('_label -> "Choose a date range")
+            }
             <br>
             @b3.form(lunatech.lunchplanner.controllers.routes.MenuPerDayController.deleteMenusPerDay) {
+                <input type="hidden" name="dateStart" value="@defaultDateStart" />
+                <input type="hidden" name="dateEnd" value="@defaultDateEnd" />
                 <table class="table" >
                     <thead>
                         <tr>
@@ -42,5 +49,4 @@
             }
         </div>
     </div>
-</div>
 }

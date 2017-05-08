@@ -31,6 +31,7 @@ POST        /menu/:menuUuid                    lunatech.lunchplanner.controllers
 GET         /menuPerDay/all                    lunatech.lunchplanner.controllers.MenuPerDayController.getAllMenusPerDay
 GET         /menuPerDay/new                    lunatech.lunchplanner.controllers.MenuPerDayController.getNewMenuPerDay
 POST        /menuPerDay/add                    lunatech.lunchplanner.controllers.MenuPerDayController.createNewMenuPerDay
+POST        /menuPerDay/filter                 lunatech.lunchplanner.controllers.MenuPerDayController.filterMenusPerDay
 POST        /menuPerDay/delete                 lunatech.lunchplanner.controllers.MenuPerDayController.deleteMenusPerDay
 POST        /menuPerDay/delete/:uuid           lunatech.lunchplanner.controllers.MenuPerDayController.deleteMenuPerDay(uuid: java.util.UUID)
 GET         /menuPerDay/:uuid                  lunatech.lunchplanner.controllers.MenuPerDayController.getMenuPerDayDetails(uuid: java.util.UUID)

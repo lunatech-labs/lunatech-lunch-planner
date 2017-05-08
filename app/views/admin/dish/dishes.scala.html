@@ -4,7 +4,7 @@
 @import lunatech.lunchplanner.viewModels.ListDishesForm
 
 @(admin: User, listDishesForm: Form[ListDishesForm], listOfDishes: Array[Dish])(implicit messages: play.api.i18n.Messages)
-@main("Dishes", admin, isUserAdmin = true) {
+@main("Dishes", admin) {
 <!-- Nav tabs -->
 <ul class="nav nav-tabs">
     <li role="presentation" class="active"><a data-toggle="tab" href="#list">All dishes</a></li>

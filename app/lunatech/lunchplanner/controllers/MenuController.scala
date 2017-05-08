@@ -4,7 +4,7 @@ import java.util.UUID
 
 import com.google.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.MenuDish
+import lunatech.lunchplanner.models.{ Menu, MenuDish }
 import lunatech.lunchplanner.services.{ DishService, MenuDishService, MenuPerDayPerPersonService, MenuPerDayService, MenuService, UserService }
 import lunatech.lunchplanner.viewModels.{ ListMenusForm, MenuForm }
 import play.api.i18n.{ I18nSupport, MessagesApi }
@@ -33,7 +33,9 @@ class MenuController  @Inject() (
         currentUser <- userService.getByEmailAddress(username)
         menus <- menuDishService.getAllWithListOfDishes.map(_.toArray)
       } yield
-        Ok(views.html.admin.menu.menus(currentUser.get, ListMenusForm.listMenusForm, menus))
+        Ok(views.html.admin.menu.menus(
+          getCurrentUser(currentUser, isAdmin = true, username),
+          ListMenusForm.listMenusForm, menus))
     }
   }
 
@@ -48,7 +50,7 @@ class MenuController  @Inject() (
             currentUser <- userService.getByEmailAddress(username)
             dishes <- dishService.getAll.map(_.toArray)
           } yield BadRequest(views.html.admin.menu.newMenu(
-          currentUser.get,
+            getCurrentUser(currentUser, isAdmin = true, username),
           formWithErrors,
           dishes))},
         menuData => {
@@ -64,7 +66,9 @@ class MenuController  @Inject() (
         currentUser <- userService.getByEmailAddress(username)
         dishes <- dishService.getAll.map(_.toArray)
       } yield
-        Ok(views.html.admin.menu.newMenu(currentUser.get, MenuForm.menuForm, dishes))
+        Ok(views.html.admin.menu.newMenu(
+          getCurrentUser(currentUser, isAdmin = true, username),
+          MenuForm.menuForm, dishes))
     }
   }
 
@@ -74,7 +78,9 @@ class MenuController  @Inject() (
         currentUser <- userService.getByEmailAddress(username)
         menuDish <- menuDishService.getByUuidWithSelectedDishes(menuUuid)
       } yield
-        Ok(views.html.admin.menu.menuDetails(currentUser.get, MenuForm.menuForm, menuDish))
+        Ok(views.html.admin.menu.menuDetails(
+          getCurrentUser(currentUser, isAdmin = true, username),
+          MenuForm.menuForm, menuDish))
     }
   }
 
@@ -88,7 +94,9 @@ class MenuController  @Inject() (
             for {
               currentUser <- userService.getByEmailAddress(username)
               menuDish <- menuDishService.getByUuidWithSelectedDishes(menuUuid)
-          } yield BadRequest(views.html.admin.menu.menuDetails(currentUser.get, formWithErrors, menuDish))},
+          } yield BadRequest(views.html.admin.menu.menuDetails(
+              getCurrentUser(currentUser, isAdmin = true, username),
+              formWithErrors, menuDish))},
           menuData => {
             updateMenuDishes(menuUuid, menuData).map(_ =>
               Redirect(lunatech.lunchplanner.controllers.routes.MenuController.getAllMenus()))
@@ -106,7 +114,9 @@ class MenuController  @Inject() (
             for {
               currentUser <- userService.getByEmailAddress(username)
               menuDish <- menuDishService.getByUuidWithSelectedDishes(menuUuid)
-            } yield BadRequest(views.html.admin.menu.menuDetails(currentUser.get, formWithErrors, menuDish))
+            } yield BadRequest(views.html.admin.menu.menuDetails(getCurrentUser(
+              currentUser, isAdmin = true, username),
+              formWithErrors, menuDish))
           },
           _ => {
             deleteMenuDish(menuUuid).map(_ =>
@@ -115,7 +125,7 @@ class MenuController  @Inject() (
     }
   }
 
-  def deleteMenus = IsAdminAsync { username =>
+  def deleteMenus() = IsAdminAsync { username =>
     implicit request => {
       ListMenusForm
         .listMenusForm
@@ -126,7 +136,9 @@ class MenuController  @Inject() (
               currentUser <- userService.getByEmailAddress(username)
               menus <- menuDishService.getAllWithListOfDishes.map(_.toArray)
             } yield BadRequest(
-            views.html.admin.menu.menus(currentUser.get, formWithErrors, menus))},
+            views.html.admin.menu.menus(
+              getCurrentUser(currentUser, isAdmin = true, username),
+              formWithErrors, menus))},
           menusData =>
             deleteMenuDishes(menusData).map( _ =>
               Redirect(lunatech.lunchplanner.controllers.routes.MenuController.getAllMenus()))
@@ -136,23 +148,25 @@ class MenuController  @Inject() (
 
   private def addNewMenuDishes(menuData: MenuForm) = {
     // add new menu
-   menuService.add(menuData)
+    val newMenu = Menu(name = menuData.menuName)
+   menuService.add(newMenu)
      .flatMap(menu =>
       //Add MenuDishes
-       addMenuDishes(menu.uuid, menuData))
+       addMenuDishes(menu.uuid, menuData.dishesUuid))
   }
 
   private def updateMenuDishes(menuUuid: UUID, menuData: MenuForm) = {
     // update menu name
-    menuService.insertOrUpdate(menuUuid, menuData)
+    val menu = Menu(name = menuData.menuName)
+    menuService.insertOrUpdate(menuUuid, menu)
 
     // remove all previous menu dishes and add them again
     menuDishService.deleteByMenuUuid(menuUuid)
-    addMenuDishes(menuUuid, menuData)
+    addMenuDishes(menuUuid, menuData.dishesUuid)
   }
 
-  private def addMenuDishes(menuUuid: UUID, menuData: MenuForm) =
-    Future.sequence(menuData.dishesUuid.map { uuid =>
+  private def addMenuDishes(menuUuid: UUID, dishesUuid: List[UUID]) =
+    Future.sequence(dishesUuid.map { uuid =>
       val newMenuDish = MenuDish(menuUuid = menuUuid, dishUuid = uuid)
       menuDishService.add(newMenuDish)
     })
