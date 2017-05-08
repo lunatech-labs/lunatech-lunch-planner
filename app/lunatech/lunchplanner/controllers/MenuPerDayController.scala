@@ -91,7 +91,8 @@ class MenuPerDayController @Inject() (
               menusUuidAndNames))},
           menuPerDayForm => {
             menuPerDayService.add(getNewMenuPerDay(menuPerDayForm)).map(_ =>
-              Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay()))
+              Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay())
+                .flashing("success" -> "New schedule created!"))
           })
     }
   }
@@ -130,7 +131,8 @@ class MenuPerDayController @Inject() (
                 menusPerDay))},
           menusPerDayData =>
             deleteSeveral(menusPerDayData).map( _ =>
-              Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay()))
+              Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay())
+                .flashing("success" -> "Schedule(s) deleted!"))
         )
     }
  }
@@ -168,7 +170,8 @@ class MenuPerDayController @Inject() (
               menuPerDayOption))},
           _ => {
             delete(uuid).map(_ =>
-              Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay()))
+              Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay())
+                .flashing("success" -> "Schedule deleted!"))
           })
     }
   }
@@ -191,7 +194,8 @@ class MenuPerDayController @Inject() (
               menuPerDayOption))},
           menuPerDayData => {
             menuPerDayService.insertOrUpdate(uuid, getNewMenuPerDay(menuPerDayData)).map(_ =>
-              Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay()))
+              Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay())
+                .flashing("success" -> "Schedule updated!"))
           })
     }
   }

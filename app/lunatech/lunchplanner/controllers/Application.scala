@@ -6,7 +6,7 @@ import lunatech.lunchplanner.models.User
 import lunatech.lunchplanner.services.{ DishService, MenuPerDayPerPersonService, MenuService, UserService }
 import lunatech.lunchplanner.viewModels.MenuPerDayPerPersonForm
 import play.api.i18n.{ I18nSupport, MessagesApi }
-import play.api.mvc.Controller
+import play.api.mvc.{ Controller, Flash }
 import play.api.{ Configuration, Environment }
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -27,13 +27,13 @@ class Application @Inject() (
         getIndex(currentUser))
   }
 
-  private def getIndex(normalUser: Option[User]) =
+  private def getIndex(normalUser: Option[User])(implicit flash: Flash) =
     normalUser match {
       case Some(user) => getMenuPerDayPerPerson(user)
       case None => Future.successful(Unauthorized)
     }
 
-  private def getMenuPerDayPerPerson(user: User) = {
+  private def getMenuPerDayPerPerson(user: User)(implicit flash: Flash) = {
     val userIsAdmin = userService.isAdminUser(user.emailAddress)
     menuPerDayPerPersonService.getAllMenuWithNamePerDayWithDishesPerPerson(user.uuid).map(_.toArray)
       .map(menusPerDayPerPerson =>

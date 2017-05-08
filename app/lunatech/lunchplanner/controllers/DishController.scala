@@ -62,7 +62,8 @@ class DishController @Inject() (
             formWithErrors))},
         dishForm =>
           dishService.add(getDish(dishForm)).map( _ =>
-            Redirect(lunatech.lunchplanner.controllers.routes.DishController.getAllDishes())))
+            Redirect(lunatech.lunchplanner.controllers.routes.DishController.getAllDishes())
+              .flashing("success" -> "New dish created!")))
     }
   }
 
@@ -94,7 +95,8 @@ class DishController @Inject() (
             formWithErrors, dish))},
         dishForm => {
           dishService.insertOrUpdate(uuid, getDish(dishForm)).map(_ =>
-            Redirect(lunatech.lunchplanner.controllers.routes.DishController.getAllDishes()))
+            Redirect(lunatech.lunchplanner.controllers.routes.DishController.getAllDishes())
+              .flashing("success" -> "Dish updated!"))
         }
       )
     }
@@ -114,7 +116,8 @@ class DishController @Inject() (
           views.html.admin.dish.dishes(currentUser.get, formWithErrors, dishes))},
         dishData =>
           Future.sequence(dishData.listUuids.map(uuid => deleteDishAndDependencies(uuid)))
-            .map( _ => Redirect(lunatech.lunchplanner.controllers.routes.DishController.getAllDishes()))
+            .map( _ => Redirect(lunatech.lunchplanner.controllers.routes.DishController.getAllDishes())
+              .flashing("success" -> "Dish(es) deleted!"))
       )
     }
   }
@@ -122,7 +125,8 @@ class DishController @Inject() (
   def deleteDish(uuid: UUID) = IsAdminAsync { username =>
     implicit request => {
       deleteDishAndDependencies(uuid)
-      .map( _ => Redirect(lunatech.lunchplanner.controllers.routes.DishController.getAllDishes()))
+      .map( _ => Redirect(lunatech.lunchplanner.controllers.routes.DishController.getAllDishes()
+      ).flashing("success" -> "Dish deleted!"))
     }
   }
 
