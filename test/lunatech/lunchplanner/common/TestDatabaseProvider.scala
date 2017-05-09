@@ -1,6 +1,6 @@
 package lunatech.lunchplanner.common
 
-import lunatech.lunchplanner.persistence.{ DishTable, MenuTable, UserTable, MenuDishTable, MenuPerDayTable, MenuPerDayPerPersonTable }
+import lunatech.lunchplanner.persistence.{ DishTable, MenuDishTable, MenuPerDayPerPersonTable, MenuPerDayTable, MenuTable, UserProfileTable, UserTable }
 import slick.driver.PostgresDriver.api._
 import slick.lifted.TableQuery
 
@@ -12,6 +12,7 @@ trait TestDatabaseProvider {
 
   val defaultTimeout = 10.seconds
 
+  val userProfileTable: TableQuery[UserProfileTable] = TableQuery[UserProfileTable]
   val userTable: TableQuery[UserTable] = TableQuery[UserTable]
   val dishTable: TableQuery[DishTable] = TableQuery[DishTable]
   val menuTable: TableQuery[MenuTable] = TableQuery[MenuTable]
@@ -25,6 +26,7 @@ trait TestDatabaseProvider {
     Await.result(db.run(menuDishTable.delete), defaultTimeout)
     Await.result(db.run(dishTable.delete), defaultTimeout)
     Await.result(db.run(menuTable.delete), defaultTimeout)
+    Await.result(db.run(userProfileTable.delete), defaultTimeout)
     Await.result(db.run(userTable.delete), defaultTimeout)
   }
 
