@@ -5,8 +5,8 @@ import java.util.{ Date, UUID }
 
 import com.google.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.MenuPerDay
-import lunatech.lunchplanner.services.{ MenuDishService, MenuPerDayPerPersonService, MenuPerDayService, MenuService, UserService }
+import lunatech.lunchplanner.models.{ MenuPerDay, MenuPerDayDietRestrictions }
+import lunatech.lunchplanner.services.{ MenuDishService, MenuPerDayPerPersonService, MenuPerDayService, MenuService, UserProfileService, UserService }
 import lunatech.lunchplanner.viewModels.{ FilterMenusPerDayForm, ListMenusPerDayForm, MenuPerDayForm }
 import org.joda.time.DateTime
 import play.api.i18n.{ I18nSupport, MessagesApi }
@@ -18,6 +18,7 @@ import scala.concurrent.Future
 
 class MenuPerDayController @Inject() (
   userService: UserService,
+  userProfileService: UserProfileService,
   menuService: MenuService,
   menuDishService: MenuDishService,
   menuPerDayService: MenuPerDayService,
@@ -143,12 +144,14 @@ class MenuPerDayController @Inject() (
         currentUser <- userService.getByEmailAddress(username)
         menusUuidAndNames <- menuService.getAllMenusUuidAndNames
         menuPerDayOption <- menuPerDayService.getMenuPerDayByUuid(uuid)
+        dietRestrictions <- userProfileService.getRestrictionsByMenuPerDay(uuid)
       } yield
         Ok(views.html.admin.menuPerDay.menuPerDayDetails(
           getCurrentUser(currentUser, isAdmin = true, username),
           MenuPerDayForm.menuPerDayForm,
           menusUuidAndNames,
-          menuPerDayOption))
+          menuPerDayOption,
+          dietRestrictions))
     }
   }
 
@@ -167,7 +170,8 @@ class MenuPerDayController @Inject() (
               getCurrentUser(currentUser, isAdmin = true, username),
               formWithErrors,
               menusUuidAndNames,
-              menuPerDayOption))},
+              menuPerDayOption, MenuPerDayDietRestrictions(UUID.randomUUID())
+))},
           _ => {
             delete(uuid).map(_ =>
               Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay())
@@ -191,7 +195,7 @@ class MenuPerDayController @Inject() (
               getCurrentUser(currentUser, isAdmin = true, username),
               formWithErrors,
               menusUuidAndNames,
-              menuPerDayOption))},
+              menuPerDayOption, MenuPerDayDietRestrictions(UUID.randomUUID())))},
           menuPerDayData => {
             menuPerDayService.insertOrUpdate(uuid, getNewMenuPerDay(menuPerDayData)).map(_ =>
               Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay())

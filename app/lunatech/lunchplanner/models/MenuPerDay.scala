@@ -16,3 +16,14 @@ case class MenuWithNamePerDay(
   menuName: String,
   numberOfPeopleSignedIn: Int
 )
+
+case class MenuPerDayDietRestrictions(
+  menuPerDayUuid: UUID,
+  vegetarian: Int = 0,
+  seaFoodRestriction: Int = 0,
+  porkRestriction: Int = 0,
+  beefRestriction: Int = 0,
+  chickenRestriction: Int = 0,
+  glutenRestriction: Int = 0,
+  lactoseRestriction: Int = 0
+)

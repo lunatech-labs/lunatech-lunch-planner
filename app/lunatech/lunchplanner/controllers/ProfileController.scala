@@ -26,7 +26,7 @@ class ProfileController @Inject()(
       for{
         currentUser <- userService.getByEmailAddress(username)
         user <- Future.successful(getCurrentUser(currentUser, isAdmin = userService.isAdminUser(currentUser.get.emailAddress), username))
-        userProfile <- userProfileService.getUserProfileBtUserUuid(user.uuid)
+        userProfile <- userProfileService.getUserProfileByUserUuid(user.uuid)
       } yield
         Ok(views.html.profile(
           user,
@@ -46,7 +46,7 @@ class ProfileController @Inject()(
             for {
               currentUser <- userService.getByEmailAddress(username)
               user <- Future.successful(getCurrentUser(currentUser, isAdmin = userService.isAdminUser(currentUser.get.emailAddress), username))
-              userProfile <- userProfileService.getUserProfileBtUserUuid(user.uuid)
+              userProfile <- userProfileService.getUserProfileByUserUuid(user.uuid)
             } yield BadRequest(
               views.html.profile(
                 user,

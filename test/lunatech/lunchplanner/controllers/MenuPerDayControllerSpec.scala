@@ -8,7 +8,7 @@ import lunatech.lunchplanner.common.{ ControllerSpec, DBConnection }
 import lunatech.lunchplanner.data.ControllersData._
 import lunatech.lunchplanner.models.User
 import lunatech.lunchplanner.persistence.DishTable
-import lunatech.lunchplanner.services.{ DishService, MenuDishService, MenuPerDayPerPersonService, MenuPerDayService, MenuService, UserService }
+import lunatech.lunchplanner.services.{ DishService, MenuDishService, MenuPerDayPerPersonService, MenuPerDayService, MenuService, UserProfileService, UserService }
 import org.joda.time.DateTime
 import org.mockito.Matchers.any
 import org.mockito.Mockito._
@@ -26,6 +26,7 @@ class MenuPerDayControllerSpec extends ControllerSpec {
   private val developer = User(UUID.randomUUID(), "Developer", "developer@lunatech.com", isAdmin = true)
 
   val userService = mock[UserService]
+  val userProfileService = mock[UserProfileService]
   val dishService = mock[DishService]
   val menuService = mock[MenuService]
   val menuDishService = mock[MenuDishService]
@@ -48,6 +49,7 @@ class MenuPerDayControllerSpec extends ControllerSpec {
 
   val controller = new MenuPerDayController(
     userService,
+    userProfileService,
     menuService,
     menuDishService,
     menuPerDayService,
