@@ -18,7 +18,7 @@
             <br>
             @flash.get("success").map { message =>
 
-                <div class="alert alert-info alert-dismissable">
+                <div class="alert alert-success alert-dismissable">
                     @message
                 </div>
             }
@@ -50,7 +50,7 @@
                         </tr>
                     }
                 </table>
-                @b3.submit('class -> "btn btn-primary"){ <span class="glyphicon glyphicon-remove"></span> Delete selected }
+                @b3.submit('class -> "btn btn-danger"){ <span class="glyphicon glyphicon-remove"></span> Delete selected }
             }
         </div>
     </div>

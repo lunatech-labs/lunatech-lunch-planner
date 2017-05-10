@@ -1,0 +1,36 @@
+@(currentUser: lunatech.lunchplanner.models.User)
+
+<div id="sidebar-wrapper">
+    <ul class="sidebar-nav">
+        <li class="sidebar-brand">
+            <a href="#">Meal Planner</a>
+        </li>
+        <li>
+            <a href="@lunatech.lunchplanner.controllers.routes.Application.index">Planned meals</a>
+        </li>
+        @if(currentUser.isAdmin) {
+            <li>
+                <a href="@lunatech.lunchplanner.controllers.routes.DishController.getAllDishes">Dishes</a>
+            </li>
+            <li>
+                <a href="@lunatech.lunchplanner.controllers.routes.MenuController.getAllMenus">Menus</a>
+            </li>
+            <li>
+                <a href="@lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay()">Schedules</a>
+            </li>
+        }
+        <li><br></li>
+        <div class="sidebar-heading" style="padding-left: 20px;">Logged in as @currentUser.name</div>
+        <li>
+            <a href="@lunatech.lunchplanner.controllers.routes.ProfileController.getProfile">Profile</a>
+        </li>
+        <li>
+            <a href="@lunatech.lunchplanner.controllers.routes.Authentication.logout">Log out</a>
+        </li>
+        <li><br></li>
+        <li>
+            <img class="logo" src="@routes.Assets.at("images/lunatech_logo.png")"/>
+        </li>
+    </ul>
+</div>
+
