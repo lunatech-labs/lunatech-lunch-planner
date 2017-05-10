@@ -55,6 +55,15 @@ object MenuPerDayPerPersonTable {
     connection.db.run(query.result)
   }
 
+  def getUsersByMenuPerDayUuid(menuPerDayUuid: UUID)(implicit connection: DBConnection): Future[Seq[User]] = {
+    val query = for {
+      mpdpp <- menuPerDayPerPersonTable.filter(_.menuPerDayUuid === menuPerDayUuid)
+      user <- UserTable.userTable if mpdpp.userUuid === user.uuid
+    } yield user
+
+    connection.db.run(query.result)
+  }
+
   def getByUserUuid(userUuid: UUID)(implicit connection: DBConnection): Future[Seq[MenuPerDayPerPerson]] = {
     val query = menuPerDayPerPersonTable.filter(_.userUuid === userUuid)
     connection.db.run(query.result)
@@ -74,8 +83,8 @@ object MenuPerDayPerPersonTable {
       connection.db.run(query)
   }
 
-  def removeByMenuPerDayUuid(menuUuid: UUID)(implicit connection: DBConnection): Future[Int]  = {
-    val query = menuPerDayPerPersonTable.filter(x => x.menuPerDayUuid === menuUuid).delete
+  def removeByMenuPerDayUuid(menuPerDayUuid: UUID)(implicit connection: DBConnection): Future[Int] = {
+    val query = menuPerDayPerPersonTable.filter(x => x.menuPerDayUuid === menuPerDayUuid).delete
     connection.db.run(query)
   }
 

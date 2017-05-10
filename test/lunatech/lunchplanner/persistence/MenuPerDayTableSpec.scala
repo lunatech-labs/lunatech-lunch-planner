@@ -36,7 +36,7 @@ class MenuPerDayTableSpec extends AcceptanceSpec with TestDatabaseProvider {
     }
 
     "query for menus per day by uuid" in {
-      val result = Await.result(MenuPerDayTable.getByUUID(newMenuPerDay.uuid), defaultTimeout)
+      val result = Await.result(MenuPerDayTable.getByUuid(newMenuPerDay.uuid), defaultTimeout)
       result.map(_.date.toString) mustBe Some(newMenuPerDay).map(_.date.toString)
     }
 
@@ -103,7 +103,7 @@ class MenuPerDayTableSpec extends AcceptanceSpec with TestDatabaseProvider {
       val result = Await.result(MenuPerDayTable.insertOrUpdate(newMenuUpdated), defaultTimeout)
       result mustBe true
 
-      val updatedMenu = Await.result(MenuPerDayTable.getByUUID(newMenuUpdated.uuid), defaultTimeout)
+      val updatedMenu = Await.result(MenuPerDayTable.getByUuid(newMenuUpdated.uuid), defaultTimeout)
       updatedMenu.get.date.toLocalDate mustBe new Date(555555555).toLocalDate
     }
   }

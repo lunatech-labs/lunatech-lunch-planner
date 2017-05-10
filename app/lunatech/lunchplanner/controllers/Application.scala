@@ -3,7 +3,7 @@ package lunatech.lunchplanner.controllers
 import com.google.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.User
-import lunatech.lunchplanner.services.{ DishService, MenuPerDayPerPersonService, MenuService, UserService }
+import lunatech.lunchplanner.services.{ MenuPerDayPerPersonService, UserService }
 import lunatech.lunchplanner.viewModels.MenuPerDayPerPersonForm
 import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.mvc.{ Controller, Flash }
