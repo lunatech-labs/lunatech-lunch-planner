@@ -145,13 +145,16 @@ class MenuPerDayController @Inject() (
         menusUuidAndNames <- menuService.getAllMenusUuidAndNames
         menuPerDayOption <- menuPerDayService.getMenuPerDayByUuid(uuid)
         dietRestrictions <- userProfileService.getRestrictionsByMenuPerDay(uuid)
+        peopleAttendig <- menuPerDayPerPersonService.getListOfPeopleByMenuPerDay(uuid)
       } yield
         Ok(views.html.admin.menuPerDay.menuPerDayDetails(
           getCurrentUser(currentUser, isAdmin = true, username),
           MenuPerDayForm.menuPerDayForm,
           menusUuidAndNames,
           menuPerDayOption,
-          dietRestrictions))
+          dietRestrictions,
+          peopleAttendig
+        ))
     }
   }
 
@@ -166,12 +169,15 @@ class MenuPerDayController @Inject() (
               currentUser <- userService.getByEmailAddress(username)
               menusUuidAndNames <- menuService.getAllMenusUuidAndNames
               menuPerDayOption <- menuPerDayService.getMenuPerDayByUuid(uuid)
+              dietRestrictions <- userProfileService.getRestrictionsByMenuPerDay(uuid)
+              peopleAttendig <- menuPerDayPerPersonService.getListOfPeopleByMenuPerDay(uuid)
             } yield BadRequest(views.html.admin.menuPerDay.menuPerDayDetails(
               getCurrentUser(currentUser, isAdmin = true, username),
               formWithErrors,
               menusUuidAndNames,
-              menuPerDayOption, MenuPerDayDietRestrictions(UUID.randomUUID())
-))},
+              menuPerDayOption,
+              dietRestrictions,
+              peopleAttendig))},
           _ => {
             delete(uuid).map(_ =>
               Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay())
@@ -191,11 +197,15 @@ class MenuPerDayController @Inject() (
               currentUser <- userService.getByEmailAddress(username)
               menusUuidAndNames <- menuService.getAllMenusUuidAndNames
               menuPerDayOption <- menuPerDayService.getMenuPerDayByUuid(uuid)
+              dietRestrictions <- userProfileService.getRestrictionsByMenuPerDay(uuid)
+              peopleAttendig <- menuPerDayPerPersonService.getListOfPeopleByMenuPerDay(uuid)
             } yield BadRequest(views.html.admin.menuPerDay.menuPerDayDetails(
               getCurrentUser(currentUser, isAdmin = true, username),
               formWithErrors,
               menusUuidAndNames,
-              menuPerDayOption, MenuPerDayDietRestrictions(UUID.randomUUID())))},
+              menuPerDayOption,
+              dietRestrictions,
+              peopleAttendig))},
           menuPerDayData => {
             menuPerDayService.insertOrUpdate(uuid, getNewMenuPerDay(menuPerDayData)).map(_ =>
               Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay())

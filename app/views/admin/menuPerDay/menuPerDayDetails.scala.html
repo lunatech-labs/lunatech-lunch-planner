@@ -5,7 +5,7 @@
 @import lunatech.lunchplanner.models.MenuPerDayDietRestrictions
 @import java.text.SimpleDateFormat
 
-@(admin: User, menuPerDayForm: Form[MenuPerDayForm], menuOptions: Seq[(String,String)], menuPerDayOption: Option[MenuPerDay], dietRestrictionsSummary: MenuPerDayDietRestrictions)(implicit messages: play.api.i18n.Messages)
+@(admin: User, menuPerDayForm: Form[MenuPerDayForm], menuOptions: Seq[(String,String)], menuPerDayOption: Option[MenuPerDay], dietRestrictionsSummary: MenuPerDayDietRestrictions, listPeopleAttending: Seq[String])(implicit messages: play.api.i18n.Messages)
 @main("Menu schedule details", admin) {
 <!-- Nav tabs -->
 <ul class="nav nav-tabs">
@@ -54,30 +54,53 @@
         <br>
         <div class="row">
             <div class="col col-lg-3">
-            <label>Diet restrictions summary</label>
-            <table class="table" >
-                <tr><td>Vegetarian</td>
-                    <td class="align-right">@dietRestrictionsSummary.vegetarian</td>
-                </tr>
-                <tr><td>Sea food</td>
-                    <td class="align-right">@dietRestrictionsSummary.seaFoodRestriction</td>
-                </tr>
-                <tr><td>Pork</td>
-                    <td class="align-right">@dietRestrictionsSummary.porkRestriction</td>
-                </tr>
-                <tr><td>Beef</td>
-                    <td class="align-right">@dietRestrictionsSummary.beefRestriction</td>
-                </tr>
-                <tr><td>Chicken</td>
-                    <td class="align-right">@dietRestrictionsSummary.chickenRestriction</td>
-                </tr>
-                <tr><td>Gluten</td>
-                    <td class="align-right">@dietRestrictionsSummary.glutenRestriction</td>
-                </tr>
-                <tr><td>Lactose</td>
-                    <td class="align-right">@dietRestrictionsSummary.lactoseRestriction</td>
-                </tr>
-            </table>
+                <table class="table" >
+                    <thead>
+                        <tr>
+                            <th>Diet restrictions summary</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tr><td>Vegetarian</td>
+                        <td class="align-right">@dietRestrictionsSummary.vegetarian</td>
+                    </tr>
+                    <tr><td>Sea food</td>
+                        <td class="align-right">@dietRestrictionsSummary.seaFoodRestriction</td>
+                    </tr>
+                    <tr><td>Pork</td>
+                        <td class="align-right">@dietRestrictionsSummary.porkRestriction</td>
+                    </tr>
+                    <tr><td>Beef</td>
+                        <td class="align-right">@dietRestrictionsSummary.beefRestriction</td>
+                    </tr>
+                    <tr><td>Chicken</td>
+                        <td class="align-right">@dietRestrictionsSummary.chickenRestriction</td>
+                    </tr>
+                    <tr><td>Gluten</td>
+                        <td class="align-right">@dietRestrictionsSummary.glutenRestriction</td>
+                    </tr>
+                    <tr><td>Lactose</td>
+                        <td class="align-right">@dietRestrictionsSummary.lactoseRestriction</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col col-lg-3">
+                <table class="table" >
+                    <thead>
+                        <tr>
+                            <th>People attending</th>
+                            <th>@listPeopleAttending.length</th>
+                        </tr>
+                    </thead>
+
+                    @for(person <- listPeopleAttending){
+                        <tr><td>@person</td><td></td></tr>
+                    }
+                </table>
+            </div>
         </div>
     </div>
 
