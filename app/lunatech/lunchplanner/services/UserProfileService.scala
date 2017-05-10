@@ -7,8 +7,8 @@ import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.{ MenuPerDayDietRestrictions, UserProfile }
 import lunatech.lunchplanner.persistence.UserProfileTable
 import play.api.Configuration
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class UserProfileService @Inject() (configuration: Configuration, implicit val connection: DBConnection) {

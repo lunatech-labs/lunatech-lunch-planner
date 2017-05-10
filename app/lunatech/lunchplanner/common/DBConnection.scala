@@ -1,6 +1,7 @@
 package lunatech.lunchplanner.common
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.{ Inject, Singleton }
+
 import play.api.db.slick.DatabaseConfigProvider
 import slick.driver.JdbcProfile
 

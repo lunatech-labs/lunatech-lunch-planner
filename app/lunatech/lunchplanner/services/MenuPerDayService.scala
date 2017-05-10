@@ -25,7 +25,7 @@ class MenuPerDayService @Inject() (
   def getAllOrderedByDateFilterDateRange(dateStart: Date, dateEnd: Date): Future[Seq[MenuPerDay]] =
     MenuPerDayTable.getAllFilteredDateRangeOrderedDateAscending(dateStart, dateEnd)
 
-  def getMenuPerDayByUuid(uuid: UUID): Future[Option[MenuPerDay]] = MenuPerDayTable.getByUUID(uuid)
+  def getMenuPerDayByUuid(uuid: UUID): Future[Option[MenuPerDay]] = MenuPerDayTable.getByUuid(uuid)
 
   def getAllByMenuUuid(menuUuid: UUID): Future[Seq[MenuPerDay]] =
     MenuPerDayTable.getByMenuUuid(menuUuid)

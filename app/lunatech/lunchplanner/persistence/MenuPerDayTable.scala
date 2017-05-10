@@ -39,7 +39,7 @@ object MenuPerDayTable {
     connection.db.run(menuPerDayTable.filter(_.uuid === uuid).exists.result)
   }
 
-  def getByUUID(uuid: UUID)(implicit connection: DBConnection): Future[Option[MenuPerDay]] = {
+  def getByUuid(uuid: UUID)(implicit connection: DBConnection): Future[Option[MenuPerDay]] = {
     exists(uuid).flatMap {
       case true =>
         val query = menuPerDayTable.filter(x => x.uuid === uuid)
