@@ -87,5 +87,11 @@ class MenuPerDayPerPersonTableSpec extends AcceptanceSpec with TestDatabaseProvi
       val result = Await.result(MenuPerDayPerPersonTable.removeByMenuPerDayUuid(newMenuPerDayPerPerson.menuPerDayUuid), defaultTimeout)
       result mustBe 1
     }
+
+    "query the list of people by menu per day" in {
+      Await.result(MenuPerDayPerPersonTable.add(newMenuPerDayPerPerson), defaultTimeout)
+      val result = Await.result(MenuPerDayPerPersonTable.getUsersByMenuPerDayUuid(newMenuPerDay.uuid), defaultTimeout)
+      result mustBe Vector(newUser)
+    }
   }
 }
