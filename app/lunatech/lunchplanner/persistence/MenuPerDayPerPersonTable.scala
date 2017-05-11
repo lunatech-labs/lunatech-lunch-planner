@@ -3,7 +3,7 @@ package lunatech.lunchplanner.persistence
 import java.util.UUID
 
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.{ MenuPerDay, MenuPerDayPerPerson, User }
+import lunatech.lunchplanner.models.{ MenuPerDay, MenuPerDayPerPerson, User, UserProfile }
 import slick.driver.PostgresDriver.api._
 import slick.lifted.{ ForeignKeyQuery, ProvenShape, TableQuery }
 
@@ -55,11 +55,12 @@ object MenuPerDayPerPersonTable {
     connection.db.run(query.result)
   }
 
-  def getUsersByMenuPerDayUuid(menuPerDayUuid: UUID)(implicit connection: DBConnection): Future[Seq[User]] = {
+  def getUsersByMenuPerDayUuid(menuPerDayUuid: UUID)(implicit connection: DBConnection): Future[Seq[(User, UserProfile)]] = {
     val query = for {
       mpdpp <- menuPerDayPerPersonTable.filter(_.menuPerDayUuid === menuPerDayUuid)
       user <- UserTable.userTable if mpdpp.userUuid === user.uuid
-    } yield user
+      userProfile <- UserProfileTable.userProfileTable if user.uuid === userProfile.userUuid
+    } yield (user, userProfile)
 
     connection.db.run(query.result)
   }

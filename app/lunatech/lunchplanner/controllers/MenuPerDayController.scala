@@ -5,7 +5,7 @@ import java.util.{ Date, UUID }
 
 import com.google.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.{ MenuPerDay, MenuPerDayDietRestrictions }
+import lunatech.lunchplanner.models.MenuPerDay
 import lunatech.lunchplanner.services.{ MenuDishService, MenuPerDayPerPersonService, MenuPerDayService, MenuService, UserProfileService, UserService }
 import lunatech.lunchplanner.viewModels.{ FilterMenusPerDayForm, ListMenusPerDayForm, MenuPerDayForm }
 import org.joda.time.DateTime

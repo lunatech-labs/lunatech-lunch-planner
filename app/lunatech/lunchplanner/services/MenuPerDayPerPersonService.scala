@@ -5,7 +5,7 @@ import java.util.UUID
 import javax.inject.Inject
 
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.{ MenuPerDayPerPerson, MenuWithNamePerDay, MenuWithNamePerDayPerPerson, MenuWithNameWithDishesPerPerson }
+import lunatech.lunchplanner.models.{ MenuPerDayAttendant, MenuPerDayPerPerson, MenuWithNamePerDay, MenuWithNamePerDayPerPerson, MenuWithNameWithDishesPerPerson }
 import lunatech.lunchplanner.persistence.{ MenuDishTable, MenuPerDayPerPersonTable }
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -104,8 +104,9 @@ class MenuPerDayPerPersonService  @Inject() (
   def deleteByMenuPerPersonUuid(menuPerDayUuid: UUID): Future[Int] =
     MenuPerDayPerPersonTable.removeByMenuPerDayUuid(menuPerDayUuid)
 
-  def getListOfPeopleByMenuPerDay(menuPerDayUuid: UUID): Future[Seq[String]] = {
-    MenuPerDayPerPersonTable.getUsersByMenuPerDayUuid(menuPerDayUuid).map(_.map(_.name))
+  def getListOfPeopleByMenuPerDay(menuPerDayUuid: UUID): Future[Seq[MenuPerDayAttendant]] = {
+    MenuPerDayPerPersonTable.getUsersByMenuPerDayUuid(menuPerDayUuid)
+      .map(_.map(user => MenuPerDayAttendant(user._1.name, user._2.otherRestriction.getOrElse(""))))
   }
 
   private def getNumberOfMenusPerDayPerPersonByMenuPerDay(menuPerDayUuid: UUID): Future[Int] =
