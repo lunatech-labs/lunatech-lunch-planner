@@ -50,3 +50,12 @@ function allSelected(){
         });
     }
 }
+
+$(function() {
+    $('#formAttendance').submit(function (eventObj) {
+        $('.schedule:checked').each(function () {
+            $(this).append('<input type="hidden" name="menuDate[]" value="' + this.parentNode.parentNode.cells.item(1).textContent.toString() + '" />');
+        });
+        return true;
+    });
+});

@@ -40,15 +40,32 @@ class MenuPerDayPerPersonController @Inject() (
                       menusPerDayPerPerson.toArray,
                       formWithErrors))),
               menuPerDayPerPersonData => {
-                updateMenusPerDayPerPerson(
-                  getCurrentUser(currentUser, isAdmin = false, username).uuid,
-                  menuPerDayPerPersonData).map(_ =>
+                if(thereAreNotDuplicateDates(menuPerDayPerPersonData)) {
+                  updateMenusPerDayPerPerson(
+                    getCurrentUser(currentUser, isAdmin = false, username).uuid,
+                    menuPerDayPerPersonData).map(_ =>
                     Redirect(lunatech.lunchplanner.controllers.routes.Application.index())
                       .flashing("success" -> "Meals updated!"))
+                } else {
+                  val dates = duplicatedDates(menuPerDayPerPersonData)
+                  Future.successful(Redirect(lunatech.lunchplanner.controllers.routes.Application.index())
+                    .flashing("error" -> s"Error: More than one menu for date(s) $dates was selected!"))
+                }
               }
             )
       } yield result
     }
+  }
+
+  private def thereAreNotDuplicateDates(menuPerDayPerPersonForm: MenuPerDayPerPersonForm): Boolean =
+    menuPerDayPerPersonForm.menuDate.length == menuPerDayPerPersonForm.menuDate.to[Set].size
+
+  private def duplicatedDates(menuPerDayPerPersonForm: MenuPerDayPerPersonForm): String = {
+    val allDates = menuPerDayPerPersonForm.menuDate
+    val filteredDates = menuPerDayPerPersonForm.menuDate.to[Set].toList
+    val difference = allDates.diff(filteredDates).to[Set]
+
+    difference.mkString(", ")
   }
 
   private def updateMenusPerDayPerPerson(userUuid: UUID, form: MenuPerDayPerPersonForm): Future[Seq[Int]] = {

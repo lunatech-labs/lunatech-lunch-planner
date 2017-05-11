@@ -10,12 +10,16 @@
     <div>
       <br>
       @flash.get("success").map { message =>
-
         <div class="alert alert-success alert-dismissable">
           @message
         </div>
       }
-      @helper.form(lunatech.lunchplanner.controllers.routes.MenuPerDayPerPersonController.createNewMenuPerDayPerPerson) {
+      @flash.get("error").map { message =>
+        <div class="alert alert-danger alert-dismissable">
+          @message
+        </div>
+      }
+      @helper.form(lunatech.lunchplanner.controllers.routes.MenuPerDayPerPersonController.createNewMenuPerDayPerPerson, 'id -> "formAttendance") {
         <table class="table" >
           <thead>
             <tr>
