@@ -27,3 +27,5 @@ case class MenuPerDayDietRestrictions(
   glutenRestriction: Int = 0,
   lactoseRestriction: Int = 0
 )
+
+case class MenuPerDayAttendant(name: String, otherRestrictions: String)

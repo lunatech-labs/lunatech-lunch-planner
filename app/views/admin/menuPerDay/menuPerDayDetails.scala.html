@@ -3,9 +3,10 @@
 @import lunatech.lunchplanner.viewModels.MenuPerDayForm
 @import lunatech.lunchplanner.models.MenuPerDay
 @import lunatech.lunchplanner.models.MenuPerDayDietRestrictions
+@import lunatech.lunchplanner.models.MenuPerDayAttendant
 @import java.text.SimpleDateFormat
 
-@(admin: User, menuPerDayForm: Form[MenuPerDayForm], menuOptions: Seq[(String,String)], menuPerDayOption: Option[MenuPerDay], dietRestrictionsSummary: MenuPerDayDietRestrictions, listPeopleAttending: Seq[String])(implicit messages: play.api.i18n.Messages)
+@(admin: User, menuPerDayForm: Form[MenuPerDayForm], menuOptions: Seq[(String,String)], menuPerDayOption: Option[MenuPerDay], dietRestrictionsSummary: MenuPerDayDietRestrictions, listPeopleAttending: Seq[MenuPerDayAttendant])(implicit messages: play.api.i18n.Messages)
 @main("Menu schedule details", admin) {
 <!-- Nav tabs -->
 <ul class="nav nav-tabs">
@@ -86,18 +87,22 @@
             </div>
         </div>
         <br>
+
+        <!-- list peopl attending -->
         <div class="row">
             <div class="col col-lg-3">
                 <table class="table" >
                     <thead>
                         <tr>
-                            <th>People attending</th>
-                            <th>@listPeopleAttending.length</th>
+                            <th>People attending (@listPeopleAttending.length)</th>
+                            <th>Other info</th>
                         </tr>
                     </thead>
 
                     @for(person <- listPeopleAttending){
-                        <tr><td>@person</td><td></td></tr>
+                        <tr><td>@person.name</td>
+                            <td>@person.otherRestrictions</td>
+                        </tr>
                     }
                 </table>
             </div>
