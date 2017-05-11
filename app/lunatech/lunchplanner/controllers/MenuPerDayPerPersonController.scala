@@ -40,7 +40,7 @@ class MenuPerDayPerPersonController @Inject() (
                       menusPerDayPerPerson.toArray,
                       formWithErrors))),
               menuPerDayPerPersonData => {
-                if(thereAreNotDuplicateDates(menuPerDayPerPersonData)) {
+                if(thereAreNoDuplicatedDates(menuPerDayPerPersonData)) {
                   updateMenusPerDayPerPerson(
                     getCurrentUser(currentUser, isAdmin = false, username).uuid,
                     menuPerDayPerPersonData).map(_ =>
@@ -57,7 +57,7 @@ class MenuPerDayPerPersonController @Inject() (
     }
   }
 
-  private def thereAreNotDuplicateDates(menuPerDayPerPersonForm: MenuPerDayPerPersonForm): Boolean =
+  private def thereAreNoDuplicatedDates(menuPerDayPerPersonForm: MenuPerDayPerPersonForm): Boolean =
     menuPerDayPerPersonForm.menuDate.length == menuPerDayPerPersonForm.menuDate.to[Set].size
 
   private def duplicatedDates(menuPerDayPerPersonForm: MenuPerDayPerPersonForm): String = {
