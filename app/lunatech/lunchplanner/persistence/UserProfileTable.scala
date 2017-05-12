@@ -3,14 +3,16 @@ package lunatech.lunchplanner.persistence
 import java.util.UUID
 
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.UserProfile
+import lunatech.lunchplanner.models.{ User, UserProfile }
 import slick.driver.PostgresDriver.api._
-import slick.lifted.{ ProvenShape, TableQuery }
+import slick.lifted.{ ForeignKeyQuery, ProvenShape, TableQuery }
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class UserProfileTable(tag: Tag) extends Table[UserProfile](tag, "UserProfile") {
+  private val userTable = TableQuery[UserTable]
+
   def userUuid: Rep[UUID] = column[UUID]("userUuid", O.PrimaryKey)
 
   def vegetarian: Rep[Boolean] = column[Boolean]("vegetarian")
@@ -28,6 +30,8 @@ class UserProfileTable(tag: Tag) extends Table[UserProfile](tag, "UserProfile") 
   def lactoseRestriction: Rep[Boolean] = column[Boolean]("lactoseRestriction")
 
   def otherRestriction: Rep[String] = column[String]("otherRestriction")
+
+  def userProfileUserForeignKey: ForeignKeyQuery[UserTable, User] = foreignKey("userProfileUser_fkey_", userUuid, userTable)(_.uuid)
 
   def * : ProvenShape[UserProfile] =
     (userUuid, vegetarian, seaFoodRestriction, porkRestriction, beefRestriction, chickenRestriction, glutenRestriction, lactoseRestriction, otherRestriction.?) <> ((UserProfile.apply _).tupled, UserProfile.unapply)

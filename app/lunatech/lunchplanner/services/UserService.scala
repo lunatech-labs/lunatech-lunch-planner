@@ -3,8 +3,8 @@ package lunatech.lunchplanner.services
 import javax.inject.Inject
 
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.User
-import lunatech.lunchplanner.persistence.UserTable
+import lunatech.lunchplanner.models.{ User, UserProfile }
+import lunatech.lunchplanner.persistence.{ UserProfileTable, UserTable }
 import play.api.Configuration
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -22,8 +22,12 @@ class UserService @Inject() (configuration: Configuration, implicit val connecti
     val newUser = User(name = name, emailAddress = emailAddress)
 
     UserTable.existsByEmail(emailAddress).flatMap(exist => {
-      if (!exist)
-        UserTable.add(newUser)
+      if (!exist) {
+        UserTable.add(newUser).map(user => {
+          UserProfileTable.insertOrUpdate(UserProfile(newUser.uuid))
+          user }
+          )
+      }
       else {
         Future.successful(newUser)
       }
