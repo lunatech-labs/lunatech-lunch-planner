@@ -145,7 +145,7 @@ class MenuPerDayController @Inject() (
         menusUuidAndNames <- menuService.getAllMenusUuidAndNames
         menuPerDayOption <- menuPerDayService.getMenuPerDayByUuid(uuid)
         dietRestrictions <- userProfileService.getRestrictionsByMenuPerDay(uuid)
-        peopleAttendig <- menuPerDayPerPersonService.getListOfPeopleByMenuPerDay(uuid)
+        peopleAttending <- menuPerDayPerPersonService.getListOfPeopleByMenuPerDay(uuid)
       } yield
         Ok(views.html.admin.menuPerDay.menuPerDayDetails(
           getCurrentUser(currentUser, isAdmin = true, username),
@@ -153,7 +153,7 @@ class MenuPerDayController @Inject() (
           menusUuidAndNames,
           menuPerDayOption,
           dietRestrictions,
-          peopleAttendig
+          peopleAttending
         ))
     }
   }

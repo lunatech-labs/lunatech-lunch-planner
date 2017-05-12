@@ -4,7 +4,7 @@ import java.sql.Date
 import java.util.UUID
 
 import lunatech.lunchplanner.common.{ AcceptanceSpec, DBConnection, TestDatabaseProvider }
-import lunatech.lunchplanner.models.{ Menu, MenuPerDay, MenuPerDayPerPerson, User }
+import lunatech.lunchplanner.models.{ Menu, MenuPerDay, MenuPerDayPerPerson, User, UserProfile }
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -13,6 +13,7 @@ class MenuPerDayPerPersonTableSpec extends AcceptanceSpec with TestDatabaseProvi
   implicit private val dbConnection = app.injector.instanceOf[DBConnection]
 
   private val newUser = User(name = "Leonor Boga", emailAddress ="leonor.boga@lunatech.com")
+  private val newUserProfile = UserProfile(newUser.uuid)
   private val newMenu = Menu(name = "Main menu")
   private val newMenuPerDay = MenuPerDay(menuUuid = newMenu.uuid, date = new Date(3000000))
 
@@ -22,6 +23,7 @@ class MenuPerDayPerPersonTableSpec extends AcceptanceSpec with TestDatabaseProvi
     cleanDatabase()
 
     Await.result(UserTable.add(newUser), defaultTimeout)
+    Await.result(UserProfileTable.insertOrUpdate(newUserProfile), defaultTimeout)
     Await.result(MenuTable.add(newMenu), defaultTimeout)
     Await.result(MenuPerDayTable.add(newMenuPerDay), defaultTimeout)
   }
@@ -91,7 +93,7 @@ class MenuPerDayPerPersonTableSpec extends AcceptanceSpec with TestDatabaseProvi
     "query the list of people by menu per day" in {
       Await.result(MenuPerDayPerPersonTable.add(newMenuPerDayPerPerson), defaultTimeout)
       val result = Await.result(MenuPerDayPerPersonTable.getUsersByMenuPerDayUuid(newMenuPerDay.uuid), defaultTimeout)
-      result mustBe Vector(newUser)
+      result mustBe Vector((newUser, newUserProfile))
     }
   }
 }
