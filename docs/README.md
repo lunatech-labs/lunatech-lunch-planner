@@ -15,6 +15,9 @@ To say you wish to attend a meal in a certain day, just select the checkbox in t
 You can remove attendance by unselecting the same checkbox and pressing "save selected meals".
 Using the checkbox at the top level is possible to select or unselect all meals.
 
+##Profile
+In the profile separator the user can add information about diet restrictions and ingredients that he/she is allergic to.
+This information will be available to the administrator that schedules the meals.
 
 ##Administrator
 The administrator user can perform several actions:
@@ -83,4 +86,8 @@ In this separator you can:
 `Details of a schedule`
 
 When you press a date to see its details, a new separator called `Menu schedule details` opens. There you can make modifications to the details of the schedule, delete it or just cancel and go back to the list of schedules.
+
+The list of people that is attending the meal in the scheduled day is available, together with extra information provided by the people (information that should contain ingredients the person is allergic to).
+
+A total summary of diet restrictions of the people attending the meal is also provided.
 
