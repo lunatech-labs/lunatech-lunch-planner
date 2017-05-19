@@ -32,16 +32,14 @@ class MailerUtils @Inject() (mailerClient: MailerClient,implicit val connection:
   }
 
     def send(sendTo: List[String], body: String): String = {
-      println("sendddddd callllllllllllllll")
-      sendTo.map(println(_))
-      val email: Email = Email("Friday Lunch", "@Lunatech <sandeep.purohit@lunatech.com>", List("sandeep.purohit@lunatech.com"), bodyHtml = Some(views.html.mail.render.body))
+      val email: Email = Email("Friday Lunch", "@Lunatech <hrm@lunatech.com>", sendTo, bodyHtml = Some(views.html.mail.render.body))
       mailerClient.send(email)
     }
 
   val system = ActorSystem("mailer-system")
   system.scheduler.schedule(
-    Duration.create(30, TimeUnit.SECONDS),
-    Duration.create(1, TimeUnit.MINUTES))(sendMail())
+    Duration.create(timeToNextMonday, TimeUnit.MINUTES),
+    Duration.create(7, TimeUnit.DAYS))(sendMail())
 
   def sendMail()={
     val users = UserTable.getAll.map(user=>user.map(_.emailAddress).toList)
