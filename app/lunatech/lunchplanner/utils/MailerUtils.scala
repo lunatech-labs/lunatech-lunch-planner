@@ -12,7 +12,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 
 
-class MailerUtils @Inject() (mailerClient: MailerClient,implicit val connection: DBConnection) {
+class MailerUtils @Inject()(mailerClient: MailerClient, implicit val connection: DBConnection) {
 
   import java.util.Calendar
 
@@ -21,7 +21,6 @@ class MailerUtils @Inject() (mailerClient: MailerClient,implicit val connection:
     now.set(Calendar.HOUR, 23)
     now.set(Calendar.MINUTE, 50)
     val weekday = now.get(Calendar.DAY_OF_WEEK)
-    System.out.println(now.getTime)
     if (weekday != Calendar.MONDAY) { // calculate how much to add
       // the 2 is the difference between Saturday and Monday
       val days = (Calendar.SATURDAY - weekday + 2) % 7
@@ -31,18 +30,18 @@ class MailerUtils @Inject() (mailerClient: MailerClient,implicit val connection:
     (now.getTime.getTime - System.currentTimeMillis) / (1000 * 60)
   }
 
-    def send(sendTo: List[String], body: String): String = {
-      val email: Email = Email("Friday Lunch", "@Lunatech <hrm@lunatech.com>", sendTo, bodyHtml = Some(views.html.mail.render.body))
-      mailerClient.send(email)
-    }
+  def send(sendTo: List[String], body: String): String = {
+    val email: Email = Email("Friday Lunch", "@Lunatech <hrm@lunatech.com>", sendTo, bodyHtml = Some(views.html.mail.render.body))
+    mailerClient.send(email)
+  }
 
   val system = ActorSystem("mailer-system")
   system.scheduler.schedule(
     Duration.create(timeToNextMonday, TimeUnit.MINUTES),
     Duration.create(7, TimeUnit.DAYS))(sendMail())
 
-  def sendMail()={
-    val users = UserTable.getAll.map(user=>user.map(_.emailAddress).toList)
-    users.map(usersList=>send(usersList,views.html.mail.render.body))
+  def sendMail() = {
+    val users = UserTable.getAll.map(user => user.map(_.emailAddress).toList)
+    users.map(usersList => send(usersList, views.html.mail.render.body))
   }
 }
