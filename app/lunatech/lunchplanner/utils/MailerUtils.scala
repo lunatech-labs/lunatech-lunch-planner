@@ -6,13 +6,21 @@ import javax.inject.Inject
 import akka.actor.ActorSystem
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.persistence.UserTable
+import play.api.Configuration
 import play.api.libs.mailer.{Email, MailerClient}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 
-
-class MailerUtils @Inject()(mailerClient: MailerClient, implicit val connection: DBConnection) {
+/**
+  * This is utility to send mail to all the users on every monday
+  *
+  * @param mailerClient is used for send mail
+  * @param connection is the used for connection to db for retrieve all users
+  *
+  *
+  */
+class MailerUtils @Inject()(mailerClient: MailerClient,configuration: Configuration, implicit val connection: DBConnection) {
 
   import java.util.Calendar
 
@@ -31,7 +39,7 @@ class MailerUtils @Inject()(mailerClient: MailerClient, implicit val connection:
   }
 
   def send(sendTo: List[String], body: String): String = {
-    val email: Email = Email("Friday Lunch", "@Lunatech <hrm@lunatech.com>", sendTo, bodyHtml = Some(views.html.mail.render.body))
+    val email: Email = Email("Friday Lunch", "@Lunatech <hrm@lunatech.com>", sendTo, bodyHtml = Some(body))
     mailerClient.send(email)
   }
 
@@ -42,6 +50,6 @@ class MailerUtils @Inject()(mailerClient: MailerClient, implicit val connection:
 
   def sendMail() = {
     val users = UserTable.getAll.map(user => user.map(_.emailAddress).toList)
-    users.map(usersList => send(usersList, views.html.mail.render.body))
+    users.map(usersList => send(usersList, views.html.mail.render(configuration.getString("lunatech.email").getOrElse("info@lunatech.com")).body))
   }
 }
