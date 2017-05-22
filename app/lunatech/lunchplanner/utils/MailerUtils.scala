@@ -13,7 +13,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 
 /**
-  * This is utility to send mail to all the users on every monday
+  * This is a utility to send reminder mail to all the users on every monday
   *
   * @param mailerClient is used for send mail
   * @param connection   is the used for connection to db for retrieve all users
