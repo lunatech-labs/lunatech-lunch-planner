@@ -10,8 +10,6 @@ import lunatech.lunchplanner.models.{MenuPerDay, MenuPerDayAttendant, MenuWithNa
 import scala.concurrent.Future
 
 class ReportService @Inject()(
-                               dishService: DishService,
-                               menuService: MenuService,
                                menuPerDayPerPersonService: MenuPerDayPerPersonService,
                                menuPerDayService: MenuPerDayService,
                                implicit val connection: DBConnection) {

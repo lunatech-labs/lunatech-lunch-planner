@@ -1,0 +1,32 @@
+@import b3.vertical.fieldConstructor
+@import lunatech.lunchplanner.models.User
+@import lunatech.lunchplanner.models.Report
+@import lunatech.lunchplanner.viewModels.ReportForm
+
+@(admin: User, defaultDateStart: String, defaultDateEnd: String, reportForm: Form[ReportForm],report:Report)(implicit messages: play.api.i18n.Messages, flash: play.api.mvc.Flash)
+@main("Monthly Report", admin) {
+<h1>Reports</h1>
+@b3.form(lunatech.lunchplanner.controllers.routes.ReportController.filterAttendees, 'id -> "filterDateRange") {
+@datepickerrange(reportForm("dateStart"), 'value -> defaultDateStart)(
+reportForm("dateEnd"), 'value -> defaultDateEnd)('_label -> "Choose a date range")
+}
+<br>
+
+<table class="table" >
+<thead>
+<tr>
+    <th>Name</th>
+    <th>No of Fridays</th>
+</tr>
+</thead>
+@report.userPerAttendance.map { user =>
+<tr>
+    <td>@user._1</td>
+    <td>@user._2</td>
+</tr>
+}
+    <tr>
+        <th>Total number of attendees</th>
+        <th>@report.total</th>
+</table>
+}
