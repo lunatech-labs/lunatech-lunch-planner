@@ -7,7 +7,7 @@ import java.time.temporal.TemporalAdjusters
 import com.google.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.services._
-import lunatech.lunchplanner.viewModels.{FilterMenusPerDayForm, FilterReportForm, ListMenusPerDayForm, ReportForm}
+import lunatech.lunchplanner.viewModels.{FilterReportForm, ReportForm}
 import play.api.{Configuration, Environment}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.Controller
@@ -17,7 +17,6 @@ import scala.concurrent.Future
 
 class ReportController @Inject()(
                                   userService: UserService,
-                                  menuPerDayPerPersonService: MenuPerDayPerPersonService,
                                   reportService: ReportService,
                                   val environment: Environment,
                                   val messagesApi: MessagesApi,

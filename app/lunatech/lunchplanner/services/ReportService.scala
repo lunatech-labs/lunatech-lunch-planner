@@ -15,12 +15,11 @@ class ReportService @Inject()(
                                implicit val connection: DBConnection) {
 
   def getReport(sDate: Date, eDate: Date) = {
-    val attendees =menuPerDayService.getAllOrderedByDateFilterDateRange(sDate, eDate).flatMap {
+    val attendees = menuPerDayService.getAllOrderedByDateFilterDateRange(sDate, eDate).flatMap {
       Future.traverse(_) { (menuPerDay: MenuPerDay) =>
         menuPerDayPerPersonService.getListOfPeopleByMenuPerDay(menuPerDay.uuid)
-        }
+      }
     }.map(_.flatten)
-    attendees.map(menuAttendant=>Report(menuAttendant.groupBy(_.name).mapValues(_.size),menuAttendant.size))
+    attendees.map(menuAttendant => Report(menuAttendant.groupBy(_.name).mapValues(_.size), menuAttendant.size))
   }
 }
-
