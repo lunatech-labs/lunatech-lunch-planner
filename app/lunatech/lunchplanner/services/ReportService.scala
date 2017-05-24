@@ -9,6 +9,13 @@ import lunatech.lunchplanner.models.{MenuPerDay, MenuPerDayAttendant, MenuWithNa
 
 import scala.concurrent.Future
 
+/**
+  * Service to generate the reports like total number of attendees between two dates
+  *
+  * @param menuPerDayPerPersonService
+  * @param menuPerDayService
+  * @param connection
+  */
 class ReportService @Inject()(
                                menuPerDayPerPersonService: MenuPerDayPerPersonService,
                                menuPerDayService: MenuPerDayService,

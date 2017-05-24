@@ -15,6 +15,10 @@ import play.api.mvc.Controller
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
+/**
+  * It's serve the request for the reports between two dates
+  *
+  */
 class ReportController @Inject()(
                                   userService: UserService,
                                   reportService: ReportService,
