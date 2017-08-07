@@ -1,3 +1,3 @@
 package lunatech.lunchplanner.models
 
-case class Report (userPerAttendance:Map[String,Int],total:Int)
+case class Report(usersPerDate: Map[String, Seq[String]], total: Int)

@@ -3,30 +3,64 @@
 @import lunatech.lunchplanner.models.Report
 @import lunatech.lunchplanner.viewModels.ReportForm
 
-@(admin: User, defaultDateStart: String, defaultDateEnd: String, reportForm: Form[ReportForm],report:Report)(implicit messages: play.api.i18n.Messages, flash: play.api.mvc.Flash)
+@(admin: User, reportForm: Form[String], report: Report, month: Int)(implicit messages: play.api.i18n.Messages)
+@months = @{ Seq(
+    "1"->"January",
+    "2"->"February",
+    "3"->"March",
+    "4"->"April",
+    "5"->"May",
+    "6"->"June",
+    "7"->"July",
+    "8"->"August",
+    "9"->"September",
+    "10"->"October",
+    "11"->"November",
+    "12"->"December")
+}
+
 @main("Monthly Report", admin) {
 <h1>Reports</h1>
-@b3.form(lunatech.lunchplanner.controllers.routes.ReportController.filterAttendees, 'id -> "filterDateRange") {
-@datepickerrange(reportForm("dateStart"), 'value -> defaultDateStart)(
-reportForm("dateEnd"), 'value -> defaultDateEnd)('_label -> "Choose a date range")
+
+@b3.form(lunatech.lunchplanner.controllers.routes.ReportController.filterAttendees, 'id -> "monthNumber") {
+    @b3.select( reportForm("month"), options = months, '_label -> "Select report month", 'value -> month, '_id->"monthSelection" )
 }
 <br>
 
 <table class="table" >
 <thead>
 <tr>
+    <th style="width: 15%">Date</th>
     <th>Name</th>
-    <th>No of Fridays</th>
+    <th>Count</th>
 </tr>
 </thead>
-@report.userPerAttendance.map { user =>
-<tr>
-    <td>@user._1</td>
-    <td>@user._2</td>
-</tr>
+@report.usersPerDate.map { case (date, users) =>
+    <tr>
+        <th>@date</th>
+        <th></th>
+        <th></th>
+    </tr>
+    @users.map { user =>
+        <tr>
+            <td></td>
+            <td>@user</td>
+            <td></td>
+        </tr>
+    }
+    <tr>
+        <td></td>
+        <td></td>
+        <td>@users.length</td>
+    </tr>
 }
     <tr>
         <th>Total number of attendees</th>
+        <th></th>
         <th>@report.total</th>
+    </tr>
 </table>
+
+<button type="submit" class="btn btn-primary" formaction="/filter/reportExcel">
+    <span class="glyphicon glyphicon-th-list"></span> Export to Excel </button>
 }

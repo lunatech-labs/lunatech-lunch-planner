@@ -23,12 +23,22 @@ $(function(){
 });
 
 $(function(defaultDateStart, defaultDateEnd){
-    $(".daterange").change(function(){
+    $('.daterange').change(function(){
         var dateStart = document.getElementById("dateStart").value;
         var dateEnd = document.getElementById("dateEnd").value;
 
         if(dateStart !== defaultDateStart || dateEnd !== defaultDateEnd) {
             $('#filterDateRange').submit();
+        }
+    });
+});
+
+$(function(selectedMonth){
+    $('#monthSelection').change(function(){
+        var dateStart = document.getElementById("month").value;
+
+        if(dateStart !== selectedMonth) {
+            $('#monthNumber').submit();
         }
     });
 });

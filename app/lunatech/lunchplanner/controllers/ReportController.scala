@@ -7,9 +7,10 @@ import java.time.temporal.TemporalAdjusters
 import com.google.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.services._
-import lunatech.lunchplanner.viewModels.{FilterReportForm, ReportForm}
-import play.api.{Configuration, Environment}
-import play.api.i18n.{I18nSupport, MessagesApi}
+import lunatech.lunchplanner.viewModels.ReportForm
+import org.joda.time.DateTime
+import play.api.{ Configuration, Environment }
+import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.mvc.Controller
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -27,59 +28,69 @@ class ReportController @Inject()(
                                   val configuration: Configuration,
                                   implicit val connection: DBConnection) extends Controller with Secured with I18nSupport {
 
-  val DateStart = "dateStart"
-  val DateEnd = "dateEnd"
+  val month = "month"
 
   def getReport =
     IsAdminAsync { username =>
+
       implicit request => {
-        val dStart = request.session.get(DateStart).map(java.sql.Date.valueOf).getOrElse(getDateStart)
-        val dEnd = request.session.get(DateEnd).map(java.sql.Date.valueOf).getOrElse(getDateEnd)
+        val preferedMonth = request.session.get(month).map(_.toInt).getOrElse(getPreferedMonth)
+
         for {
           currentUser <- userService.getByEmailAddress(username)
-          totalAttendees <- reportService.getReport(dStart, dEnd)
+          totalAttendees <- reportService.getReport(preferedMonth)
         } yield
           Ok(views.html.admin.report(
             getCurrentUser(currentUser, isAdmin = true, username),
-            new SimpleDateFormat("dd-MM-yyyy").format(dStart),
-            new SimpleDateFormat("dd-MM-yyyy").format(dEnd),
             ReportForm.reportForm,
-            totalAttendees))
+            totalAttendees,
+            preferedMonth))
       }
     }
 
 
   def filterAttendees = IsAdminAsync { _ =>
     implicit request => {
-      FilterReportForm
-        .filterReportForm
+
+      ReportForm
+        .reportForm
         .bindFromRequest
         .fold(
           _ => {
             Future.successful(
               Redirect(lunatech.lunchplanner.controllers.routes.ReportController.getReport()))
           },
-          filterDataForm => {
-            val start = new SimpleDateFormat("yyyy-MM-dd").format(filterDataForm.dateStart)
-            val end = new SimpleDateFormat("yyyy-MM-dd").format(filterDataForm.dateEnd)
-            val session = request.session + (DateStart -> start) + (DateEnd -> end)
-
+          selectedMonth => {
+            val session = request.session + (month -> selectedMonth)
             Future.successful(
               Redirect(lunatech.lunchplanner.controllers.routes.ReportController.getReport())
-                .withSession(session))
+              .withSession(session))
           })
     }
   }
 
-  private def getDateStart = {
-    val dateNow = LocalDate.now()
-    java.sql.Date.valueOf(dateNow.withDayOfMonth(1))
+  def reportExcel = IsAdminAsync { _ =>
+    implicit request => {
+
+      ReportForm
+        .reportForm
+        .bindFromRequest
+        .fold(
+          _ => {
+            Future.successful(
+              Redirect(lunatech.lunchplanner.controllers.routes.ReportController.getReport()))
+          },
+          selectedMonth => {
+            // GET excel report
+
+
+
+            Future.successful(
+              Redirect(lunatech.lunchplanner.controllers.routes.ReportController.getReport()))
+          })
+      }
   }
 
-  private def getDateEnd = {
-    val dateNow = LocalDate.now()
-    val lastDate = dateNow.`with`(TemporalAdjusters.lastDayOfMonth())
-    java.sql.Date.valueOf(lastDate)
-  }
+  def getPreferedMonth: Int = DateTime.now.minusMonths(1).getMonthOfYear
 
 }
