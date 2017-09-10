@@ -20,47 +20,32 @@
 }
 
 @main("Monthly Report", admin) {
-<h1>Reports</h1>
+    <h1>Reports</h1>
 
-@b3.form(lunatech.lunchplanner.controllers.routes.ReportController.filterAttendees, 'id -> "monthNumber") {
-    @b3.select( reportForm("month"), options = months, '_label -> "Select report month", 'value -> month, '_id->"monthSelection" )
-}
-<br>
-
-<table class="table" >
-<thead>
-<tr>
-    <th style="width: 15%">Date</th>
-    <th>Name</th>
-    <th>Count</th>
-</tr>
-</thead>
-@report.usersPerDate.map { case (date, users) =>
-    <tr>
-        <th>@date</th>
-        <th></th>
-        <th></th>
-    </tr>
-    @users.map { user =>
-        <tr>
-            <td></td>
-            <td>@user</td>
-            <td></td>
-        </tr>
+    @b3.form(lunatech.lunchplanner.controllers.routes.ReportController.filterAttendees, 'id -> "monthNumber") {
+        @b3.select( reportForm("month"), options = months, '_label -> "Select report month", 'value -> month, '_id->"monthSelection" )
     }
-    <tr>
-        <td></td>
-        <td></td>
-        <td>@users.length</td>
-    </tr>
-}
-    <tr>
-        <th>Total number of attendees</th>
-        <th></th>
-        <th>@report.total</th>
-    </tr>
-</table>
+    <br>
 
-<button type="submit" class="btn btn-primary" formaction="/filter/reportExcel">
-    <span class="glyphicon glyphicon-th-list"></span> Export to Excel </button>
+    <div class="col col-lg-12" style="padding-left: 0">
+    @report.usersPerDate.map { case (date, users) =>
+    <div class="col col-lg-3" style="padding-left: 0">
+        <table class="table">
+            <thead>
+                <th>@date</th>
+            </thead>
+            <tbody>
+            @users.map { user =>
+                <tr>
+                    <td>@user</td>
+                </tr>
+            }
+            </tbody>
+            <tfoot>
+                <td>@users.length</td>
+    </tfoot>
+    </table>
+    </div>
+    }
+    </div>
 }

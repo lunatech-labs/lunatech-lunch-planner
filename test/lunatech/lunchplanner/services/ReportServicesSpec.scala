@@ -30,8 +30,8 @@ class ReportServicesSpec extends PlaySpec with MockitoSugar {
 
   "report service" should {
     "report service generate report for controller" in {
-      val report=Await.result(reportService.getReport(any[Date],any[Date]),defaultTimeout)
-      report mustBe Report(Map.empty,0)
+      val report=Await.result(reportService.getReport(any[Date]),defaultTimeout)
+      report mustBe Report(Map.empty)
     }
   }
 }

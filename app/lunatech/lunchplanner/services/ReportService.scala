@@ -35,47 +35,6 @@ class ReportService @Inject()(
         menuPerDayPerPersonService.getListOfPeopleByMenuPerDayForReport(menuPerDay)
       }
     }.map(_.flatten)
-    attendees.map(menuAttendant => Report(menuAttendant.groupBy(_.date.toString).mapValues(_.map(_.name)), menuAttendant.size))
+    attendees.map(menuAttendant => Report(menuAttendant.groupBy(_.date.toString).mapValues(_.map(_.name))))
   }
-
-  def exportToExcel(month:Int) = {
-
-    val workbook = for {
-      reportData <- getReport(month)
-      usersCells <- Future.successful(reportData.usersPerDate.zipWithIndex.map { case ((date, users), index) =>
-        val zipUsers = users.zipWithIndex
-        val usersCells = zipUsers.map(user => StringCell(user._2, user._1 + 1))
-        (date, usersCells)
-        Set(Row(index) {
-          Set(StringCell(1, date))
-        },
-          Row(index + 1) {
-            usersCells.toSet
-          })
-      })
-    } yield Workbook { Set(Sheet("Report") {
-      usersCells.toSet.flatten })
-    }
-
-    workbook.map(_.safeToFile("file.xls").fold(ex ⇒ throw ex, identity).unsafePerformIO)
-  }
-
-//    val sheetTwo = Workbook {
-//      Set(Sheet("name") {
-//        Set(Row(1) {
-//          Set(StringCell(1, "newdata"), StringCell(2, "data2"), StringCell(3, "data3"))
-//        },
-//          Row(2) {
-//            Set(StringCell(1, "data"), StringCell(2, "data2"))
-//          },
-//          Row(3) {
-//            Set(StringCell(1, "data"), StringCell(2, "data2"))
-//          })
-//      },
-//        Sheet("name") {
-//          Set(Row(2) {
-//            Set(StringCell(1, "data"), StringCell(2, "data2"))
-//          })
-//        })
-//    }
 }

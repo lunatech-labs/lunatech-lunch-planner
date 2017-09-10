@@ -34,17 +34,18 @@ class ReportController @Inject()(
     IsAdminAsync { username =>
 
       implicit request => {
-        val preferedMonth = request.session.get(month).map(_.toInt).getOrElse(getPreferedMonth)
+        val reportMonth = request.session.get(month).map(_.toInt).getOrElse(getPreferedMonth)
 
         for {
           currentUser <- userService.getByEmailAddress(username)
-          totalAttendees <- reportService.getReport(preferedMonth)
+          totalAttendees <- reportService.getReport(reportMonth)
         } yield
           Ok(views.html.admin.report(
             getCurrentUser(currentUser, isAdmin = true, username),
             ReportForm.reportForm,
             totalAttendees,
-            preferedMonth))
+            reportMonth))
+
       }
     }
 
@@ -68,29 +69,6 @@ class ReportController @Inject()(
           })
     }
   }
-
-  def reportExcel = IsAdminAsync { _ =>
-    implicit request => {
-
-      ReportForm
-        .reportForm
-        .bindFromRequest
-        .fold(
-          _ => {
-            Future.successful(
-              Redirect(lunatech.lunchplanner.controllers.routes.ReportController.getReport()))
-          },
-          selectedMonth => {
-            // GET excel report
-
-
-
-            Future.successful(
-              Redirect(lunatech.lunchplanner.controllers.routes.ReportController.getReport()))
-          })
-      }
-  }
-
   def getPreferedMonth: Int = DateTime.now.minusMonths(1).getMonthOfYear
 
 }
