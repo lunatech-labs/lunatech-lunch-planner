@@ -3,15 +3,12 @@ package lunatech.lunchplanner.services
 import com.google.inject.Inject
 import java.sql.Date
 
-import info.folone.scala.poi.{ Row, Sheet, StringCell, Workbook }
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.{ MenuPerDay, MenuPerDayAttendant, MenuWithNamePerDay, Report }
+import lunatech.lunchplanner.models.{ MenuPerDay, Report }
 import org.joda.time.DateTime
 
 import scala.concurrent.Future
-import scalaz._
 
 /**
   * Service to generate the reports like total number of attendees between two dates
