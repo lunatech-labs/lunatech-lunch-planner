@@ -37,6 +37,7 @@
                             <th>Date</th>
                             <th>Menu name</th>
                             <th>Number attendees</th>
+                            <th>Location</th>
                         </tr>
                     </thead>
                     @for(index <- listOfMenusPerDay.indices) {
@@ -47,11 +48,14 @@
                             </td>
                             <td>@listOfMenusPerDay(index).menuName</td>
                             <td>@listOfMenusPerDay(index).numberOfPeopleSignedIn</td>
+                            <td>@listOfMenusPerDay(index).location</td>
                         </tr>
                     }
                 </table>
                 @b3.submit('class -> "btn btn-danger"){ <span class="glyphicon glyphicon-remove"></span> Delete selected }
+
             }
+
         </div>
     </div>
 }

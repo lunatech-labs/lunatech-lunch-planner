@@ -48,6 +48,6 @@ object ControllersData {
   val menuDish1 = MenuWithDishes(UUID.randomUUID(), menu1.name, Seq(dish2, dish3))
   val menuDish2 = MenuWithDishes(UUID.randomUUID(), menu2.name, Seq(dish1, dish5, dish4))
 
-  val schedule1 = MenuWithNamePerDay(UUID.randomUUID(), menu1.uuid, "10-02-2017", menu1.name, 7)
-  val schedule2 = MenuWithNamePerDay(UUID.randomUUID(), menu2.uuid, "05-04-2017", menu2.name, 9)
+  val schedule1 = MenuWithNamePerDay(UUID.randomUUID(), menu1.uuid, "10-02-2017", menu1.name, 7, "Amsterdam")
+  val schedule2 = MenuWithNamePerDay(UUID.randomUUID(), menu2.uuid, "05-04-2017", menu2.name, 9, "Rotterdam")
 }
