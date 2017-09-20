@@ -1,15 +1,16 @@
-$(function() {
-    $(document).ready(function(){
-        var selected=window.location.pathname;
-        if(selected=="/")
-        $("#planned").addClass('selected');
-        else if(selected=="/dish/all")
-        $("#dishes").addClass('selected');
-        else if(selected=="/menu/all")
-        $("#menus").addClass('selected');
-        else if(selected=="/menuPerDay/all")
-        $("#schedule").addClass('selected');
-        else if(selected=="/profile")
-        $("#profile").addClass('selected');
+$(function () {
+    $(document).ready(function () {
+        var selected = window.location.pathname;
+        if (selected == "/") {
+            $("#planned").addClass('selected');
+        } else if (selected.startsWith("/dish/")) {
+            $("#dishes").addClass('selected');
+        } else if (selected.startsWith("/menu/")) {
+            $("#menus").addClass('selected');
+        } else if (selected.startsWith("/menuPerDay/")) {
+            $("#schedule").addClass('selected');
+        } else if (selected.startsWith("/profile")) {
+            $("#profile").addClass('selected');
+        }
     });
 });
