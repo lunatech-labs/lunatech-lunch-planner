@@ -6,7 +6,8 @@ import java.util.UUID
 case class MenuPerDay(
   uuid: UUID = UUID.randomUUID(),
   menuUuid: UUID,
-  date: Date
+  date: Date,
+  location: String
 )
 
 case class MenuWithNamePerDay(
@@ -14,7 +15,8 @@ case class MenuWithNamePerDay(
   menuUuid: UUID,
   menuDate: String,
   menuName: String,
-  numberOfPeopleSignedIn: Int
+  numberOfPeopleSignedIn: Int,
+  location: String
 )
 
 case class MenuPerDayDietRestrictions(

@@ -1,15 +1,18 @@
 package lunatech.lunchplanner.viewModels
 
-import java.util.{ Date, UUID }
+import java.util.{Date, UUID}
 
+import lunatech.lunchplanner.data.Constants
 import play.api.data.Form
-import play.api.data.Forms.{ mapping, of, _ }
+import play.api.data.Forms.{mapping, of, _}
 import play.api.data.format.Formats._
-import play.api.libs.json.{ Json, OFormat }
+import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
+import play.api.libs.json.{Json, OFormat}
 
 case class MenuPerDayForm(
   menuUuid: UUID,
-  date: Date
+  date: Date,
+  location: String
 )
 
 object MenuPerDayForm {
@@ -18,9 +21,14 @@ object MenuPerDayForm {
   val menuPerDayForm = Form(
     mapping(
       "menuUuid" -> of[UUID],
-      "date" -> date(pattern = "dd-MM-yyyy")
+      "date" -> date(pattern = "dd-MM-yyyy"),
+      "location" -> nonEmptyText.verifying(officeLocationConstraint)
     )(MenuPerDayForm.apply)(MenuPerDayForm.unapply)
   )
+
+  def officeLocationConstraint: Constraint[String] = Constraint[String]("constraint.officelocation")({ text =>
+    if (Constants.OfficeLocations.map(s => s._1).contains(text)) Valid else Invalid(ValidationError(s"$text is not a valid office location"))
+  })
 }
 
 case class ListMenusPerDayForm(listUuids: List[UUID], dateStart: Date, dateEnd: Date)

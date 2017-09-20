@@ -43,7 +43,7 @@ class UserProfileTableSpec extends AcceptanceSpec with TestDatabaseProvider {
 
     "give summary of diet restrictions by menuPerDay" in {
       val newMenu = Menu(name = "Main menu")
-      val newMenuPerDay = MenuPerDay(menuUuid = newMenu.uuid, date = new Date(99999999))
+      val newMenuPerDay = MenuPerDay(menuUuid = newMenu.uuid, date = new Date(99999999), location = "Rotterdam")
       val newMenuPerDayPerPerson = MenuPerDayPerPerson(menuPerDayUuid = newMenuPerDay.uuid, userUuid = newUser.uuid)
 
       Await.result(UserProfileTable.insertOrUpdate(newUserProfile), defaultTimeout)

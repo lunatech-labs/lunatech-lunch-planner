@@ -15,7 +15,7 @@ class MenuPerDayPerPersonTableSpec extends AcceptanceSpec with TestDatabaseProvi
   private val newUser = User(name = "Leonor Boga", emailAddress ="leonor.boga@lunatech.com")
   private val newUserProfile = UserProfile(newUser.uuid)
   private val newMenu = Menu(name = "Main menu")
-  private val newMenuPerDay = MenuPerDay(menuUuid = newMenu.uuid, date = new Date(3000000))
+  private val newMenuPerDay = MenuPerDay(menuUuid = newMenu.uuid, date = new Date(3000000), location = "Amsterdam")
 
   private val newMenuPerDayPerPerson = MenuPerDayPerPerson(menuPerDayUuid = newMenuPerDay.uuid, userUuid = newUser.uuid)
 

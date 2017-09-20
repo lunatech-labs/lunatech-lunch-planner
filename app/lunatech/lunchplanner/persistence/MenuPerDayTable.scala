@@ -22,9 +22,11 @@ class MenuPerDayTable(tag: Tag) extends Table[MenuPerDay](tag, "MenuPerDay") {
 
   def date: Rep[Date] = column[Date]("date")
 
+  def location: Rep[String] = column[String]("location")
+
   def menuPerDayMenuForeignKey: ForeignKeyQuery[MenuTable, Menu] = foreignKey("menuPerDayMenu_fkey_", menuUuid, menuTable)(_.uuid)
 
-  def * : ProvenShape[MenuPerDay] = (uuid, menuUuid, date) <> ((MenuPerDay.apply _).tupled, MenuPerDay.unapply)
+  def * : ProvenShape[MenuPerDay] = (uuid, menuUuid, date, location) <> ((MenuPerDay.apply _).tupled, MenuPerDay.unapply)
 }
 
 object MenuPerDayTable {

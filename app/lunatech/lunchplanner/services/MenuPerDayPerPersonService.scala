@@ -29,7 +29,13 @@ class MenuPerDayPerPersonService  @Inject() (
       Future.traverse(_) { menuWithNamePerDay =>
         isMenuPerDaySelectedForPerson(userUuid, menuWithNamePerDay.uuid)
           .map(isSelected =>
-        MenuWithNamePerDayPerPerson(menuWithNamePerDay.uuid, menuWithNamePerDay.menuDate, menuWithNamePerDay.menuName, userUuid, isSelected))
+            MenuWithNamePerDayPerPerson(
+              menuWithNamePerDay.uuid,
+              menuWithNamePerDay.menuDate,
+              menuWithNamePerDay.menuName,
+              userUuid,
+              isSelected,
+              menuWithNamePerDay.location))
       }
     }
   }
@@ -50,7 +56,8 @@ class MenuPerDayPerPersonService  @Inject() (
                 menuWithNamePerDay.menuName,
                 dishes,
                 userUuid,
-                isSelected))
+                isSelected,
+                menuWithNamePerDay.location))
           }
       }
     }
@@ -74,7 +81,8 @@ class MenuPerDayPerPersonService  @Inject() (
                   menuData.uuid,
                   new SimpleDateFormat("dd-MM-yyyy").format(menuPerDay.date),
                   menuData.name,
-                  numberOfPeopleSignedIn = count)))
+                  numberOfPeopleSignedIn = count,
+                  menuPerDay.location)))
           case None => Future.successful(None)
         }
       }
@@ -94,7 +102,8 @@ class MenuPerDayPerPersonService  @Inject() (
                   menuData.uuid,
                   new SimpleDateFormat("dd-MM-yyyy").format(menuPerDay.date),
                   menuData.name,
-                  numberOfPeopleSignedIn = count)))
+                  numberOfPeopleSignedIn = count,
+                  menuPerDay.location)))
           case None => Future.successful(None)
         }
       }

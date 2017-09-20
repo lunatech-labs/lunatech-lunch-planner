@@ -13,8 +13,8 @@ class MenuPerDayTableSpec extends AcceptanceSpec with TestDatabaseProvider {
   implicit private val dbConnection = app.injector.instanceOf[DBConnection]
 
   private val newMenu = Menu(name = "Main menu")
-  private val newMenuPerDay = MenuPerDay(menuUuid = newMenu.uuid, date = new Date(99999999))
-  private val newMenuPerDay2 = MenuPerDay(menuUuid = newMenu.uuid, date = new Date(10000))
+  private val newMenuPerDay = MenuPerDay(menuUuid = newMenu.uuid, date = new Date(99999999), location = "Amsterdam")
+  private val newMenuPerDay2 = MenuPerDay(menuUuid = newMenu.uuid, date = new Date(10000), location = "Rotterdam")
 
   override def beforeAll {
     cleanDatabase()
