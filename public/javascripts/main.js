@@ -35,6 +35,10 @@ $(function(defaultDateStart, defaultDateEnd){
 
 $(document).ready(function() {
     allSelected();
+
+    $('button.js-delete-confirmation').click(function() {
+        return confirm("Are you sure you want to delete?");
+    })
 });
 
 $(".schedule").change(function(){
