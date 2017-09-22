@@ -100,6 +100,12 @@
     background: none;
 }
 
+.selected {
+     text-decoration: none;
+     color: #dcdcdc;
+     background: rgba(255,255,255,0.2);
+}
+
 @media(min-width:768px) {
     #wrapper {
         padding-left: 0;
