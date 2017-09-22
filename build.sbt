@@ -21,7 +21,7 @@ libraryDependencies ++= Seq(
   "com.google.api-client" % "google-api-client" % "1.22.0",
   "com.google.http-client" % "google-http-client-jackson" % "1.22.0",
   "com.lunatech" %% "play-googleopenconnect" % "1.3-SNAPSHOT",
-  "com.adrianhurt" %% "play-bootstrap" % "1.1.1-P25-B3-SNAPSHOT",
+  "com.adrianhurt" %% "play-bootstrap" % "1.1.1-P25-B3",
   "com.enragedginger" %% "akka-quartz-scheduler" % "1.6.0-akka-2.4.x",
   "org.scalaz" %% "scalaz-core" % "7.2.10",
   "com.typesafe.play" %% "play-mailer" % "5.0.0",
