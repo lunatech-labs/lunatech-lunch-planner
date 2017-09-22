@@ -83,7 +83,7 @@ $(function(){
     //     ignoreCols: null,                           // (Number, Number[]), column indices to exclude from the exported file(s) (default: null)
     //     trimWhitespace: true                        // (Boolean), remove all leading/trailing newlines, spaces, and tabs from cell text in the exported file(s) (default: false)
     // });
-    $('table').tableExport({
+    $('.printTable').tableExport({
         formats: ['csv'],
         headers: true,
         footers: true
