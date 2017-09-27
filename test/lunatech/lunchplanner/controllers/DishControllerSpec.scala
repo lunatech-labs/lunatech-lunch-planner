@@ -4,16 +4,17 @@ import java.util
 import java.util.UUID
 
 import akka.stream.Materializer
-import lunatech.lunchplanner.common.{ ControllerSpec, DBConnection }
+import com.typesafe.config.ConfigFactory
+import lunatech.lunchplanner.common.{ControllerSpec, DBConnection}
 import lunatech.lunchplanner.data.ControllersData._
 import lunatech.lunchplanner.models.User
 import lunatech.lunchplanner.persistence.DishTable
-import lunatech.lunchplanner.services.{ DishService, MenuDishService, UserService }
+import lunatech.lunchplanner.services.{DishService, MenuDishService, UserService}
 import org.mockito.Mockito._
-import play.api.i18n.MessagesApi
+import play.api.i18n.{DefaultLangs, DefaultMessagesApi}
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{ call, status, _ }
-import play.api.{ Configuration, Environment }
+import play.api.test.Helpers.{call, status, _}
+import play.api.{Configuration, Environment}
 import slick.lifted.TableQuery
 
 import scala.concurrent.Future
@@ -21,13 +22,15 @@ import scala.concurrent.Future
 class DishControllerSpec extends ControllerSpec {
   implicit lazy val materializer: Materializer = app.materializer
 
+  val config = Configuration(ConfigFactory.load())
+
   private val developer = User(UUID.randomUUID(), "Developer", "developer@lunatech.com")
 
   val userService = mock[UserService]
   val dishService = mock[DishService]
   val menuDishService = mock[MenuDishService]
   val environment = mock[Environment]
-  val messagesApi = mock[MessagesApi]
+  val messagesApi = new DefaultMessagesApi(Environment.simple(), config, new DefaultLangs(config))
   val configuration = mock[Configuration]
   val connection = mock[DBConnection]
 
