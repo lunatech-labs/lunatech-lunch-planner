@@ -4,6 +4,7 @@ import java.util
 import java.util.UUID
 
 import akka.stream.Materializer
+import com.typesafe.config.ConfigFactory
 import lunatech.lunchplanner.common.{ControllerSpec, DBConnection}
 import lunatech.lunchplanner.data.ControllersData._
 import lunatech.lunchplanner.models.User
@@ -11,16 +12,25 @@ import lunatech.lunchplanner.persistence.DishTable
 import lunatech.lunchplanner.services._
 import org.mockito.Matchers.any
 import org.mockito.Mockito._
-import play.api.i18n.MessagesApi
+import play.api.i18n.{DefaultLangs, DefaultMessagesApi}
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{call, _}
+import play.api.test.Helpers._
 import play.api.{Configuration, Environment}
 import slick.lifted.TableQuery
+import play.api.inject.bind
 
 import scala.concurrent.Future
 
 class MenuPerDayControllerSpec extends ControllerSpec {
+
+  implicit override lazy val app = new GuiceApplicationBuilder()
+      .overrides(bind[MenuPerDayController].toInstance(controller))
+      .build()
+
   implicit lazy val materializer: Materializer = app.materializer
+
+  val config = Configuration(ConfigFactory.load())
 
   private val developer = User(UUID.randomUUID(), "Developer", "developer@lunatech.com", isAdmin = true)
 
@@ -32,7 +42,7 @@ class MenuPerDayControllerSpec extends ControllerSpec {
   val menuPerDayService = mock[MenuPerDayService]
   val menuPerDayPerPersonService = mock[MenuPerDayPerPersonService]
   val environment = mock[Environment]
-  val messagesApi = mock[MessagesApi]
+  val messagesApi = new DefaultMessagesApi(Environment.simple(), config, new DefaultLangs(config))
   val configuration = mock[Configuration]
   val connection = mock[DBConnection]
 
@@ -66,9 +76,9 @@ class MenuPerDayControllerSpec extends ControllerSpec {
       val request = FakeRequest().withSession("email" -> "developer@lunatech.com")
       val result = call(controller.getAllMenusPerDay, request)
 
-//      status(result) mustBe 200
-//      contentAsString(result).contains("Menu 1") mustBe true
-//      contentAsString(result).contains("Menu 2") mustBe true
+      status(result) mustBe 200
+      contentAsString(result).contains("Menu 1") mustBe true
+      contentAsString(result).contains("Menu 2") mustBe true
     }
 
     "not accept location not in scope" in {
@@ -79,8 +89,10 @@ class MenuPerDayControllerSpec extends ControllerSpec {
           "location" -> "The Hague"))
 
       result match {
-        case Some(s) => contentAsString(s).contains("The Hague is not a valid office location") mustBe true
-        case _ => fail("Invalid locations are accepted! This should not happen!")
+        case Some(r) =>
+          status(r) mustBe 400
+          contentAsString(r).contains("The Hague is not a valid office location") mustBe true
+        case _ => fail("Invalid locations were accepted! This should not happen!")
       }
     }
   }
