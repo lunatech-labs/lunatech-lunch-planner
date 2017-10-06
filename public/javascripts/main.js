@@ -19,13 +19,13 @@ $(function(){
             var inputsByDate = $("input[data-date='" + date + "']");
 
             var checkedInputsByDate = $("input[data-date='" + date + "']:checked");
-            if(checkedInputsByDate.length == 0) {
+            if(checkedInputsByDate.length === 0) {
                 inputsByDate.each(function() {
-                    if(inputsByDate.length == 1) {
+                    if(inputsByDate.length === 1) {
                         this.checked = true;
                     } else {
                         var location = $(this).parents(".schedule-row").children(".js-menu-location").attr("value");
-                        if (!hasCheck && defaultLocation == location) {
+                        if (!hasCheck && defaultLocation === location) {
                             this.checked = true;
                             hasCheck = true;
                         }
@@ -35,7 +35,7 @@ $(function(){
         });
     }
 
-    $('#select-all').click(function(event) {
+    $('#select-all').click(function() {
         if (this.checked) {
             smartSelectAll("Rotterdam");
         } else {

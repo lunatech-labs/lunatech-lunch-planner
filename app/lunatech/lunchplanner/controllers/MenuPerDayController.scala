@@ -1,18 +1,18 @@
 package lunatech.lunchplanner.controllers
 
 import java.text.SimpleDateFormat
-import java.util.{ Date, UUID }
+import java.util.{Date, UUID}
 
 import com.google.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.data.Constants
+import lunatech.lunchplanner.data.Location
 import lunatech.lunchplanner.models.MenuPerDay
-import lunatech.lunchplanner.services.{ MenuDishService, MenuPerDayPerPersonService, MenuPerDayService, MenuService, UserProfileService, UserService }
-import lunatech.lunchplanner.viewModels.{ FilterMenusPerDayForm, ListMenusPerDayForm, MenuPerDayForm }
+import lunatech.lunchplanner.services._
+import lunatech.lunchplanner.viewModels.{FilterMenusPerDayForm, ListMenusPerDayForm, MenuPerDayForm}
 import org.joda.time.DateTime
-import play.api.i18n.{ I18nSupport, MessagesApi }
-import play.api.mvc.{ Controller, EssentialAction }
-import play.api.{ Configuration, Environment }
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc.{Controller, EssentialAction}
+import play.api.{Configuration, Environment}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -89,7 +89,7 @@ class MenuPerDayController @Inject()(userService: UserService,
               currentDate,
               formWithErrors,
               menusUuidAndNames,
-              Constants.OfficeLocations))
+              Location.values))
           },
           menuPerDayForm => {
             menuPerDayService.add(getNewMenuPerDay(menuPerDayForm)).map(_ =>
@@ -111,7 +111,7 @@ class MenuPerDayController @Inject()(userService: UserService,
           currentDate,
           MenuPerDayForm.menuPerDayForm,
           menusUuidAndNames,
-          Constants.OfficeLocations))
+          Location.values))
     }
   }
 
@@ -157,7 +157,7 @@ class MenuPerDayController @Inject()(userService: UserService,
           menuPerDayOption,
           dietRestrictions,
           peopleAttending,
-          Constants.OfficeLocations
+          Location.values
         ))
     }
   }
@@ -182,7 +182,7 @@ class MenuPerDayController @Inject()(userService: UserService,
               menuPerDayOption,
               dietRestrictions,
               peopleAttendig,
-              Constants.OfficeLocations))
+              Location.values))
           },
           _ => {
             delete(uuid).map(_ =>
@@ -212,7 +212,7 @@ class MenuPerDayController @Inject()(userService: UserService,
               menuPerDayOption,
               dietRestrictions,
               peopleAttendig,
-              Constants.OfficeLocations))
+              Location.values))
           },
           menuPerDayData => {
             menuPerDayService.insertOrUpdate(uuid, getNewMenuPerDay(menuPerDayData)).map(_ =>
