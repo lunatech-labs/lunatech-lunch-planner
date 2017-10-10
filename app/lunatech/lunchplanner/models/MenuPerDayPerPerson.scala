@@ -13,7 +13,8 @@ case class MenuWithNamePerDayPerPerson(
   menuDate: String,
   menuName: String,
   userUuid: UUID,
-  isSelected: Boolean
+  isSelected: Boolean,
+  location: String
 )
 
 case class MenuWithNameWithDishesPerPerson(
@@ -22,5 +23,6 @@ case class MenuWithNameWithDishesPerPerson(
   menuName: String,
   listOfDishes: Seq[Dish],
   userUuid: UUID,
-  isSelected: Boolean
+  isSelected: Boolean,
+  location: String
 )

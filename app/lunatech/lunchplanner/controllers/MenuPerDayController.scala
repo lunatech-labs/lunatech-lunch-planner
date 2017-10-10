@@ -5,54 +5,53 @@ import java.util.{ Date, UUID }
 
 import com.google.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
+import lunatech.lunchplanner.data.Constants
 import lunatech.lunchplanner.models.MenuPerDay
 import lunatech.lunchplanner.services.{ MenuDishService, MenuPerDayPerPersonService, MenuPerDayService, MenuService, UserProfileService, UserService }
 import lunatech.lunchplanner.viewModels.{ FilterMenusPerDayForm, ListMenusPerDayForm, MenuPerDayForm }
 import org.joda.time.DateTime
 import play.api.i18n.{ I18nSupport, MessagesApi }
-import play.api.mvc.Controller
+import play.api.mvc.{ Controller, EssentialAction }
 import play.api.{ Configuration, Environment }
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class MenuPerDayController @Inject() (
-  userService: UserService,
-  userProfileService: UserProfileService,
-  menuService: MenuService,
-  menuDishService: MenuDishService,
-  menuPerDayService: MenuPerDayService,
-  menuPerDayPerPersonService: MenuPerDayPerPersonService,
-  val environment: Environment,
-  val messagesApi: MessagesApi,
-  val configuration: Configuration,
-  implicit val connection: DBConnection)
+class MenuPerDayController @Inject()(userService: UserService,
+                                     userProfileService: UserProfileService,
+                                     menuService: MenuService,
+                                     menuDishService: MenuDishService,
+                                     menuPerDayService: MenuPerDayService,
+                                     menuPerDayPerPersonService: MenuPerDayPerPersonService,
+                                     val environment: Environment,
+                                     val messagesApi: MessagesApi,
+                                     val configuration: Configuration,
+                                     implicit val connection: DBConnection)
   extends Controller with Secured with I18nSupport {
 
   val DateStart = "dateStart"
   val DateEnd = "dateEnd"
 
-  def getAllMenusPerDay =
-    IsAdminAsync { username =>
-      implicit request => {
-        val dStart = request.session.get(DateStart).map(java.sql.Date.valueOf).getOrElse(getDateStart)
-        val dEnd = request.session.get(DateEnd).map(java.sql.Date.valueOf).getOrElse(getDateEnd)
+  def getAllMenusPerDay: EssentialAction = IsAdminAsync { username =>
+    implicit request => {
+      val dStart = request.session.get(DateStart).map(java.sql.Date.valueOf).getOrElse(getDateStart)
+      val dEnd = request.session.get(DateEnd).map(java.sql.Date.valueOf).getOrElse(getDateEnd)
 
-        for{
-          currentUser <- userService.getByEmailAddress(username)
-          menusPerDay <- menuPerDayPerPersonService.getAllMenuWithNamePerDayFilterDateRange(dStart, dEnd)
-              .map(_.toArray)
-        } yield
-          Ok(views.html.admin.menuPerDay.menusPerDay(
-            getCurrentUser(currentUser, isAdmin = true, username),
-            new SimpleDateFormat("dd-MM-yyyy").format(dStart),
-            new SimpleDateFormat("dd-MM-yyyy").format(dEnd),
-            ListMenusPerDayForm.listMenusPerDayForm,
-            menusPerDay))
-      }
+      for {
+        currentUser <- userService.getByEmailAddress(username)
+        menusPerDay <- menuPerDayPerPersonService.getAllMenuWithNamePerDayFilterDateRange(dStart, dEnd)
+          .map(_.toArray)
+      } yield
+        Ok(views.html.admin.menuPerDay.menusPerDay(
+          getCurrentUser(currentUser, isAdmin = true, username),
+          new SimpleDateFormat("dd-MM-yyyy").format(dStart),
+          new SimpleDateFormat("dd-MM-yyyy").format(dEnd),
+          ListMenusPerDayForm.listMenusPerDayForm,
+          menusPerDay))
+    }
   }
 
-  def filterMenusPerDay = IsAdminAsync { _ =>
+  def filterMenusPerDay: EssentialAction = IsAdminAsync { _ =>
     implicit request => {
       FilterMenusPerDayForm
         .filterMenusPerDayForm
@@ -69,13 +68,13 @@ class MenuPerDayController @Inject() (
 
             Future.successful(
               Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay())
-              .withSession(session))
+                .withSession(session))
           })
     }
   }
 
-  def createNewMenuPerDay = IsAdminAsync { username =>
-    val currentDate =  new SimpleDateFormat("dd-MM-yyyy").format(new Date())
+  def createNewMenuPerDay: EssentialAction = IsAdminAsync { username =>
+    val currentDate = new SimpleDateFormat("dd-MM-yyyy").format(new Date())
     implicit request => {
       MenuPerDayForm
         .menuPerDayForm
@@ -89,7 +88,9 @@ class MenuPerDayController @Inject() (
               getCurrentUser(currentUser, isAdmin = true, username),
               currentDate,
               formWithErrors,
-              menusUuidAndNames))},
+              menusUuidAndNames,
+              Constants.OfficeLocations))
+          },
           menuPerDayForm => {
             menuPerDayService.add(getNewMenuPerDay(menuPerDayForm)).map(_ =>
               Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay())
@@ -98,10 +99,10 @@ class MenuPerDayController @Inject() (
     }
   }
 
-  def getNewMenuPerDay = IsAdminAsync { username =>
+  def getNewMenuPerDay: EssentialAction = IsAdminAsync { username =>
     val currentDate = new SimpleDateFormat("dd-MM-yyyy").format(new Date())
     implicit request => {
-      for{
+      for {
         currentUser <- userService.getByEmailAddress(username)
         menusUuidAndNames <- menuService.getAllMenusUuidAndNames
       } yield
@@ -109,11 +110,12 @@ class MenuPerDayController @Inject() (
           getCurrentUser(currentUser, isAdmin = true, username),
           currentDate,
           MenuPerDayForm.menuPerDayForm,
-          menusUuidAndNames))
+          menusUuidAndNames,
+          Constants.OfficeLocations))
     }
   }
 
-  def deleteMenusPerDay() = IsAdminAsync { username =>
+  def deleteMenusPerDay(): EssentialAction = IsAdminAsync { username =>
     implicit request => {
       ListMenusPerDayForm
         .listMenusPerDayForm
@@ -129,18 +131,19 @@ class MenuPerDayController @Inject() (
                 new SimpleDateFormat("dd-MM-yyyy").format(getDateStart),
                 new SimpleDateFormat("dd-MM-yyyy").format(getDateEnd),
                 formWithErrors,
-                menusPerDay))},
+                menusPerDay))
+          },
           menusPerDayData =>
-            deleteSeveral(menusPerDayData).map( _ =>
+            deleteSeveral(menusPerDayData).map(_ =>
               Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay())
                 .flashing("success" -> "Schedule(s) deleted!"))
         )
     }
- }
+  }
 
-  def getMenuPerDayDetails(uuid: UUID) = IsAdminAsync { username =>
+  def getMenuPerDayDetails(uuid: UUID): EssentialAction = IsAdminAsync { username =>
     implicit request => {
-      for{
+      for {
         currentUser <- userService.getByEmailAddress(username)
         menusUuidAndNames <- menuService.getAllMenusUuidAndNames
         menuPerDayOption <- menuPerDayService.getMenuPerDayByUuid(uuid)
@@ -153,12 +156,13 @@ class MenuPerDayController @Inject() (
           menusUuidAndNames,
           menuPerDayOption,
           dietRestrictions,
-          peopleAttending
+          peopleAttending,
+          Constants.OfficeLocations
         ))
     }
   }
 
-  def deleteMenuPerDay(uuid: UUID) = IsAdminAsync { username =>
+  def deleteMenuPerDay(uuid: UUID): EssentialAction = IsAdminAsync { username =>
     implicit request => {
       MenuPerDayForm
         .menuPerDayForm
@@ -177,7 +181,9 @@ class MenuPerDayController @Inject() (
               menusUuidAndNames,
               menuPerDayOption,
               dietRestrictions,
-              peopleAttendig))},
+              peopleAttendig,
+              Constants.OfficeLocations))
+          },
           _ => {
             delete(uuid).map(_ =>
               Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay())
@@ -186,7 +192,7 @@ class MenuPerDayController @Inject() (
     }
   }
 
-  def saveMenuPerDayDetails(uuid: UUID) = IsAdminAsync { username =>
+  def saveMenuPerDayDetails(uuid: UUID): EssentialAction = IsAdminAsync { username =>
     implicit request => {
       MenuPerDayForm
         .menuPerDayForm
@@ -205,7 +211,9 @@ class MenuPerDayController @Inject() (
               menusUuidAndNames,
               menuPerDayOption,
               dietRestrictions,
-              peopleAttendig))},
+              peopleAttendig,
+              Constants.OfficeLocations))
+          },
           menuPerDayData => {
             menuPerDayService.insertOrUpdate(uuid, getNewMenuPerDay(menuPerDayData)).map(_ =>
               Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay())
@@ -218,7 +226,7 @@ class MenuPerDayController @Inject() (
     Future.sequence(form.listUuids.map(uuid => delete(uuid)))
 
   private def delete(uuid: UUID) =
-    for{
+    for {
       _ <- menuPerDayPerPersonService.deleteByMenuPerPersonUuid(uuid)
       result <- menuPerDayService.delete(uuid)
     } yield result
@@ -231,5 +239,5 @@ class MenuPerDayController @Inject() (
   }
 
   private def getNewMenuPerDay(menuPerDayForm: MenuPerDayForm) =
-    MenuPerDay(menuUuid = menuPerDayForm.menuUuid, date = new java.sql.Date(menuPerDayForm.date.getTime))
+    MenuPerDay(menuUuid = menuPerDayForm.menuUuid, date = new java.sql.Date(menuPerDayForm.date.getTime), location = menuPerDayForm.location)
 }

@@ -28,6 +28,7 @@
               <th>Menu name</th>
               <th>Menu details</th>
               <th>Extra info</th>
+              <th>Location</th>
             </tr>
           </thead>
           @for(index <- listOfMenusPerDayPerPerson.indices) {
@@ -70,6 +71,7 @@
                 }
               }
               </td>
+              <td>@listOfMenusPerDayPerPerson(index).location</td>
             </tr>
           }
         </table>
