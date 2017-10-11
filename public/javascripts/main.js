@@ -63,7 +63,7 @@ $(function(){
 });
 
 $(function(defaultDateStart, defaultDateEnd){
-    $(".daterange").change(function(){
+    $('.daterange').change(function(){
         var dateStart = document.getElementById("dateStart").value;
         var dateEnd = document.getElementById("dateEnd").value;
 
@@ -88,6 +88,13 @@ $(function verifySelectedMeals() {
             }
         }
     });
+
+$(document).ready(function() {
+    allSelected();
+
+    $('button.js-delete-confirmation').click(function() {
+        return confirm("Are you sure you want to delete?");
+    })
 });
 
 $(function() {
@@ -98,4 +105,3 @@ $(function() {
         return true;
     });
 });
-

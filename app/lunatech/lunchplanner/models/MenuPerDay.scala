@@ -31,3 +31,5 @@ case class MenuPerDayDietRestrictions(
 )
 
 case class MenuPerDayAttendant(name: String, otherRestrictions: String)
+
+case class MenuPerDayReport(name: String, date: Date)

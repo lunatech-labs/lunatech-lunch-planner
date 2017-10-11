@@ -1,0 +1,55 @@
+@import b3.vertical.fieldConstructor
+@import lunatech.lunchplanner.models.{Report, User}
+
+@(admin: User, reportForm: Form[String], report: Report, month: Int)(implicit messages: play.api.i18n.Messages)
+@months = @{
+    Seq("1" -> "January",
+        "2" -> "February",
+        "3" -> "March",
+        "4" -> "April",
+        "5" -> "May",
+        "6" -> "June",
+        "7" -> "July",
+        "8" -> "August",
+        "9" -> "September",
+        "10" -> "October",
+        "11" -> "November",
+        "12" -> "December")
+}
+
+@main("Monthly Report", admin) {
+    <h1>Reports</h1>
+
+    @b3.form(lunatech.lunchplanner.controllers.routes.ReportController.filterAttendees, 'id -> "monthNumber") {
+        @b3.select(reportForm("month"), options = months, '_label -> "Select report month", 'value -> month, '_id -> "monthSelection")
+    }
+    <br>
+
+    <div class="col col-lg-12" style="padding-left: 0">
+    @b3.form(lunatech.lunchplanner.controllers.routes.ReportController.export) {
+        @b3.submit('class -> "btn btn-primary") {
+            Export
+        }
+        @report.usersPerDate.map { case (date, users) =>
+        <div class="col col-lg-3" style="padding-left: 0">
+            <table class="table ">
+                <thead>
+                    <th>@date</th>
+                </thead>
+                <tbody>
+                @users.map { user =>
+                    <tr>
+                        <td>@user</td>
+                    </tr>
+                }
+                </tbody>
+                <tfoot>
+                    <td align="right">Total: @users.length</td>
+        </tfoot>
+        </table>
+        </div>
+        }
+    }
+
+    </div>
+}
