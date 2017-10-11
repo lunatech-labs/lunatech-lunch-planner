@@ -17,7 +17,7 @@ class MenuPerDayPerPersonTableSpec extends AcceptanceSpec with TestDatabaseProvi
   private val newMenu = Menu(name = "Main menu")
   private val newMenuPerDay = MenuPerDay(menuUuid = newMenu.uuid, date = new Date(3000000), location = "Amsterdam")
 
-  private val newMenuPerDayPerPerson = MenuPerDayPerPerson(menuPerDayUuid = newMenuPerDay.uuid, userUuid = newUser.uuid)
+  private val newMenuPerDayPerPerson = MenuPerDayPerPerson(menuPerDayUuid = newMenuPerDay.uuid, userUuid = newUser.uuid, isAttending = false)
 
   override def beforeAll {
     cleanDatabase()
@@ -92,7 +92,7 @@ class MenuPerDayPerPersonTableSpec extends AcceptanceSpec with TestDatabaseProvi
 
     "query the list of people by menu per day" in {
       Await.result(MenuPerDayPerPersonTable.add(newMenuPerDayPerPerson), defaultTimeout)
-      val result = Await.result(MenuPerDayPerPersonTable.getUsersByMenuPerDayUuid(newMenuPerDay.uuid), defaultTimeout)
+      val result = Await.result(MenuPerDayPerPersonTable.getAttendeesByMenuPerDayUuid(newMenuPerDay.uuid, false), defaultTimeout)
       result mustBe Vector((newUser, newUserProfile))
     }
   }

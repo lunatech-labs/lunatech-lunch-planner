@@ -9,6 +9,7 @@ import play.api.libs.json.{ Json, OFormat }
 
 case class MenuPerDayPerPersonForm(
   menuPerDayUuid: List[UUID],
+  menuPerDayUuidNotAttending: List[UUID],
   menuDate: List[String]
 )
 
@@ -18,6 +19,7 @@ object MenuPerDayPerPersonForm {
   val menuPerDayPerPersonForm = Form(
     mapping(
       "menuPerDayUuid" -> list(of[UUID]),
+      "menuPerDayUuidNotAttending" -> list(of[UUID]),
       "menuDate" -> list(text)
     )(MenuPerDayPerPersonForm.apply)(MenuPerDayPerPersonForm.unapply)
   )
