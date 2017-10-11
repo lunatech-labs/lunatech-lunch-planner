@@ -3,9 +3,10 @@ package lunatech.lunchplanner.persistence
 import java.util.UUID
 
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.{ MenuPerDay, MenuPerDayPerPerson, User, UserProfile }
+import lunatech.lunchplanner.models.{MenuPerDay, MenuPerDayPerPerson, User, UserProfile}
 import slick.driver.PostgresDriver.api._
-import slick.lifted.{ ForeignKeyQuery, ProvenShape, TableQuery }
+import slick.jdbc.GetResult
+import slick.lifted.{ForeignKeyQuery, ProvenShape, TableQuery}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -20,13 +21,15 @@ class MenuPerDayPerPersonTable(tag: Tag) extends Table[MenuPerDayPerPerson](tag,
 
   def userUuid: Rep[UUID] = column[UUID]("userUuid")
 
+  def isAttending: Rep[Boolean] = column[Boolean]("isAttending")
+
   def menuPerDayPerPersonMenuPerDayForeignKey: ForeignKeyQuery[MenuPerDayTable, MenuPerDay] =
     foreignKey("menuPerDayPerPersonMenuPerDay_fkey_", menuPerDayUuid, menuPerDayTable)(_.uuid)
 
   def menuPerDayPerPersonUserForeignKey: ForeignKeyQuery[UserTable, User] =
     foreignKey("menuPerDayPerPersonUser_fkey_", userUuid, userTable)(_.uuid)
 
-  def * : ProvenShape[MenuPerDayPerPerson] = (uuid, menuPerDayUuid, userUuid) <> ((MenuPerDayPerPerson.apply _).tupled, MenuPerDayPerPerson.unapply)
+  def * : ProvenShape[MenuPerDayPerPerson] = (uuid, menuPerDayUuid, userUuid, isAttending) <> ((MenuPerDayPerPerson.apply _).tupled, MenuPerDayPerPerson.unapply)
 }
 
 object MenuPerDayPerPersonTable {
@@ -36,7 +39,6 @@ object MenuPerDayPerPersonTable {
     val query = menuPerDayPerPersonTable returning menuPerDayPerPersonTable += menuPerDayPerPerson
     connection.db.run(query)
   }
-
   def exists(uuid: UUID)(implicit connection: DBConnection): Future[Boolean] = {
     connection.db.run(menuPerDayPerPersonTable.filter(_.uuid === uuid).exists.result)
   }
@@ -55,14 +57,24 @@ object MenuPerDayPerPersonTable {
     connection.db.run(query.result)
   }
 
-  def getUsersByMenuPerDayUuid(menuPerDayUuid: UUID)(implicit connection: DBConnection): Future[Seq[(User, UserProfile)]] = {
+  def getAttendeesByMenuPerDayUuid(menuPerDayUuid: UUID, isAttending: Boolean)(implicit connection: DBConnection): Future[Seq[(User, UserProfile)]] = {
     val query = for {
       mpdpp <- menuPerDayPerPersonTable.filter(_.menuPerDayUuid === menuPerDayUuid)
-      user <- UserTable.userTable if mpdpp.userUuid === user.uuid
+      user <- UserTable.userTable if mpdpp.userUuid === user.uuid && mpdpp.isAttending === isAttending
       userProfile <- UserProfileTable.userProfileTable if user.uuid === userProfile.userUuid
     } yield (user, userProfile)
 
     connection.db.run(query.result)
+  }
+
+  def getAllUpcomingSchedulesByUser(userUuid: UUID)(implicit connection: DBConnection) : Future[Seq[MenuPerDayPerPerson]] = {
+    implicit val getMenuPerDayPerPersonResult = GetResult(r => MenuPerDayPerPerson(UUID.fromString(r.<<), UUID.fromString(r.<<), UUID.fromString(r.<<), r.<<))
+
+    val query = sql"""SELECT a."uuid", a."menuPerDayUuid", a."userUuid", a."isAttending"
+                      FROM "MenuPerDayPerPerson" AS a JOIN "MenuPerDay" AS b ON a."menuPerDayUuid"=b.uuid
+                      WHERE a."userUuid"='#$userUuid' AND b."date" >= current_date""".as[MenuPerDayPerPerson]
+
+    connection.db.run(query)
   }
 
   def getByUserUuid(userUuid: UUID)(implicit connection: DBConnection): Future[Seq[MenuPerDayPerPerson]] = {

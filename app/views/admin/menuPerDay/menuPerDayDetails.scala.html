@@ -6,7 +6,7 @@
 
 @import lunatech.lunchplanner.data.Location
 
-@(admin: User, menuPerDayForm: Form[MenuPerDayForm], menuOptions: Seq[(String,String)], menuPerDayOption: Option[MenuPerDay], dietRestrictionsSummary: MenuPerDayDietRestrictions, listPeopleAttending: Seq[MenuPerDayAttendant], locations: List[Location])(implicit messages: play.api.i18n.Messages)
+@(admin: User, menuPerDayForm: Form[MenuPerDayForm], menuOptions: Seq[(String,String)], menuPerDayOption: Option[MenuPerDay], dietRestrictionsSummary: MenuPerDayDietRestrictions, listPeopleAttending: Seq[MenuPerDayAttendant], peopleNotAttending: Seq[MenuPerDayAttendant], locations: List[Location])(implicit messages: play.api.i18n.Messages)
 @main("Menu schedule details", admin) {
 <!-- Nav tabs -->
 <ul class="nav nav-tabs">
@@ -91,7 +91,7 @@
 
         <!-- list peopl attending -->
         <div class="row">
-            <div class="col col-lg-3">
+            <div class="col col-xs-6">
                 <table class="table" >
                     <thead>
                         <tr>
@@ -101,6 +101,22 @@
                     </thead>
 
                     @for(person <- listPeopleAttending){
+                        <tr><td>@person.name</td>
+                            <td>@person.otherRestrictions</td>
+                        </tr>
+                    }
+                </table>
+            </div>
+            <div class="col col-xs-6">
+                <table class="table" >
+                    <thead>
+                        <tr>
+                            <th>People not attending (@peopleNotAttending.length)</th>
+                            <th>Other info</th>
+                        </tr>
+                    </thead>
+
+                    @for(person <- peopleNotAttending){
                         <tr><td>@person.name</td>
                             <td>@person.otherRestrictions</td>
                         </tr>
