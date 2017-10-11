@@ -23,8 +23,8 @@
         <table class="table" >
           <thead>
             <tr>
-              <th><input type="checkbox" id="select-all" /> Attending<br/></th>
-              <th><input type="checkbox" id="select-all" /> No<br/></th>
+              <th><input type="checkbox" class="select-all js-select-attending" /> Attending<br/></th>
+              <th><input type="checkbox" class="select-all js-select-not-attending" /> No<br/></th>
               <th class="list-date">Date</th>
               <th>Menu name</th>
               <th>Menu details</th>
@@ -35,16 +35,18 @@
           @for(index <- listOfMenusPerDayPerPerson.indices) {
             <tr class="schedule-row">
               <td class="list-select-all">
-                @b3.checkbox(form("menuPerDayUuid["+ index +"]"), 'class -> "schedule",
+                @b3.checkbox(form("menuPerDayUuid["+ index +"]"), 'class -> "schedule attending",
                   'value -> listOfMenusPerDayPerPerson(index).menuPerDayUuid,
                   'checked -> (listOfMenusPerDayPerPerson(index).isAttending == Some(true)),
-                  Symbol("data-date") -> listOfMenusPerDayPerPerson(index).menuDate)
+                  Symbol("data-date") -> listOfMenusPerDayPerPerson(index).menuDate,
+                  Symbol("data-index") -> index)
               </td>
               <td class="list-select-all">
-              @b3.checkbox(form("menuPerDayUuidNotAttending["+ index +"]"), 'class -> "schedule",
+              @b3.checkbox(form("menuPerDayUuidNotAttending["+ index +"]"), 'class -> "schedule not-attending",
                   'value -> listOfMenusPerDayPerPerson(index).menuPerDayUuid,
                   'checked -> (listOfMenusPerDayPerPerson(index).isAttending == Some(false)),
-                  Symbol("data-date") -> listOfMenusPerDayPerPerson(index).menuDate)
+                  Symbol("data-date") -> listOfMenusPerDayPerPerson(index).menuDate,
+                  Symbol("data-index") -> index)
               </td>
               <td class="js-menu-date" value="@listOfMenusPerDayPerPerson(index).menuDate"><label class="font-normal">@listOfMenusPerDayPerPerson(index).menuDate</label></td>
               <td><label class="font-normal">@listOfMenusPerDayPerPerson(index).menuName</label></td>
