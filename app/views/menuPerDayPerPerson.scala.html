@@ -24,6 +24,7 @@
           <thead>
             <tr>
               <th><input type="checkbox" id="select-all" /> Attending<br/></th>
+              <th><input type="checkbox" id="select-all" /> No<br/></th>
               <th class="list-date">Date</th>
               <th>Menu name</th>
               <th>Menu details</th>
@@ -34,10 +35,16 @@
           @for(index <- listOfMenusPerDayPerPerson.indices) {
             <tr class="schedule-row">
               <td class="list-select-all">
-                <input type="checkbox" class="schedule"
-                value="@listOfMenusPerDayPerPerson(index).menuPerDayUuid"
-                name="menuPerDayUuid[@index]" data-date="@listOfMenusPerDayPerPerson(index).menuDate"
-                @if(listOfMenusPerDayPerPerson(index).isSelected) { checked } >
+                @b3.checkbox(form("menuPerDayUuid["+ index +"]"), 'class -> "schedule",
+                  'value -> listOfMenusPerDayPerPerson(index).menuPerDayUuid,
+                  'checked -> (listOfMenusPerDayPerPerson(index).isAttending == Some(true)),
+                  Symbol("data-date") -> listOfMenusPerDayPerPerson(index).menuDate)
+              </td>
+              <td class="list-select-all">
+              @b3.checkbox(form("menuPerDayUuidNotAttending["+ index +"]"), 'class -> "schedule",
+                  'value -> listOfMenusPerDayPerPerson(index).menuPerDayUuid,
+                  'checked -> (listOfMenusPerDayPerPerson(index).isAttending == Some(false)),
+                  Symbol("data-date") -> listOfMenusPerDayPerPerson(index).menuDate)
               </td>
               <td class="js-menu-date" value="@listOfMenusPerDayPerPerson(index).menuDate"><label class="font-normal">@listOfMenusPerDayPerPerson(index).menuDate</label></td>
               <td><label class="font-normal">@listOfMenusPerDayPerPerson(index).menuName</label></td>

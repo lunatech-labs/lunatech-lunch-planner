@@ -83,7 +83,7 @@ $(function verifySelectedMeals() {
                 $.toaster({
                     priority: 'danger',
                     title: 'Ah ah ah!',
-                    message: 'You can only attend one meal per day.'
+                    message: 'You can only make one decision per day. ' + date
                 });
             }
         }
