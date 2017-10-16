@@ -1,6 +1,6 @@
 package lunatech.lunchplanner.services
 
-import java.io.{File, FileOutputStream}
+import java.io.ByteArrayOutputStream
 import java.sql.Date
 
 import com.google.inject.Inject
@@ -37,10 +37,9 @@ class ReportService @Inject()(
     attendees.map(menuAttendant => Report(menuAttendant.groupBy(_.date.toString).mapValues(_.map(_.name))))
   }
 
-  def exportToExcel(month: String, report: Report): File = {
+  def exportToExcel(report: Report): Array[Byte] = {
     val workbook = new XSSFWorkbook
-    val file = new File(s"$month report.xlsx")
-    val out = new FileOutputStream(file)
+    val out = new ByteArrayOutputStream
     try {
       report.usersPerDate.foreach(dateAndUsers => {
         val date = dateAndUsers._1
@@ -81,7 +80,7 @@ class ReportService @Inject()(
       workbook.close()
     }
 
-    file
+    out.toByteArray
   }
 
 }
