@@ -1,12 +1,12 @@
-@import b3.vertical.fieldConstructor
-@import lunatech.lunchplanner.models.User
-@import lunatech.lunchplanner.viewModels.MenuPerDayForm
-@import lunatech.lunchplanner.models.MenuPerDay
-@import lunatech.lunchplanner.models.MenuPerDayDietRestrictions
-@import lunatech.lunchplanner.models.MenuPerDayAttendant
 @import java.text.SimpleDateFormat
 
-@(admin: User, menuPerDayForm: Form[MenuPerDayForm], menuOptions: Seq[(String,String)], menuPerDayOption: Option[MenuPerDay], dietRestrictionsSummary: MenuPerDayDietRestrictions, listPeopleAttending: Seq[MenuPerDayAttendant], locations: Seq[(String,String)])(implicit messages: play.api.i18n.Messages)
+@import b3.vertical.fieldConstructor
+@import lunatech.lunchplanner.models.{MenuPerDay, MenuPerDayAttendant, MenuPerDayDietRestrictions, User}
+@import lunatech.lunchplanner.viewModels.MenuPerDayForm
+
+@import lunatech.lunchplanner.data.Location
+
+@(admin: User, menuPerDayForm: Form[MenuPerDayForm], menuOptions: Seq[(String,String)], menuPerDayOption: Option[MenuPerDay], dietRestrictionsSummary: MenuPerDayDietRestrictions, listPeopleAttending: Seq[MenuPerDayAttendant], locations: List[Location])(implicit messages: play.api.i18n.Messages)
 @main("Menu schedule details", admin) {
 <!-- Nav tabs -->
 <ul class="nav nav-tabs">
@@ -31,7 +31,7 @@
                             <div class="col col-lg-6">
                                 @datepicker(menuPerDayForm("date"), 'value -> new SimpleDateFormat("dd-MM-yyyy").format(menuPerDay.date))('_label -> "Date")
                                 @b3.select(menuPerDayForm("menuUuid"), options = menuOptions, '_label -> "Select menu", '_default -> "Select an option", 'value -> menuPerDay.menuUuid)
-                                @b3.select(menuPerDayForm("location"), options = locations, '_label -> "Select location", '_default -> "Select an option", 'value -> menuPerDay.location)
+                                @b3.select(menuPerDayForm("location"), options = locations.map(l => l.name -> l.name), '_label -> "Select location", '_default -> "Select an option", 'value -> menuPerDay.location)
                                 <div class="col col-lg-2" style="padding-left: 0">
                                     <a href="@lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay()" type="button" class="btn btn-default">
                                         <span class="glyphicon glyphicon-arrow-left"></span> Cancel

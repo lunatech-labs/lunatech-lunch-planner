@@ -2,7 +2,7 @@ package lunatech.lunchplanner.viewModels
 
 import java.util.{Date, UUID}
 
-import lunatech.lunchplanner.data.Constants
+import lunatech.lunchplanner.data.Location
 import play.api.data.Form
 import play.api.data.Forms.{mapping, of, _}
 import play.api.data.format.Formats._
@@ -27,7 +27,10 @@ object MenuPerDayForm {
   )
 
   def officeLocationConstraint: Constraint[String] = Constraint[String]("constraint.officelocation")({ text =>
-    if (Constants.OfficeLocations.map(s => s._1).contains(text)) Valid else Invalid(ValidationError(s"$text is not a valid office location"))
+    Location.forName(text) match {
+      case Some(_) => Valid
+      case None => Invalid(ValidationError(s"$text is not a valid office location"))
+    }
   })
 }
 

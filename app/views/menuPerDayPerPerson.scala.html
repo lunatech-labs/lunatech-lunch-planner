@@ -32,14 +32,14 @@
             </tr>
           </thead>
           @for(index <- listOfMenusPerDayPerPerson.indices) {
-            <tr>
+            <tr class="schedule-row">
               <td class="list-select-all">
                 <input type="checkbox" class="schedule"
                 value="@listOfMenusPerDayPerPerson(index).menuPerDayUuid"
-                name="menuPerDayUuid[@index]"
+                name="menuPerDayUuid[@index]" data-date="@listOfMenusPerDayPerPerson(index).menuDate"
                 @if(listOfMenusPerDayPerPerson(index).isSelected) { checked } >
               </td>
-              <td><label class="font-normal">@listOfMenusPerDayPerPerson(index).menuDate</label></td>
+              <td class="js-menu-date" value="@listOfMenusPerDayPerPerson(index).menuDate"><label class="font-normal">@listOfMenusPerDayPerPerson(index).menuDate</label></td>
               <td><label class="font-normal">@listOfMenusPerDayPerPerson(index).menuName</label></td>
               <td>
                 @for(dishIndex <- listOfMenusPerDayPerPerson(index).listOfDishes.indices) {
@@ -71,7 +71,7 @@
                 }
               }
               </td>
-              <td>@listOfMenusPerDayPerPerson(index).location</td>
+              <td class="js-menu-location" value="@listOfMenusPerDayPerPerson(index).location">@listOfMenusPerDayPerPerson(index).location</td>
             </tr>
           }
         </table>
