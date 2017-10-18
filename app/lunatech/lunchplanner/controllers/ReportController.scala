@@ -42,11 +42,13 @@ class ReportController @Inject()(
         for {
           currentUser <- userService.getByEmailAddress(username)
           totalAttendees <- reportService.getReport(reportMonth)
+          totalNotAttending <- reportService.getReportForNotAttending(reportMonth)
         } yield
           Ok(views.html.admin.report(
             getCurrentUser(currentUser, isAdmin = true, username),
             ReportForm.reportForm,
             totalAttendees,
+            totalNotAttending,
             reportMonth))
 
       }
@@ -78,9 +80,10 @@ class ReportController @Inject()(
       val reportMonth = request.session.get(month).map(_.toInt).getOrElse(getPreferredMonth)
 
       for {
-        report <- reportService.getReport(reportMonth)
+        totalAttendees <- reportService.getReport(reportMonth)
+        totalNotAttending <- reportService.getReportForNotAttending(reportMonth)
       } yield {
-        val inputStream = new ByteArrayInputStream(reportService.exportToExcel(report))
+        val inputStream = new ByteArrayInputStream(reportService.exportToExcel(totalAttendees, totalNotAttending))
         val month = Month.values(reportMonth - 1).month
         val content = StreamConverters.fromInputStream(() => inputStream, ChunkSize)
         Result(

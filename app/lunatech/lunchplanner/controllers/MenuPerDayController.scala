@@ -174,14 +174,14 @@ class MenuPerDayController @Inject()(userService: UserService,
               menusUuidAndNames <- menuService.getAllMenusUuidAndNames
               menuPerDayOption <- menuPerDayService.getMenuPerDayByUuid(uuid)
               dietRestrictions <- userProfileService.getRestrictionsByMenuPerDay(uuid)
-              peopleAttendig <- menuPerDayPerPersonService.getListOfPeopleByMenuPerDay(uuid)
+              peopleAttending <- menuPerDayPerPersonService.getListOfPeopleByMenuPerDay(uuid)
             } yield BadRequest(views.html.admin.menuPerDay.menuPerDayDetails(
               getCurrentUser(currentUser, isAdmin = true, username),
               formWithErrors,
               menusUuidAndNames,
               menuPerDayOption,
               dietRestrictions,
-              peopleAttendig,
+              peopleAttending,
               Location.values))
           },
           _ => {
@@ -204,14 +204,14 @@ class MenuPerDayController @Inject()(userService: UserService,
               menusUuidAndNames <- menuService.getAllMenusUuidAndNames
               menuPerDayOption <- menuPerDayService.getMenuPerDayByUuid(uuid)
               dietRestrictions <- userProfileService.getRestrictionsByMenuPerDay(uuid)
-              peopleAttendig <- menuPerDayPerPersonService.getListOfPeopleByMenuPerDay(uuid)
+              peopleAttending <- menuPerDayPerPersonService.getListOfPeopleByMenuPerDay(uuid)
             } yield BadRequest(views.html.admin.menuPerDay.menuPerDayDetails(
               getCurrentUser(currentUser, isAdmin = true, username),
               formWithErrors,
               menusUuidAndNames,
               menuPerDayOption,
               dietRestrictions,
-              peopleAttendig,
+              peopleAttending,
               Location.values))
           },
           menuPerDayData => {

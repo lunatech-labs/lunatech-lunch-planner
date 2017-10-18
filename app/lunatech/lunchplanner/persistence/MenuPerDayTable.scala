@@ -4,10 +4,11 @@ import java.sql.Date
 import java.util.UUID
 
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.{ Menu, MenuPerDay }
+import lunatech.lunchplanner.models.{Menu, MenuPerDay}
 import org.joda.time.DateTime
 import slick.driver.PostgresDriver.api._
-import slick.lifted.{ ForeignKeyQuery, ProvenShape, TableQuery }
+import slick.jdbc.GetResult
+import slick.lifted.{ForeignKeyQuery, ProvenShape, TableQuery}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -99,5 +100,13 @@ object MenuPerDayTable {
     connection.db.run(query).map(_ == 1)
   }
 
+  def getAllAvailableDatesWithinRange(dateStart: Date, dateEnd: Date)(implicit connection: DBConnection): Future[Seq[Date]] = {
+    implicit val result = GetResult(r => r.nextDate)
+
+    val query = sql"""SELECT DISTINCT "date"
+                            FROM "MenuPerDay"
+                            WHERE "date" >= '#$dateStart' AND "date" <= '#$dateEnd'""".as[Date]
+    connection.db.run(query)
+  }
 }
 
