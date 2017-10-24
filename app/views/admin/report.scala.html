@@ -1,7 +1,7 @@
 @import b3.vertical.fieldConstructor
 @import lunatech.lunchplanner.models.{Report, User}
 
-@(admin: User, reportForm: Form[String], report: Report, month: Int)(implicit messages: play.api.i18n.Messages)
+@(admin: User, reportForm: Form[String], report: Report, reportNotAttending: Report, month: Int)(implicit messages: play.api.i18n.Messages)
 @months = @{
     Seq("1" -> "January",
         "2" -> "February",
@@ -30,26 +30,54 @@
         @b3.submit('class -> "btn btn-primary") {
             Export
         }
+            <div class="row text-success">
+                <h4>Attendees</h4>
+            </div>
+            <div class="row text-success">
         @report.usersPerDate.map { case (date, users) =>
-        <div class="col col-lg-3" style="padding-left: 0">
-            <table class="table ">
-                <thead>
-                    <th>@date</th>
-                </thead>
-                <tbody>
-                @users.map { user =>
-                    <tr>
-                        <td>@user</td>
-                    </tr>
-                }
-                </tbody>
-                <tfoot>
-                    <td align="right">Total: @users.length</td>
-        </tfoot>
-        </table>
-        </div>
+                <div class="col col-xs-6" style="padding-left: 0">
+                    <table class="table">
+                        <thead>
+                            <th>@date</th>
+                        </thead>
+                        <tbody>
+                        @users.map { user =>
+                            <tr>
+                                <td>@user</td>
+                            </tr>
+                        }
+                        </tbody>
+                        <tfoot>
+                            <td align="right">Total: @users.length</td>
+                        </tfoot>
+                    </table>
+                </div>
         }
+            </div>
+            <div class="row text-primary">
+                <h4>Didn't attend</h4>
+            </div>
+            <div class="row text-primary">
+        @reportNotAttending.usersPerDate.map { case (date, users) =>
+                <div class="col col-xs-6" style="padding-left: 0">
+                    <table class="table">
+                        <thead>
+                            <th>@date </th>
+                        </thead>
+                        <tbody>
+                        @users.map { user =>
+                            <tr>
+                                <td>@user</td>
+                            </tr>
+                        }
+                        </tbody>
+                        <tfoot>
+                            <td align="right">Total: @users.length</td>
+                        </tfoot>
+                    </table>
+                </div>
+        }
+            </div>
     }
-
     </div>
 }

@@ -39,4 +39,8 @@ class MenuPerDayService @Inject() (
 
   def delete(uuid: UUID): Future[Int] =
     MenuPerDayTable.remove(uuid)
+
+  def getAllAvailableDatesWithinRange(dateStart: Date, dateEnd: Date): Future[Seq[Date]] = {
+    MenuPerDayTable.getAllAvailableDatesWithinRange(dateStart, dateEnd)
+  }
 }

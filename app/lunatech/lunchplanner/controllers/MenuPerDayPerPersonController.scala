@@ -5,89 +5,91 @@ import javax.inject.Inject
 
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.MenuPerDayPerPerson
-import lunatech.lunchplanner.services.{ MenuPerDayPerPersonService, MenuPerDayService, UserService }
+import lunatech.lunchplanner.services.{MenuPerDayPerPersonService, MenuPerDayService, UserService}
 import lunatech.lunchplanner.viewModels.MenuPerDayPerPersonForm
-import play.api.i18n.{ I18nSupport, MessagesApi }
-import play.api.mvc.Controller
-import play.api.{ Configuration, Environment }
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc.{Controller, EssentialAction}
+import play.api.{Configuration, Environment}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class MenuPerDayPerPersonController @Inject() (
-  userService: UserService,
-  menuPerDayService: MenuPerDayService,
-  menuPerDayPerPersonService: MenuPerDayPerPersonService,
-  val environment: Environment,
-  val messagesApi: MessagesApi,
-  val configuration: Configuration,
-  implicit val connection: DBConnection) extends Controller with Secured with I18nSupport {
+class MenuPerDayPerPersonController @Inject()(userService: UserService,
+                                              menuPerDayService: MenuPerDayService,
+                                              menuPerDayPerPersonService: MenuPerDayPerPersonService,
+                                              val environment: Environment,
+                                              val messagesApi: MessagesApi,
+                                              val configuration: Configuration,
+                                              implicit val connection: DBConnection) extends Controller with Secured with I18nSupport {
 
-  def createNewMenuPerDayPerPerson = IsAuthenticatedAsync { username =>
+  def createNewMenuPerDayPerPerson: EssentialAction = IsAuthenticatedAsync { username =>
     implicit request => {
-      for{
+      for {
         currentUser <- userService.getByEmailAddress(username)
         result <- MenuPerDayPerPersonForm
-            .menuPerDayPerPersonForm
-            .bindFromRequest
-            .fold(
-              formWithErrors =>
-                menuPerDayPerPersonService.getAllMenuWithNamePerDayWithDishesPerPerson(
+          .menuPerDayPerPersonForm
+          .bindFromRequest
+          .fold(
+            formWithErrors =>
+              for {
+                menusPerDayPerPerson <- menuPerDayPerPersonService.getAllMenuWithNamePerDayWithDishesPerPerson(
                   getCurrentUser(currentUser, isAdmin = false, username).uuid)
-                  .map( menusPerDayPerPerson =>
-                    BadRequest(views.html.menuPerDayPerPerson(
-                      getCurrentUser(currentUser, isAdmin = userService.isAdminUser(currentUser.get.emailAddress), username),
-                      menusPerDayPerPerson.toArray,
-                      formWithErrors))),
-              menuPerDayPerPersonData => {
-                if(thereAreNoDuplicatedDates(menuPerDayPerPersonData)) {
-                  updateMenusPerDayPerPerson(
-                    getCurrentUser(currentUser, isAdmin = false, username).uuid,
-                    menuPerDayPerPersonData).map(_ =>
-                    Redirect(lunatech.lunchplanner.controllers.routes.Application.index())
-                      .flashing("success" -> "Meals updated!"))
-                } else {
-                  val dates = duplicatedDates(menuPerDayPerPersonData)
-                  Future.successful(Redirect(lunatech.lunchplanner.controllers.routes.Application.index())
-                    .flashing("error" -> s"Error: More than one menu for date(s) $dates was selected!"))
-                }
+              } yield {
+                BadRequest(views.html.menuPerDayPerPerson(
+                  getCurrentUser(currentUser, isAdmin = userService.isAdminUser(currentUser.get.emailAddress), username),
+                  menusPerDayPerPerson.toArray,
+                  formWithErrors
+                ))
+              },
+            formData => {
+              updateData(getCurrentUser(currentUser, isAdmin = false, username).uuid, formData).map { _ =>
+                Redirect(lunatech.lunchplanner.controllers.routes.Application.index())
+                  .flashing("success" -> "Meals updated!")
               }
-            )
+            }
+          )
       } yield result
     }
   }
 
-  private def thereAreNoDuplicatedDates(menuPerDayPerPersonForm: MenuPerDayPerPersonForm): Boolean =
-    menuPerDayPerPersonForm.menuDate.length == menuPerDayPerPersonForm.menuDate.to[Set].size
-
-  private def duplicatedDates(menuPerDayPerPersonForm: MenuPerDayPerPersonForm): String = {
-    val allDates = menuPerDayPerPersonForm.menuDate
-    val filteredDates = menuPerDayPerPersonForm.menuDate.to[Set].toList
-    val difference = allDates.diff(filteredDates).to[Set]
-
-    difference.mkString(", ")
+  private def updateData(userUuid: UUID, form: MenuPerDayPerPersonForm): Future[Boolean] = {
+    updateMenusPerDayPerPerson(form.menuPerDayUuids, form.menuPerDayUuidsNotAttending, userUuid)
+    Future.successful(true)
   }
 
-  private def updateMenusPerDayPerPerson(userUuid: UUID, form: MenuPerDayPerPersonForm): Future[Seq[Int]] = {
-    menuPerDayPerPersonService.getAllByUserUuid(userUuid).flatMap(allMenusPerDayPerPerson => {
-      menusPerDayToAdd(allMenusPerDayPerPerson, userUuid, form).
-        flatMap(_ => menusPerDayToRemove(allMenusPerDayPerPerson, userUuid, form))
-    })
+  private def updateMenusPerDayPerPerson(menuPerDayUuidList: List[UUID], uuidsNotAttending: List[String], userUuid: UUID) = {
+    remove(userUuid)
+    addAttending(menuPerDayUuidList, userUuid)
+    addNotAttending(uuidsNotAttending, userUuid)
   }
 
-  private def menusPerDayToAdd(menusChosen: Seq[MenuPerDayPerPerson], userUuid: UUID, form: MenuPerDayPerPersonForm):
-  Future[List[MenuPerDayPerPerson]] =
-    Future.sequence(
-      form.menuPerDayUuid
-      .filter(!menusChosen.map(_.menuPerDayUuid).contains(_))
-      .map{ uuid =>
-      val newMenuPerDayPerPerson = MenuPerDayPerPerson(menuPerDayUuid = uuid, userUuid = userUuid)
+  private def remove(userUuid: UUID) = {
+    for {
+      allMenuPerDayPerPerson <- menuPerDayPerPersonService.getAllUpcomingSchedulesByUser(userUuid)
+    } yield {
+      allMenuPerDayPerPerson.foreach { menuPerDayPerPerson  =>
+        menuPerDayPerPersonService.delete(menuPerDayPerPerson.uuid)
+      }
+    }
+  }
+
+  private def addAttending(menuPerDayUuidList: List[UUID], userUuid: UUID) = {
+    menuPerDayUuidList.foreach { menuPerDayUuid =>
+      val newMenuPerDayPerPerson = MenuPerDayPerPerson(menuPerDayUuid = menuPerDayUuid,
+        userUuid = userUuid,
+        isAttending = true)
       menuPerDayPerPersonService.add(newMenuPerDayPerPerson)
-    })
+    }
+  }
 
-  private def menusPerDayToRemove(allMenusPerDayPerPerson: Seq[MenuPerDayPerPerson], userUuid: UUID, form: MenuPerDayPerPersonForm):
-  Future[Seq[Int]] =
-    Future.sequence(allMenusPerDayPerPerson.filter(menu => !form.menuPerDayUuid.contains(menu.menuPerDayUuid))
-      .map(menu => menuPerDayPerPersonService.delete(menu.uuid)))
-
+  private def addNotAttending(uuidsNotAttending: List[String], userUuid: UUID): Unit = {
+    uuidsNotAttending.foreach { uuids =>
+      uuids.split("~").foreach { uuid =>
+        val newMenuPerDayPerPerson = MenuPerDayPerPerson(menuPerDayUuid = UUID.fromString(uuid),
+          userUuid = userUuid,
+          isAttending = false)
+        menuPerDayPerPersonService.add(newMenuPerDayPerPerson)
+      }
+    }
+  }
 }

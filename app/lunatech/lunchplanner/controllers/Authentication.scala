@@ -3,8 +3,8 @@ package lunatech.lunchplanner.controllers
 import com.google.inject.Inject
 import com.lunatech.openconnect.Authenticate
 import lunatech.lunchplanner.services.UserService
-import play.api.mvc.{ Action, AnyContent, Controller }
-import play.api.{ Configuration, Environment, Mode }
+import play.api.mvc.{Action, AnyContent, Controller, EssentialAction}
+import play.api.{Configuration, Environment, Mode}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -15,7 +15,7 @@ class Authentication @Inject()(
   environment: Environment,
   auth: Authenticate) extends Controller {
 
-  def login = Action { implicit request =>
+  def login: EssentialAction = Action { implicit request =>
     if (environment.mode == Mode.Prod) {
       val clientId: String = configuration.getString("google.clientId").get
       Ok(views.html.login(clientId)).withSession("state" -> auth.generateState)
@@ -36,7 +36,7 @@ class Authentication @Inject()(
     }
   }
 
-  def logout = Action {
+  def logout: EssentialAction = Action {
     Redirect(routes.Authentication.login()).withNewSession.flashing("success" -> "You've been logged out")
   }
 }

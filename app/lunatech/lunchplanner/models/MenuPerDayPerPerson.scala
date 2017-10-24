@@ -5,7 +5,8 @@ import java.util.UUID
 case class MenuPerDayPerPerson(
   uuid: UUID = UUID.randomUUID(),
   menuPerDayUuid: UUID,
-  userUuid: UUID
+  userUuid: UUID,
+  isAttending: Boolean
 )
 
 case class MenuWithNamePerDayPerPerson(
@@ -13,7 +14,7 @@ case class MenuWithNamePerDayPerPerson(
   menuDate: String,
   menuName: String,
   userUuid: UUID,
-  isSelected: Boolean,
+  isAttending: Option[Boolean],
   location: String
 )
 
@@ -23,6 +24,6 @@ case class MenuWithNameWithDishesPerPerson(
   menuName: String,
   listOfDishes: Seq[Dish],
   userUuid: UUID,
-  isSelected: Boolean,
+  isAttending: Option[Boolean],
   location: String
 )
