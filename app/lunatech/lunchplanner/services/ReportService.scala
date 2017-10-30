@@ -5,7 +5,7 @@ import java.sql.Date
 
 import com.google.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.{MenuPerDay, Report}
+import lunatech.lunchplanner.models._
 import org.apache.poi.ss.usermodel.CellStyle
 import org.apache.poi.xssf.usermodel.{XSSFRow, XSSFSheet, XSSFWorkbook}
 import org.joda.time.DateTime
@@ -36,6 +36,21 @@ class ReportService @Inject()(
       }
     }.map(_.flatten)
     attendees.map(menuAttendant => Report(menuAttendant.groupBy(_.date.toString).mapValues(_.map(_.name))))
+  }
+
+  def getReportByLocationAndDate(month: Int): Future[ReportByDateAndLocation] = {
+    val baseDate = DateTime.now.withMonthOfYear(month)
+    val sDate = baseDate.withDayOfMonth(1)
+    val eDate = sDate.plusMonths(1).minusDays(1)
+
+    val attendees: Future[Seq[MenuPerDayReportByDateAndLocation]]  = menuPerDayService.getAllOrderedByDateFilterDateRange(new Date(sDate.getMillis), new Date(eDate.getMillis)).flatMap {
+      Future.traverse(_) { (menuPerDay: MenuPerDay) =>
+        menuPerDayPerPersonService.getListOfPeopleByMenuPerDayByLocationAndDateForReport(menuPerDay)
+      }
+    }.map(_.flatten)
+    attendees.map(attendees => {
+      ReportByDateAndLocation(attendees.groupBy(attendee => (attendee.date, attendee.location)).mapValues(_.map(_.attendeeName)))
+    })
   }
 
   def getReportForNotAttending(month: Int): Future[Report] = {

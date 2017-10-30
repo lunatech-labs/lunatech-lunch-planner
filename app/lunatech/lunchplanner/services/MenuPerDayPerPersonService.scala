@@ -121,6 +121,11 @@ class MenuPerDayPerPersonService  @Inject() (
       .map(_.map(user => MenuPerDayReport(user._1.name, menuPerDay.date)))
   }
 
+  def getListOfPeopleByMenuPerDayByLocationAndDateForReport(menuPerDay: MenuPerDay): Future[Seq[MenuPerDayReportByDateAndLocation]] = {
+    MenuPerDayPerPersonTable.getAttendeesByMenuPerDayUuid(menuPerDay.uuid)
+      .map(_.map(user => MenuPerDayReportByDateAndLocation(menuPerDay.date, menuPerDay.location, user._1.name)))
+  }
+
   def getNotAttendingByDate(date: Date): Future[Seq[MenuPerDayReport]] = {
     MenuPerDayPerPersonTable.getNotAttendingByDate(date)
       .map(_.map(user => MenuPerDayReport(user._1.name, date)))
