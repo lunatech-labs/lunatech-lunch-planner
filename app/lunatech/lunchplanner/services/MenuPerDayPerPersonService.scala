@@ -93,7 +93,7 @@ class MenuPerDayPerPersonService  @Inject() (
       Future.traverse(_) { menuPerDay =>
         menuService.getByUuid(menuPerDay.menuUuid).flatMap {
           case Some(menuData) =>
-            getNumberOfMenusPerDayPerPersonByMenuPerDay(menuPerDay.uuid)
+            getAttendeeCountByMenuPerDayUuid(menuPerDay.uuid)
               .map(count =>
                 Some(MenuWithNamePerDay(
                   menuPerDay.uuid,
@@ -121,6 +121,11 @@ class MenuPerDayPerPersonService  @Inject() (
       .map(_.map(user => MenuPerDayReport(user._1.name, menuPerDay.date)))
   }
 
+  def getListOfPeopleByMenuPerDayByLocationAndDateForReport(menuPerDay: MenuPerDay): Future[Seq[MenuPerDayReportByDateAndLocation]] = {
+    MenuPerDayPerPersonTable.getAttendeesByMenuPerDayUuid(menuPerDay.uuid)
+      .map(_.map(user => MenuPerDayReportByDateAndLocation(menuPerDay.date, menuPerDay.location, user._1.name)))
+  }
+
   def getNotAttendingByDate(date: Date): Future[Seq[MenuPerDayReport]] = {
     MenuPerDayPerPersonTable.getNotAttendingByDate(date)
       .map(_.map(user => MenuPerDayReport(user._1.name, date)))
@@ -132,5 +137,8 @@ class MenuPerDayPerPersonService  @Inject() (
 
   private def getNumberOfMenusPerDayPerPersonByMenuPerDay(menuPerDayUuid: UUID): Future[Int] =
     MenuPerDayPerPersonTable.getByMenuPerDayUuid(menuPerDayUuid).map(_.length)
+
+  private def getAttendeeCountByMenuPerDayUuid(menuPerDayUuid: UUID): Future[Int] =
+    MenuPerDayPerPersonTable.getAttendeeCountByMenuPerDayUuid(menuPerDayUuid)
 
 }

@@ -58,6 +58,11 @@ object MenuPerDayPerPersonTable {
     connection.db.run(query.result)
   }
 
+  def getAttendeeCountByMenuPerDayUuid(menuPerDayUuid: UUID)(implicit connection: DBConnection): Future[Int] = {
+    val query = menuPerDayPerPersonTable.filter(_.menuPerDayUuid === menuPerDayUuid).filter(_.isAttending === true).length
+    connection.db.run(query.result)
+  }
+
   def getAttendeesByMenuPerDayUuid(menuPerDayUuid: UUID)(implicit connection: DBConnection): Future[Seq[(User, UserProfile)]] = {
     val query = for {
       mpdpp <- menuPerDayPerPersonTable.filter(mpdppt => mpdppt.menuPerDayUuid === menuPerDayUuid && mpdppt.isAttending)
