@@ -44,7 +44,7 @@
                     @listOfMenusPerDayPerPerson.groupBy(_.menuDate).toSeq.sortBy(m => new java.text.SimpleDateFormat("dd-MM-yyyy").parse(m._1).getTime).map { schedulesByDate =>
                     <tr>
                         <td rowspan="@schedulesByDate._2.length">
-                            <select name="menuPerDayUuids[]" class="select">
+                            <select name="menuPerDayUuids[]" class="select select-@schedulesByDate._1">
                                 <option class="select-empty"></option>
                                 @schedulesByDate._2.map { s =>
                                     <option class="location-@s.location" value="@s.menuPerDayUuid" @if(s.isAttending == Some(true)) { selected }>@s.menuName:@s.location</option>
@@ -53,7 +53,7 @@
                             </select>
                         </td>
                         <td rowspan="@schedulesByDate._2.length">
-                        @schedulesByDate._1
+                            <label class="font-normal label-date">@schedulesByDate._1</label>
                         </td>
                     @schedulesByDate._2.zipWithIndex.map { scheduleDetails =>
                         @if(scheduleDetails._2 != 0) {
