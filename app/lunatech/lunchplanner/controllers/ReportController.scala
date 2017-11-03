@@ -41,7 +41,7 @@ class ReportController @Inject()(
 
         for {
           currentUser <- userService.getByEmailAddress(username)
-          totalAttendees <- reportService.getReport(reportMonth)
+          totalAttendees <- reportService.getReportByLocationAndDate(reportMonth)
           totalNotAttending <- reportService.getReportForNotAttending(reportMonth)
         } yield
           Ok(views.html.admin.report(
