@@ -135,6 +135,10 @@ class MenuPerDayPerPersonService  @Inject() (
     menuPerDayPerPerson.map(_.isAttending)
   }
 
+  def getAttendeesEmailAddressesForUpcomingLunch: Future[Seq[String]] = {
+    MenuPerDayPerPersonTable.getAttendeesEmailAddressesForUpcomingLunch
+  }
+
   private def getNumberOfMenusPerDayPerPersonByMenuPerDay(menuPerDayUuid: UUID): Future[Int] =
     MenuPerDayPerPersonTable.getByMenuPerDayUuid(menuPerDayUuid).map(_.length)
 

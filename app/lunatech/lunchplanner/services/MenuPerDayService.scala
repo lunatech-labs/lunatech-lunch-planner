@@ -30,6 +30,10 @@ class MenuPerDayService @Inject() (
   def getAllByMenuUuid(menuUuid: UUID): Future[Seq[MenuPerDay]] =
     MenuPerDayTable.getByMenuUuid(menuUuid)
 
+  def getMenuForUpcomingSchedule: Future[Seq[(MenuPerDay, String)]] = {
+    MenuPerDayTable.getMenuForUpcomingSchedule
+  }
+
   def insertOrUpdate(uuid: UUID, menuPerDay: MenuPerDay): Future[Boolean] = {
     MenuPerDayTable.insertOrUpdate(menuPerDay.copy(uuid))
   }

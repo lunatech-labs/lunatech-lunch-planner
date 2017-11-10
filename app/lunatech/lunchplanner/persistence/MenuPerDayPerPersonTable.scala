@@ -126,5 +126,17 @@ object MenuPerDayPerPersonTable {
     val query = menuPerDayPerPersonTable.filter(x => x.menuPerDayUuid === menuPerDayUuid).delete
     connection.db.run(query)
   }
+
+  /**
+    * Get attendees for upcoming Friday lunch. The '5' refers to Friday.
+    */
+  def getAttendeesEmailAddressesForUpcomingLunch(implicit connection: DBConnection): Future[Seq[String]] = {
+    val query = sql"""SELECT u."emailAddress" FROM "MenuPerDayPerPerson" mpdpp
+                      JOIN "User" u ON mpdpp."userUuid"=u."uuid"
+                      JOIN "MenuPerDay" mpd ON mpdpp."menuPerDayUuid"=mpd."uuid"
+                      WHERE mpd."date" = (SELECT current_date - cast(extract(dow FROM current_date) AS int) + 5)""".as[String]
+    connection.db.run(query)
+  }
+
 }
 

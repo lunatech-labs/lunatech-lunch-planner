@@ -1,10 +1,10 @@
 package lunatech.lunchplanner.modules
 
 import com.google.inject.AbstractModule
-import lunatech.lunchplanner.utils.MailerUtils
+import lunatech.lunchplanner.slack.LunchBotScheduler
 
-  class Module extends AbstractModule {
+class Module extends AbstractModule {
   protected def configure(): Unit = {
-    bind(classOf[MailerUtils]).asEagerSingleton()
+    bind(classOf[LunchBotScheduler]).asEagerSingleton()
   }
 }

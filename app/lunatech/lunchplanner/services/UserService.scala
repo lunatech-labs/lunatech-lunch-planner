@@ -34,6 +34,14 @@ class UserService @Inject() (configuration: Configuration, implicit val connecti
     })
   }
 
+  def getAllEmailAddresses(): Future[Seq[String]] = {
+    UserTable.getAll.flatMap { users =>
+      val emailAddresses = users.map(user => user.emailAddress)
+
+      Future.successful(emailAddresses)
+    }
+  }
+
   private def getUserNameFromEmail(emailAddress: String) =
     emailAddress.split("@").head.split("\\.").map(w => w.head.toUpper + w.tail ).mkString(" ")
 }

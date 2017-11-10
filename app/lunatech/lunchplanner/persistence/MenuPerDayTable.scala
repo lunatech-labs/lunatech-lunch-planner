@@ -100,6 +100,16 @@ object MenuPerDayTable {
     connection.db.run(query).map(_ == 1)
   }
 
+  def getMenuForUpcomingSchedule(implicit connection: DBConnection): Future[Seq[(MenuPerDay, String)]] = {
+    implicit val getTupleResult = GetResult(r => (MenuPerDay(UUID.fromString(r.<<), UUID.fromString(r.<<), r.<<, r.<<)))
+    val query =
+      sql"""SELECT mpd."uuid", mpd."menuUuid", mpd."date", mpd."location", m."name"
+           FROM "MenuPerDay" mpd JOIN "Menu" m ON mpd."menuUuid"=m."uuid"
+           WHERE mpd."date" = (SELECT current_date - cast(extract(dow FROM current_date) AS int) + 5)""".as[(MenuPerDay, String)]
+
+    connection.db.run(query)
+  }
+
   def getAllAvailableDatesWithinRange(dateStart: Date, dateEnd: Date)(implicit connection: DBConnection): Future[Seq[Date]] = {
     implicit val result = GetResult(r => r.nextDate)
 

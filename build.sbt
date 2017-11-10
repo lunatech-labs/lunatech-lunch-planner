@@ -27,6 +27,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-mailer" % "5.0.0",
   "com.github.nscala-time" %% "nscala-time" % "2.16.0",
   "org.apache.poi" % "poi-ooxml" % "3.16",
+  "com.enragedginger" %% "akka-quartz-scheduler" % "1.6.0-akka-2.4.x",
   "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % Test,
   "org.mockito" % "mockito-all" % "1.10.19" % Test
 )

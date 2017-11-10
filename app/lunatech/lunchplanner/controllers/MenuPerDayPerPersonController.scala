@@ -8,7 +8,8 @@ import lunatech.lunchplanner.models.MenuPerDayPerPerson
 import lunatech.lunchplanner.services.{MenuPerDayPerPersonService, MenuPerDayService, UserService}
 import lunatech.lunchplanner.viewModels.MenuPerDayPerPersonForm
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Controller, EssentialAction}
+import play.api.libs.json.Json
+import play.api.mvc.{Action, Controller, EssentialAction}
 import play.api.{Configuration, Environment}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -49,6 +50,14 @@ class MenuPerDayPerPersonController @Inject()(userService: UserService,
             }
           )
       } yield result
+    }
+  }
+
+  def getAttendeesEmailAddressesForUpcomingLunch: EssentialAction = Action.async {
+    implicit request => {
+      for {
+        emails <- menuPerDayPerPersonService.getAttendeesEmailAddressesForUpcomingLunch
+      } yield Ok(Json.toJson(emails))
     }
   }
 
