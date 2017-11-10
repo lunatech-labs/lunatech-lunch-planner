@@ -21,7 +21,7 @@ class SlackService @Inject()(val userService: UserService,
                              val ws: WSClient,
                              val configuration: Configuration) {
 
-  val token = configuration.getString("slack.api.token").get
+  val token = configuration.getString("slack.api.token").getOrElse(throw new IllegalStateException(s"No value for slack.api.token"))
   val sdf = new SimpleDateFormat("dd-MM-yyyy")
 
   /**
