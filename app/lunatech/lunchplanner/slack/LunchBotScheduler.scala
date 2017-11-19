@@ -24,7 +24,7 @@ class LunchBotScheduler @Inject()(val lifecycle: ApplicationLifecycle,
   val system = ActorSystem("LunchBotActorSystem")
   var scheduler = QuartzSchedulerExtension(system)
 
-  val scheduleName = "EveryTuesdayAndThursday"
+  val scheduleName = "EveryTuesday"
   val lunchBotActor = system.actorOf(Props.create(classOf[LunchBotActor], client, conf.getString("slack.bot.host").get))
   scheduler.createSchedule(scheduleName,
     None,
