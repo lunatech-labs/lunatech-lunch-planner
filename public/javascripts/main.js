@@ -62,3 +62,39 @@ $(document).ready(function() {
     })
 });
 
+$(function () {
+    var dateObject = new Date();
+    var currentDate = {
+        date : dateObject.getDate(),
+        hour : dateObject.getHours()
+    };
+
+    var dateFormat = formatDate(dateObject);
+    disableDropdown(dateFormat);
+
+    dateObject.setDate(currentDate.date + 1)
+    var nextDateFormat = formatDate(dateObject);
+    if (currentDate.hour >= 13) {
+        disableDropdown(nextDateFormat);
+    }
+
+    function formatDate(dateObj) {
+        return dateObj.getDate() + '-' + (dateObj.getMonth() + 1) + '-' + dateObj.getFullYear();
+    }
+
+    function disableDropdown(dateFormat) {
+        var obj = $('.select-' + dateFormat);
+        var value = obj.val();
+        var text = $('.select-' + dateFormat + ' > option:selected').text();
+
+        var parents = obj.parents('td');
+        parents.append('<p>'+ text + '</p>');
+
+        if (text === "Not Attending") {
+            parents.append('<input type="hidden" name="menuPerDayUuidsNotAttending[]" value="' + value + '" />');
+        } else if (value !== "") {
+            parents.append('<input type="hidden" name="menuPerDayUuids[]" value="' + value + '"/>');
+        }
+        obj.remove();
+    }
+});
