@@ -74,12 +74,15 @@ $(function () {
 
     dateObject.setDate(currentDate.date + 1)
     var nextDateFormat = formatDate(dateObject);
-    if (currentDate.hour >= 13) {
+    if (currentDate.hour >= 15) {
         disableDropdown(nextDateFormat);
     }
 
     function formatDate(dateObj) {
-        return dateObj.getDate() + '-' + (dateObj.getMonth() + 1) + '-' + dateObj.getFullYear();
+        function appendZero(input) {
+            return input < 10 ? '0' + input : input;
+        }
+        return appendZero(dateObj.getDate()) + '-' + appendZero(dateObj.getMonth() + 1) + '-' + dateObj.getFullYear();
     }
 
     function disableDropdown(dateFormat) {
