@@ -56,7 +56,7 @@ class SlackService @Inject()(val userService: UserService,
   /**
     * Will post a message to a direct message channel (channel ID starts with a D) with attachments.
     */
-  def postMessage(channelIds: Seq[String]): Future[Int] = {
+  def postMessage(channelIds: Seq[String]): Future[String] = {
     val text = getString("slack.bot.message.text")
 
     getAttachments.flatMap { attachments =>
@@ -70,9 +70,9 @@ class SlackService @Inject()(val userService: UserService,
           val response = doPost(getString("slack.api.postMessage.url"), requestBody)
           response.map(r => r.json)
         }
-        Future.successful(responses.length)
+        Future.successful(s"Message sent to ${responses.length} people!")
       } else {
-        Future.successful(-1)
+        Future.successful("No message sent because there's no upcoming lunch this coming Friday")
       }
     }
   }
