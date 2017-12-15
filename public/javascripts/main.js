@@ -23,8 +23,8 @@ $(function () {
 });
 
 $(function () {
-    $('#monthSelection').change(function() {
-       $('#monthNumber').submit();
+    $('#dateSelection').change(function() {
+       $('#reportDateForm').submit();
     });
 });
 
@@ -72,7 +72,7 @@ $(function () {
     var dateFormat = formatDate(dateObject);
     disableDropdown(dateFormat);
 
-    dateObject.setDate(currentDate.date + 1)
+    dateObject.setDate(currentDate.date + 1);
     var nextDateFormat = formatDate(dateObject);
     if (currentDate.hour >= 15) {
         disableDropdown(nextDateFormat);

@@ -1,28 +1,44 @@
 @import b3.vertical.fieldConstructor
-@import lunatech.lunchplanner.models.{Report, ReportByDateAndLocation, User}
+@import lunatech.lunchplanner.models.{Report, ReportByDateAndLocation, User, ReportDate}
+@import org.joda.time.DateTime
 
-@(admin: User, reportForm: Form[String], report: ReportByDateAndLocation, reportNotAttending: Report, month: Int)(implicit messages: play.api.i18n.Messages)
+@(admin: User, reportForm: Form[ReportDate], report: ReportByDateAndLocation, reportNotAttending: Report, reportDate: ReportDate)(implicit messages: play.api.i18n.Messages)
+
 @months = @{
-    Seq("1" -> "January",
-        "2" -> "February",
-        "3" -> "March",
-        "4" -> "April",
-        "5" -> "May",
-        "6" -> "June",
-        "7" -> "July",
-        "8" -> "August",
-        "9" -> "September",
-        "10" -> "October",
-        "11" -> "November",
-        "12" -> "December")
+    Seq(1 -> "January",
+        2 -> "February",
+        3 -> "March",
+        4 -> "April",
+        5 -> "May",
+        6 -> "June",
+        7 -> "July",
+        8 -> "August",
+        9 -> "September",
+        10 -> "October",
+        11 -> "November",
+        12 -> "December")
+}
+@years = @{
+    (2017 to DateTime.now.getYear).map(year => year)
 }
 
 @main("Monthly Report", admin) {
     <h1>Reports</h1>
 
-    @b3.form(lunatech.lunchplanner.controllers.routes.ReportController.filterAttendees, 'id -> "monthNumber") {
-        @b3.select(reportForm("month"), options = months, '_label -> "Select report month", 'value -> month, '_id -> "monthSelection")
-    }
+    <form action="/report/filter" method="GET" class="form-inline" id="reportDateForm">
+        <div class="form-group" id="dateSelection">
+            <select id="month" name="month" class="form-control form-control-sm">
+                @months.map { month =>
+                  <option value="@month._1" @if(reportDate.month == month._1) { selected }>@month._2</option>
+                }
+            </select>
+            <select id="year" name="year" class="form-control form-control-sm">
+                @years.map { year =>
+                    <option value="@year" @if(reportDate.year == year) { selected }>@year</option>
+                }
+            </select>
+        </div>
+    </form>
     <br>
 
     <div class="col col-lg-12" style="padding-left: 0">
@@ -33,49 +49,55 @@
             <div class="row text-success">
                 <h4>Attendees</h4>
             </div>
+
+        @report.usersPerDateAndLocation.groupBy{ case ((date, _), _) => @date }.map { case (date, usersPerDateAndLocation) =>
             <div class="row text-success">
-        @report.usersPerDateAndLocation.map { case ((date, location), users) =>
-                <div class="col col-xs-6" style="padding-left: 0">
-                    <table class="table">
-                        <thead>
-                            <th>@date @location</th>
-                        </thead>
-                        <tbody>
-                        @users.map { user =>
-                            <tr>
-                                <td>@user</td>
-                            </tr>
-                        }
-                        </tbody>
-                        <tfoot>
-                            <td align="right">Total: @users.length</td>
-                        </tfoot>
-                    </table>
-                </div>
-        }
+                <h4>@date</h4>
+
+                @usersPerDateAndLocation.map { case ((_, location), users) =>
+                    <div class="col col-xs-4" style="padding-left: 0">
+                        <table class="table">
+                            <thead>
+                                <th>@location</th>
+                            </thead>
+                            <tbody>
+                            @users.map { user =>
+                                <tr>
+                                    <td>@user</td>
+                                </tr>
+                            }
+                            </tbody>
+                            <tfoot>
+                                <td align="right">Total: @users.length</td>
+                            </tfoot>
+                        </table>
+                    </div>
+                }
             </div>
+        }
+
             <div class="row text-primary">
                 <h4>Didn't attend</h4>
             </div>
             <div class="row text-primary">
         @reportNotAttending.usersPerDate.map { case (date, users) =>
-                <div class="col col-xs-6" style="padding-left: 0">
-                    <table class="table">
-                        <thead>
-                            <th>@date </th>
-                        </thead>
-                        <tbody>
-                        @users.map { user =>
-                            <tr>
-                                <td>@user</td>
-                            </tr>
-                        }
-                        </tbody>
-                        <tfoot>
-                            <td align="right">Total: @users.length</td>
-                        </tfoot>
-                    </table>
-                </div>
+            <div class="col col-xs-4" style="padding-left: 0">
+                <table class="table">
+                    <thead>
+                        <th>@date </th>
+                    </thead>
+                    <tbody>
+                    @users.map { user =>
+                        <tr>
+                            <td>@user</td>
+                        </tr>
+                    }
+                    </tbody>
+                    <tfoot>
+                        <td align="right">Total: @users.length</td>
+                    </tfoot>
+                </table>
+            </div>
         }
             </div>
     }
