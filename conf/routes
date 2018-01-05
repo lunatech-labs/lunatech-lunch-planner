@@ -40,7 +40,6 @@ POST        /menuPerDay/delete/:uuid           lunatech.lunchplanner.controllers
 GET         /menuPerDay/:uuid                  lunatech.lunchplanner.controllers.MenuPerDayController.getMenuPerDayDetails(uuid: java.util.UUID)
 POST        /menuPerDay/:uuid                  lunatech.lunchplanner.controllers.MenuPerDayController.saveMenuPerDayDetails(uuid: java.util.UUID)
 
-
 #Report
 GET         /report/                           lunatech.lunchplanner.controllers.ReportController.getReport
 GET         /report/filter                     lunatech.lunchplanner.controllers.ReportController.filterAttendees
@@ -53,11 +52,5 @@ GET         /menuPerDayPerPerson/attendees     lunatech.lunchplanner.controllers
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                      controllers.Assets.at(path="/public", file)
 
-# User
-GET         /user/all/emailAddress             lunatech.lunchplanner.controllers.UserController.getAllEmailAddresses
-
 # Slack
 POST        /slack                             lunatech.lunchplanner.controllers.SlackController.processSlackRequest
-POST        /slack/postMessages                lunatech.lunchplanner.controllers.SlackController.postMessages
-POST        /slack/users                       lunatech.lunchplanner.controllers.SlackController.getSlackUserIds
-POST        /slack/openConversation            lunatech.lunchplanner.controllers.SlackController.openConversation
