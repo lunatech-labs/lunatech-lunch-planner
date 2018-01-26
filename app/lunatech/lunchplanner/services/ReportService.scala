@@ -85,7 +85,7 @@ class ReportService @Inject()(
     )
   }
 
-  def exportToExcel(report: Report, reportNotAttending: Report): Array[Byte] = {
+  def exportToExcel(report: ReportByDateAndLocation, reportNotAttending: Report): Array[Byte] = {
     val workbook = new XSSFWorkbook
     val cellStyle = workbook.createCellStyle
     val font = workbook.createFont
@@ -94,27 +94,8 @@ class ReportService @Inject()(
 
     val out = new ByteArrayOutputStream
     try {
-      report.usersPerDate.foreach { case (date, users) => {
-
-        val sheet = workbook.createSheet(date)
-
-        initializeSheet(sheet, date, users, cellStyle)
-        writeSecondRow(sheet.createRow(2), "Attendees:", cellStyle, 0)
-        writeUserData(sheet, users, 0)
-      }}
-
-      reportNotAttending.usersPerDate.foreach { case (date, users) =>
-        Option(workbook.getSheet(date)) match {
-          case Some(s) =>
-            writeSecondRow(s.getRow(2), "Did not attend:", cellStyle, 1)
-            writeUserData(s, users, 1)
-          case None =>
-            val sheet = workbook.createSheet(date)
-            initializeSheet(sheet, date, users, cellStyle)
-            writeSecondRow(sheet.createRow(2), "Did not attend:", cellStyle, 0)
-            writeUserData(sheet, users, 0)
-        }
-      }
+      writeReport(workbook, report, cellStyle)
+      writeReportForNotAttending(workbook, reportNotAttending, cellStyle)
       workbook.write(out)
     } finally {
       out.close()
@@ -124,32 +105,64 @@ class ReportService @Inject()(
     out.toByteArray
   }
 
-  private def initializeSheet(sheet: XSSFSheet, date: String, users: Seq[String], cellStyle: CellStyle) = {
+  private def writeReport(workbook: XSSFWorkbook, report: ReportByDateAndLocation, cellStyle: CellStyle): Unit = {
+    report.usersPerDateAndLocation.groupBy{case ((date, _), _) => date}.foreach { case (date, reportByDateAndLocations)  =>
+      val sheet = workbook.createSheet(date.toString)
+      initializeSheet(sheet, date.toString, reportByDateAndLocations.flatMap { case ((_, _), users) => users }.size, cellStyle)
+
+      reportByDateAndLocations.zipWithIndex.foreach { case (((_, location), users), index) =>
+        val row = if(sheet.getRow(StartingRow) == null) sheet.createRow(StartingRow) else sheet.getRow(StartingRow)
+        writeSecondRow(row, s"$location:", cellStyle, index)
+        writeUserData(sheet, users, index)
+      }
+    }
+  }
+
+  private def writeReportForNotAttending(workbook: XSSFWorkbook, reportNotAttending: Report, cellStyle: CellStyle): Unit = {
+    reportNotAttending.usersPerDate.foreach { case (date, users) =>
+      Option(workbook.getSheet(date)) match {
+        case Some(s) =>
+          val columnSkips = 3
+          writeSecondRow(s.getRow(StartingRow), "Did not attend:", cellStyle, columnSkips)
+          writeUserData(s, users, columnSkips)
+        case None =>
+          val sheet = workbook.createSheet(date)
+          val firstColumn = 0
+          initializeSheet(sheet, date, users.size, cellStyle)
+          writeSecondRow(sheet.createRow(StartingRow), "Did not attend:", cellStyle, firstColumn)
+          writeUserData(sheet, users, firstColumn)
+      }
+    }
+  }
+
+  private def initializeSheet(sheet: XSSFSheet, date: String, totalUsers: Int, cellStyle: CellStyle): Unit = {
     val row = sheet.createRow(0)
-    val firstRow = Array("Date:", date, "", "Total:", s"${users.length}")
+    val firstRow = Array("Date:", date, "", "Total Attendees:", s"$totalUsers")
     firstRow.zipWithIndex.foreach { case (cellValue, index) =>
       val cell = row.createCell(index)
       cell.setCellValue(cellValue)
 
-      if (cellValue == "Date:" || cellValue == "Total:") {
+      if (cellValue == "Date:" || cellValue == "Total Attendees:") {
         cell.setCellStyle(cellStyle)
       }
     }
   }
 
-  private def writeSecondRow(row: XSSFRow, cellValue: String, cellStyle: CellStyle, columnIndex: Int) = {
+  private def writeSecondRow(row: XSSFRow, cellValue: String, cellStyle: CellStyle, columnIndex: Int): Unit = {
     val secondRowCell = row.createCell(columnIndex)
     secondRowCell.setCellValue(cellValue)
     secondRowCell.setCellStyle(cellStyle)
   }
 
-  private def writeUserData(sheet: XSSFSheet, users: Seq[String], columnIndex: Int) = {
+  private def writeUserData(sheet: XSSFSheet, users: Seq[String], columnIndex: Int): Unit = {
     val rowSkips = 3
     users.zipWithIndex.foreach { case (user, index) =>
-      val row = if(sheet.getRow(index + rowSkips) == null) sheet.createRow(index + rowSkips) else sheet.getRow(index + rowSkips) //scalastyle:ignore
+      val row = if(sheet.getRow(index + rowSkips) == null) sheet.createRow(index + rowSkips) else sheet.getRow(index + rowSkips)
       val cell = row.createCell(columnIndex)
       cell.setCellValue(user.toString)
     }
   }
+
+  val StartingRow = 2
 
 }

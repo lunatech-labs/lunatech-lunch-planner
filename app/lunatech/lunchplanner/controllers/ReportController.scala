@@ -84,7 +84,7 @@ class ReportController @Inject()(
       val reportYear = request.session.get(year).map(_.toInt).getOrElse(getDefaultDate.year)
 
       for {
-        totalAttendees <- reportService.getReport(reportMonth, reportYear)
+        totalAttendees <- reportService.getReportByLocationAndDate(reportMonth, reportYear)
         totalNotAttending <- reportService.getReportForNotAttending(reportMonth, reportYear)
       } yield {
         val inputStream = new ByteArrayInputStream(reportService.exportToExcel(totalAttendees, totalNotAttending))
