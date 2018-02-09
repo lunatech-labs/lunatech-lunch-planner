@@ -2,13 +2,16 @@ name := """lunatech-lunch-planner"""
 
 version := "1.0-SNAPSHOT"
 
+scalaVersion := "2.11.8"
+
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala)
   .settings(
     javaOptions in Test += "-Dconfig.file=conf/application-test.conf"
   )
+  .enablePlugins(DockerComposePlugin)
 
-scalaVersion := "2.11.8"
+dockerImageCreationTask := (publishLocal in Docker).value
 
 libraryDependencies ++= Seq(
   cache,
