@@ -21,6 +21,7 @@ trait TestDatabaseProvider {
   val menuPerDayTable: TableQuery[MenuPerDayTable] = TableQuery[MenuPerDayTable]
   val menuPerDayPerPersonTable: TableQuery[MenuPerDayPerPersonTable] = TableQuery[MenuPerDayPerPersonTable]
 
+<<<<<<< 4fb7f0b808c5ae80716341b274000c067e1c0ff4
   def cleanDatabase: Unit = {
     Await.result(
       for {
@@ -40,12 +41,28 @@ trait TestDatabaseProvider {
       _ <- jdbc.run(userProfileTable.delete)
       _ <- jdbc.run(userTable.delete)
     } yield (), defaultTimeout)
+=======
+  def cleanDatabase: Int = {
+    Await.result(jdbc.run(menuPerDayPerPersonTable.delete), defaultTimeout)
+    Await.result(jdbc.run(menuPerDayTable.delete), defaultTimeout)
+    Await.result(jdbc.run(menuDishTable.delete), defaultTimeout)
+    Await.result(jdbc.run(dishTable.delete), defaultTimeout)
+    Await.result(jdbc.run(menuTable.delete), defaultTimeout)
+    Await.result(jdbc.run(userProfileTable.delete), defaultTimeout)
+    Await.result(jdbc.run(userTable.delete), defaultTimeout)
+  }
+
+  def cleanUserAndProfileTable: Int = {
+    Await.result(jdbc.run(userProfileTable.delete), defaultTimeout)
+    Await.result(jdbc.run(userTable.delete), defaultTimeout)
+>>>>>>> 142 - Replace unit test in package persistence by property based testing
   }
 
   def cleanMenuTable: Int = Await.result(jdbc.run(menuTable.delete), defaultTimeout)
 
   def cleanDishTable: Int = Await.result(jdbc.run(dishTable.delete), defaultTimeout)
 
+<<<<<<< 4fb7f0b808c5ae80716341b274000c067e1c0ff4
   def cleanMenuDishTable: Unit = {
     Await.result(
       for {
@@ -55,11 +72,23 @@ trait TestDatabaseProvider {
   }
 
   def cleanMenuPerDayTable: Unit = {
+=======
+  def cleanMenuDishTable: Int = {
+    Await.result(jdbc.run(menuDishTable.delete), defaultTimeout)
+    Await.result(jdbc.run(dishTable.delete), defaultTimeout)
+  }
+
+  def cleanMenuPerDayTable: Int = {
+>>>>>>> 142 - Replace unit test in package persistence by property based testing
     Await.result(jdbc.run(menuPerDayTable.delete), defaultTimeout)
     cleanMenuDishTable
   }
 
+<<<<<<< 4fb7f0b808c5ae80716341b274000c067e1c0ff4
   def cleanMenuPerDayPerPersonTable: Unit = {
+=======
+  def cleanMenuPerDayPerPersonTable: Int = {
+>>>>>>> 142 - Replace unit test in package persistence by property based testing
     Await.result(jdbc.run(menuPerDayPerPersonTable.delete), defaultTimeout)
     cleanMenuPerDayTable
     cleanUserAndProfileTable

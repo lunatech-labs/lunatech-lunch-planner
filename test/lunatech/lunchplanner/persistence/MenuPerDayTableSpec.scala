@@ -29,9 +29,9 @@ object MenuPerDayTableSpec extends Properties("MenuPerDay") with PropertyTesting
     cleanMenuPerDayTableProps
 
     result.date.toString == menuPerDayToAdd.date.toString &&
-    result.location == menuPerDayToAdd.location &&
-    result.menuUuid == menuPerDayToAdd.menuUuid &&
-    result.uuid == menuPerDayToAdd.uuid
+      result.location == menuPerDayToAdd.location &&
+      result.menuUuid == menuPerDayToAdd.menuUuid &&
+      result.uuid == menuPerDayToAdd.uuid
   }
 
   property("query for existing menus per day successfully") = forAll { (menu: Menu, menuPerDay: MenuPerDay) =>
@@ -52,9 +52,9 @@ object MenuPerDayTableSpec extends Properties("MenuPerDay") with PropertyTesting
     cleanMenuPerDayTableProps
 
     result.date.toString == menuPerDayToAdd.date.toString &&
-    result.location == menuPerDayToAdd.location &&
-    result.menuUuid == menuPerDayToAdd.menuUuid &&
-    result.uuid == menuPerDayToAdd.uuid
+      result.location == menuPerDayToAdd.location &&
+      result.menuUuid == menuPerDayToAdd.menuUuid &&
+      result.uuid == menuPerDayToAdd.uuid
   }
 
   property("query for menus per day by menu uuid") = forAll { (menu: Menu, menuPerDay: MenuPerDay) =>
@@ -68,7 +68,7 @@ object MenuPerDayTableSpec extends Properties("MenuPerDay") with PropertyTesting
   }
 
   property("query for menus per day by non existent menu uuid") = forAll { (menuPerDay: MenuPerDay) =>
-  // skipping adding menuPerDay to DB
+    // skipping adding menuPerDay to DB
 
     val result = Await.result(MenuPerDayTable.getByMenuUuid(menuPerDay.uuid), defaultTimeout)
 
@@ -160,15 +160,15 @@ object MenuPerDayTableSpec extends Properties("MenuPerDay") with PropertyTesting
 
   property("remove existing menu per day by menu uuid") = forAll {
     (menu: Menu, menuPerDay1: MenuPerDay, menuPerDay2: MenuPerDay) =>
-    Await.result(MenuTable.add(menu), defaultTimeout)
+      Await.result(MenuTable.add(menu), defaultTimeout)
 
-    val menuPerDayToAdd1 = menuPerDay1.copy(menuUuid = menu.uuid)
-    val menuPerDayToAdd2 = menuPerDay2.copy(menuUuid = menu.uuid)
-    Await.result(MenuPerDayTable.add(menuPerDayToAdd1), defaultTimeout)
-    Await.result(MenuPerDayTable.add(menuPerDayToAdd2), defaultTimeout)
+      val menuPerDayToAdd1 = menuPerDay1.copy(menuUuid = menu.uuid)
+      val menuPerDayToAdd2 = menuPerDay2.copy(menuUuid = menu.uuid)
+      Await.result(MenuPerDayTable.add(menuPerDayToAdd1), defaultTimeout)
+      Await.result(MenuPerDayTable.add(menuPerDayToAdd2), defaultTimeout)
 
-    val result = Await.result(MenuPerDayTable.removeByMenuUuid(menu.uuid), defaultTimeout)
-    result == 2
+      val result = Await.result(MenuPerDayTable.removeByMenuUuid(menu.uuid), defaultTimeout)
+      result == 2
   }
 
   property("update an existing menu per day by uuid") = forAll { (menu: Menu, menuPerDay: MenuPerDay) =>
