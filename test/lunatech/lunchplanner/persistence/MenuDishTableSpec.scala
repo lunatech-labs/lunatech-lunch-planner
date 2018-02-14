@@ -1,103 +1,121 @@
 package lunatech.lunchplanner.persistence
 
-import java.util.UUID
-
-import lunatech.lunchplanner.common.{ AcceptanceSpec, DBConnection, TestDatabaseProvider }
+import lunatech.lunchplanner.common.PropertyTestingConfig
 import lunatech.lunchplanner.models.{ Dish, Menu, MenuDish }
+import org.scalacheck.Properties
+import org.scalacheck.Prop._
 
 import scala.concurrent.Await
-import scala.concurrent.duration._
+import shapeless.contrib.scalacheck._
 
-class MenuDishTableSpec extends AcceptanceSpec with TestDatabaseProvider {
+object MenuDishTableSpec extends Properties("MenuDish") with PropertyTestingConfig {
 
-  implicit private val dbConnection = app.injector.instanceOf[DBConnection]
+  import TableDataGenerator._
 
-  private val newMenu = Menu(name = "Main menu")
-  private val pastaBologneseDish = Dish(
-    name = "pasta bolognese",
-    description = "pasta bolognese for 2 people",
-    hasBeef = true,
-    remarks = Some("favorite dish of person A")
-  )
-  private val vegetarianDish = Dish(
-    name = "vegetarian",
-    description = "warm vegetarian food from fancy restaurant",
-    isVegetarian = true,
-    isGlutenFree = true,
-    hasLactose = true
-  )
+  property("add a new menu dish") = forAll { (dish: Dish, menu: Menu, menuDish: MenuDish) =>
+    addMenuAndDishToDB(dish, menu)
+    val menuDishToAdd = menuDish.copy(dishUuid = dish.uuid, menuUuid = menu.uuid)
+    val result = Await.result(MenuDishTable.add(menuDishToAdd), defaultTimeout)
 
-  private val newMenuDish = MenuDish (
-    menuUuid = newMenu.uuid,
-    dishUuid = pastaBologneseDish.uuid
-  )
+    cleanMenuDishTableProps
 
-  private val newMenuDishVegetarian = MenuDish (
-    menuUuid = newMenu.uuid,
-    dishUuid = vegetarianDish.uuid
-  )
-
-  override def beforeAll {
-    cleanDatabase()
-
-    Await.result(MenuTable.add(newMenu), defaultTimeout)
-    Await.result(DishTable.add(pastaBologneseDish), defaultTimeout)
-    Await.result(DishTable.add(vegetarianDish), defaultTimeout)
+    result == menuDishToAdd
   }
 
-  "A MenuDish table" must {
-    "add a new menu dish" in {
-      val result = Await.result(MenuDishTable.add(newMenuDish), defaultTimeout)
-      result mustBe newMenuDish
-    }
+  property("query for existing menus dishes successfully") = forAll { (dish: Dish, menu: Menu, menuDish: MenuDish) =>
+    val menuDishAdded = addMenuAndDishAndMenuDishToDB(dish, menu, menuDish)
 
-    "query for existing menus dishes successfully" in {
-      val result = Await.result(MenuDishTable.exists(newMenuDish.uuid), defaultTimeout)
-      result mustBe true
-    }
+    val result = Await.result(MenuDishTable.exists(menuDishAdded.uuid), defaultTimeout)
 
-    "query for menus dishes by uuid" in {
-      val result = Await.result(MenuDishTable.getByUuid(newMenuDish.uuid), defaultTimeout)
-      result mustBe Some(newMenuDish)
-    }
+    cleanMenuDishTableProps
+    result
+  }
 
-    "query for menus dishes by menu uuid" in {
-      Await.result(MenuDishTable.add(newMenuDishVegetarian), defaultTimeout)
+  property("query for menus dishes by uuid") = forAll { (dish: Dish, menu: Menu, menuDish: MenuDish) =>
+    val menuDishToAdd = addMenuAndDishAndMenuDishToDB(dish, menu, menuDish)
 
-      val result = Await.result(MenuDishTable.getByMenuUuid(newMenu.uuid), defaultTimeout)
-      result mustBe Vector(newMenuDish, newMenuDishVegetarian)
-    }
+    val result = Await.result(MenuDishTable.getByUuid(menuDishToAdd.uuid), defaultTimeout).get
 
-    "query for menus dishes by non existent menu uuid" in {
-      val result = Await.result(MenuDishTable.getByMenuUuid(UUID.randomUUID()), defaultTimeout)
-      result mustBe Vector()
-    }
+    cleanMenuDishTableProps
+    result == menuDishToAdd
+  }
 
-    "query all menus dishes" in {
+  property("query for menus dishes by menu uuid") = forAll { (dish: Dish, menu: Menu, menuDish: MenuDish) =>
+    val menuDishToAdd = addMenuAndDishAndMenuDishToDB(dish, menu, menuDish)
+
+    val result = Await.result(MenuDishTable.getByMenuUuid(menu.uuid), defaultTimeout)
+
+    cleanMenuDishTableProps
+    result == Seq(menuDishToAdd)
+  }
+
+  property("query for menus dishes by non existent menu uuid") = forAll { menuDish: MenuDish =>
+    // skipping adding menuDish to DB
+
+    val result = Await.result(MenuDishTable.getByMenuUuid(menuDish.uuid), defaultTimeout)
+    result.isEmpty
+  }
+
+  property("query all menus dishes") = forAll {
+    (dish: Dish, menu: Menu, menuDish1: MenuDish, menuDish2: MenuDish) =>
+      addMenuAndDishToDB(dish, menu)
+
+      val menuDishToAdd1 = menuDish1.copy(dishUuid = dish.uuid, menuUuid = menu.uuid)
+      val menuDishToAdd2 = menuDish2.copy(dishUuid = dish.uuid, menuUuid = menu.uuid)
+      Await.result(MenuDishTable.add(menuDishToAdd1), defaultTimeout)
+      Await.result(MenuDishTable.add(menuDishToAdd2), defaultTimeout)
+
       val result = Await.result(MenuDishTable.getAll, defaultTimeout)
-      result mustBe Vector(newMenuDish, newMenuDishVegetarian)
-    }
 
-    "remove an existing menu dish by uuid" in {
-      val result = Await.result(MenuDishTable.remove(newMenuDish.uuid), defaultTimeout)
-      result mustBe 1
-    }
+      cleanMenuDishTableProps
+      result == Seq(menuDishToAdd1, menuDishToAdd2)
+  }
 
-    "not fail when trying to remove a menu that does not exist" in {
-      val result = Await.result(MenuDishTable.remove(UUID.randomUUID()), defaultTimeout)
-      result mustBe 0
-    }
+  property("remove an existing menu dish by uuid") = forAll {
+    (dish: Dish, menu: Menu, menuDish: MenuDish) =>
+      val menuDishAdded = addMenuAndDishAndMenuDishToDB(dish, menu, menuDish)
 
-    "remove an existing menu dish by menu uuid" in {
-      Await.result(MenuDishTable.add(newMenuDish), defaultTimeout)
-      val result = Await.result(MenuDishTable.removeByMenuUuid(newMenu.uuid), defaultTimeout)
-      result mustBe 2
-    }
+      val result = Await.result(MenuDishTable.removeByUuid(menuDishAdded.uuid), defaultTimeout)
+      result == 1
+  }
 
-    "remove an existing menu dish by dish uuid" in {
-      Await.result(MenuDishTable.add(newMenuDish), defaultTimeout)
-      val result = Await.result(MenuDishTable.removeByDishUuid(newMenuDish.dishUuid), defaultTimeout)
-      result mustBe 1
-    }
+  property("not fail when trying to remove a menu that does not exist") = forAll { menuDish: MenuDish =>
+    // skipping adding menu to DB
+
+    val result = Await.result(MenuDishTable.removeByUuid(menuDish.uuid), defaultTimeout)
+    result == 0
+  }
+
+  property("remove an existing menu dish by menu uuid") = forAll {
+    (dish: Dish, menu: Menu, menuDish: MenuDish) =>
+      addMenuAndDishAndMenuDishToDB(dish, menu, menuDish)
+
+      val result = Await.result(MenuDishTable.removeByMenuUuid(menu.uuid), defaultTimeout)
+      result == 1
+  }
+
+  property("remove an existing menu dish by dish uuid") = forAll {
+    (dish: Dish, menu: Menu, menuDish: MenuDish) =>
+      addMenuAndDishAndMenuDishToDB(dish, menu, menuDish)
+
+      val result = Await.result(MenuDishTable.removeByDishUuid(dish.uuid), defaultTimeout)
+      result == 1
+  }
+
+  private def addMenuAndDishToDB(dish: Dish, menu: Menu) = {
+    Await.result(DishTable.add(dish), defaultTimeout)
+    Await.result(MenuTable.add(menu), defaultTimeout)
+  }
+
+  private def addMenuAndDishAndMenuDishToDB(dish: Dish, menu: Menu, menuDish: MenuDish): MenuDish = {
+    addMenuAndDishToDB(dish, menu)
+
+    val menuDishToAdd = menuDish.copy(dishUuid = dish.uuid, menuUuid = menu.uuid)
+    Await.result(MenuDishTable.add(menuDishToAdd), defaultTimeout)
+  }
+
+  private def cleanMenuDishTableProps = {
+    cleanMenuDishTable
+    true
   }
 }

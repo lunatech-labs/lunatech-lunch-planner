@@ -31,7 +31,7 @@ class DishService @Inject() (implicit val connection: DBConnection){
 
   def getAll: Future[Seq[Dish]] = DishTable.getAll
 
-  def getByUuid(uuid: UUID): Future[Option[Dish]] = DishTable.getByUUID(uuid)
+  def getByUuid(uuid: UUID): Future[Option[Dish]] = DishTable.getByUuid(uuid)
 
   def insertOrUpdate(uuid: UUID, dishData: Dish): Future[Dish] = {
     getByUuid(uuid)
@@ -58,5 +58,5 @@ class DishService @Inject() (implicit val connection: DBConnection){
         }
       }
 
-  def delete(uuid: UUID): Future[Int] = DishTable.remove(uuid)
+  def delete(uuid: UUID): Future[Int] = DishTable.removeByUuid(uuid)
 }

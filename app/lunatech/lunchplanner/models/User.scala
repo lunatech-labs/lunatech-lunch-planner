@@ -4,7 +4,7 @@ import java.util.UUID
 
 case class User (
   uuid: UUID = UUID.randomUUID(),
-  name: String = "",
+  name: String,
   emailAddress: String,
   isAdmin: Boolean = false
 )

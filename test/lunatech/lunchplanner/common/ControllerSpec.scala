@@ -11,11 +11,11 @@ import scala.concurrent.duration._
 
 trait ControllerSpec
   extends PlaySpec
-  with Results
-  with MockitoSugar
-  with BeforeAndAfterAll
-  with GuiceOneAppPerSuite
-  with Writeables {
+    with Results
+    with MockitoSugar
+    with BeforeAndAfterAll
+    with GuiceOneAppPerSuite
+    with Writeables {
 
   val defaultTimeout: FiniteDuration = 10.seconds
 }

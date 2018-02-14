@@ -48,7 +48,7 @@ object UserProfileTable {
   def getAll(implicit connection: DBConnection): Future[Seq[UserProfile]] =
     connection.db.run(userProfileTable.result)
 
-  def remove(userUuid: UUID)(implicit connection: DBConnection): Future[Int] = {
+  def removeByUserUuid(userUuid: UUID)(implicit connection: DBConnection): Future[Int] = {
     val query = userProfileTable.filter(x => x.userUuid === userUuid).delete
     connection.db.run(query)
   }

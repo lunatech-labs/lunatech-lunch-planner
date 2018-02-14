@@ -5,6 +5,7 @@ import javax.inject.Inject
 
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.{ Menu, MenuDish }
+import lunatech.lunchplanner.models._
 import lunatech.lunchplanner.services.{ DishService, MenuDishService, MenuPerDayPerPersonService, MenuPerDayService, MenuService, UserService }
 import lunatech.lunchplanner.viewModels.{ ListMenusForm, MenuForm }
 import play.api.i18n.I18nSupport
@@ -138,7 +139,7 @@ class MenuController @Inject() (
 
   private def addNewMenuDishes(menuData: MenuForm) = {
     // add new menu
-    val newMenu = Menu(name = menuData.menuName)
+    val newMenu = Menu(name = menuData.menuName.normalize)
    menuService.add(newMenu)
      .flatMap(menu =>
       //Add MenuDishes
@@ -147,7 +148,7 @@ class MenuController @Inject() (
 
   private def updateMenuDishes(menuUuid: UUID, menuData: MenuForm) = {
     // update menu name
-    val menu = Menu(name = menuData.menuName)
+    val menu = Menu(name = menuData.menuName.normalize)
     menuService.insertOrUpdate(menuUuid, menu)
 
     // remove all previous menu dishes and add them again

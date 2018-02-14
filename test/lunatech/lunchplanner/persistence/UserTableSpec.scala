@@ -1,59 +1,91 @@
 package lunatech.lunchplanner.persistence
 
-import java.util.UUID
-
-import lunatech.lunchplanner.common.{ AcceptanceSpec, DBConnection, TestDatabaseProvider }
+import lunatech.lunchplanner.common.PropertyTestingConfig
 import lunatech.lunchplanner.models.User
+import org.scalacheck._
+import org.scalacheck.Prop._
 
 import scala.concurrent.Await
-import scala.concurrent.duration._
+import shapeless.contrib.scalacheck._
 
-class UserTableSpec extends AcceptanceSpec with TestDatabaseProvider {
+object UserTableSpec extends Properties("UserProfile") with PropertyTestingConfig {
 
-  implicit private val dbConnection = app.injector.instanceOf[DBConnection]
+  import TableDataGenerator._
 
-  override def beforeAll {
-    cleanDatabase()
+  override def afterAll(): Unit = dbConnection.db.close()
+
+  property("add a new user") = forAll { user: User =>
+    val result = addUserToDB(user)
+
+    cleanUserTableProps
+
+    result == user
   }
 
-  private val newUser = User(UUID.randomUUID(), "Leonor Boga", "leonor.boga@lunatech.com")
-  private val newUser2 = User(UUID.randomUUID(), "Pedro Ferreira", "pedro.ferreira@lunatech.com")
+  property("query for existing users successfully") = forAll { user: User =>
+    addUserToDB(user)
 
-  "A User table" must {
-    "add a new user" in {
-      val result = Await.result(UserTable.add(newUser), defaultTimeout)
-      result mustBe newUser
-    }
+    val result = Await.result(UserTable.exists(user.uuid), defaultTimeout)
 
-    "query for existing users successfully" in {
-      val result = Await.result(UserTable.exists(newUser.uuid), defaultTimeout)
-      result mustBe true
-    }
+    cleanUserTableProps
 
-    "query for users by uuid" in {
-      val result = Await.result(UserTable.getByUUID(newUser.uuid), defaultTimeout)
-      result mustBe Some(newUser)
-    }
+    result
+  }
 
-    "query for users by email address" in {
-      val result = Await.result(UserTable.getByEmailAddress(newUser.emailAddress), defaultTimeout)
-      result mustBe Some(newUser)
-    }
+  property("query for existing users successfully") = forAll { user: User =>
+    addUserToDB(user)
 
-    "query all users" in {
-      Await.result(UserTable.add(newUser2), defaultTimeout)
-      val result = Await.result(UserTable.getAll, defaultTimeout)
-      result mustBe Vector(newUser, newUser2)
-    }
+    val result = Await.result(UserTable.getByUUID(user.uuid), defaultTimeout).get
 
-    "remove an existing user by uuid" in {
-      val result = Await.result(UserTable.remove(newUser.uuid), defaultTimeout)
-      result mustBe 1
-    }
+    cleanUserTableProps
 
-    "not fail when trying to remove a user that does not exist" in {
-      val result = Await.result(UserTable.remove(UUID.randomUUID()), defaultTimeout)
-      result mustBe 0
-    }
+    result == user
+  }
+
+  property("query for users by email address") = forAll { user: User =>
+    addUserToDB(user)
+
+    val result = Await.result(UserTable.getByEmailAddress(user.emailAddress), defaultTimeout).get
+
+    cleanUserTableProps
+
+    result == user
+  }
+
+  property("query for users by email address") = forAll { (user1: User, user2: User) =>
+    addUserToDB(user1)
+    addUserToDB(user2)
+
+    val result = Await.result(UserTable.getAll, defaultTimeout)
+
+    cleanUserTableProps
+
+    result == Seq(user1, user2)
+  }
+
+  property("remove an existing user by uuid") = forAll { user: User =>
+    addUserToDB(user)
+
+    val result = Await.result(UserTable.remove(user.uuid), defaultTimeout)
+
+    cleanUserTableProps
+
+    result == 1
+  }
+
+  property("remove an existing user by uuid") = forAll { user: User =>
+    //skip adding user to DB
+
+    val result = Await.result(UserTable.remove(user.uuid), defaultTimeout)
+    result == 0
+  }
+
+  private def addUserToDB(user: User) = {
+    Await.result(UserTable.add(user), defaultTimeout)
+  }
+
+  private def cleanUserTableProps = {
+    cleanDatabase
+    true
   }
 }
