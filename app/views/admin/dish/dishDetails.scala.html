@@ -3,7 +3,7 @@
 @import lunatech.lunchplanner.models.User
 @import lunatech.lunchplanner.viewModels.DishForm
 
-@(admin: User, dishForm: Form[DishForm], dishOption: Option[Dish])(implicit messages: play.api.i18n.Messages)
+@(admin: User, dishForm: Form[DishForm], dishOption: Option[Dish])(implicit messages: MessagesProvider)
 @main("Dish details", admin) {
 <!-- Nav tabs -->
 <ul class="nav nav-tabs">

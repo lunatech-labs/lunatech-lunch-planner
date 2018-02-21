@@ -1,7 +1,7 @@
 package lunatech.lunchplanner.common
 
 import lunatech.lunchplanner.persistence.{ DishTable, MenuDishTable, MenuPerDayPerPersonTable, MenuPerDayTable, MenuTable, UserProfileTable, UserTable }
-import slick.driver.PostgresDriver.api._
+import slick.jdbc.PostgresProfile.api._
 import slick.lifted.TableQuery
 
 import scala.concurrent._

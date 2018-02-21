@@ -1,13 +1,14 @@
 package lunatech.lunchplanner.controllers
 
-import com.google.inject.Inject
+import javax.inject.Inject
+
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.User
-import lunatech.lunchplanner.services.{MenuPerDayPerPersonService, UserService}
+import lunatech.lunchplanner.services.{ MenuPerDayPerPersonService, UserService }
 import lunatech.lunchplanner.viewModels.MenuPerDayPerPersonForm
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Controller, EssentialAction, Flash}
-import play.api.{Configuration, Environment}
+import play.api.i18n.{ I18nSupport, Messages }
+import play.api.mvc.{ Action, AnyContent, BaseController, ControllerComponents, Flash }
+import play.api.{ Configuration, Environment }
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -15,25 +16,24 @@ import scala.concurrent.Future
 class Application @Inject() (
   userService: UserService,
   menuPerDayPerPersonService: MenuPerDayPerPersonService,
+  val controllerComponents: ControllerComponents,
   val connection: DBConnection,
   val environment: Environment,
-  val messagesApi: MessagesApi,
   val configuration: Configuration)
-  extends Controller with Secured with I18nSupport {
+  extends BaseController with Secured with I18nSupport {
 
-  def index: EssentialAction = IsAuthenticatedAsync { username =>
-    implicit request =>
-      userService.getByEmailAddress(username).flatMap(currentUser =>
+  def index: Action[AnyContent] = userAction.async { implicit request =>
+      userService.getByEmailAddress(request.email).flatMap(currentUser =>
         getIndex(currentUser))
   }
 
-  private def getIndex(normalUser: Option[User])(implicit flash: Flash) =
+  private def getIndex(normalUser: Option[User])(implicit messagesApi: Messages, flash: Flash) =
     normalUser match {
       case Some(user) => getMenuPerDayPerPerson(user)
       case None => Future.successful(Unauthorized)
     }
 
-  private def getMenuPerDayPerPerson(user: User)(implicit flash: Flash) = {
+  private def getMenuPerDayPerPerson(user: User)(implicit messagesApi: Messages, flash: Flash) = {
     val userIsAdmin = userService.isAdminUser(user.emailAddress)
     for {
       menusPerDayPerPerson <- menuPerDayPerPersonService.getAllMenuWithNamePerDayWithDishesPerPerson(user.uuid).map(_.toArray)

@@ -2,7 +2,7 @@
 @import lunatech.lunchplanner.models.{Report, ReportByDateAndLocation, User, ReportDate}
 @import org.joda.time.DateTime
 
-@(admin: User, reportForm: Form[ReportDate], report: ReportByDateAndLocation, reportNotAttending: Report, reportDate: ReportDate)(implicit messages: play.api.i18n.Messages)
+@(admin: User, reportForm: Form[ReportDate], report: ReportByDateAndLocation, reportNotAttending: Report, reportDate: ReportDate)(implicit messages: MessagesProvider)
 
 @months = @{
     Seq(1 -> "January",

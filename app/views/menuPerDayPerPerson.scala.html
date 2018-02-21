@@ -4,7 +4,7 @@
 @import lunatech.lunchplanner.models.User
 @import lunatech.lunchplanner.models.Dish
 
-@(user: User, listOfMenusPerDayPerPerson: Array[MenuWithNameWithDishesPerPerson], form : Form[MenuPerDayPerPersonForm])(implicit messages: play.api.i18n.Messages, flash: play.api.mvc.Flash)
+@(user: User, listOfMenusPerDayPerPerson: Array[MenuWithNameWithDishesPerPerson], form : Form[MenuPerDayPerPersonForm])(implicit messages: MessagesProvider, flash: play.api.mvc.Flash)
 @main("Lunatech Lunch Planner", user) {
 
     <h2>What Lunatech will be feeding you</h2>
@@ -47,7 +47,7 @@
                             <select name="menuPerDayUuids[]" class="select select-@schedulesByDate._1">
                                 <option class="select-empty"></option>
                                 @schedulesByDate._2.map { s =>
-                                    <option class="location-@s.location" value="@s.menuPerDayUuid" @if(s.isAttending == Some(true)) { selected }>@s.menuName:@s.location</option>
+                                    <option class="location-@s.location" value="@s.menuPerDayUuid" @if(s.isAttending == Some(true)) { selected } > @s.menuName:@s.location</option>
                                 }
                                 <option class="select-not-attending" value="@schedulesByDate._2.map(_.menuPerDayUuid).mkString("~")" @if(schedulesByDate._2.map(_.isAttending).contains(Some(false))) { selected }>Not Attending</option>
                             </select>

@@ -1,58 +1,55 @@
 package lunatech.lunchplanner.controllers
 
 import java.text.SimpleDateFormat
-import java.util.{Date, UUID}
+import java.util.{ Date, UUID }
+import javax.inject.Inject
 
-import com.google.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.data.Location
 import lunatech.lunchplanner.models.MenuPerDay
 import lunatech.lunchplanner.services._
-import lunatech.lunchplanner.viewModels.{FilterMenusPerDayForm, ListMenusPerDayForm, MenuPerDayForm}
+import lunatech.lunchplanner.viewModels.{ FilterMenusPerDayForm, ListMenusPerDayForm, MenuPerDayForm }
 import org.joda.time.DateTime
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Controller, EssentialAction}
-import play.api.{Configuration, Environment}
+import play.api.i18n.I18nSupport
+import play.api.mvc.{ BaseController, ControllerComponents, EssentialAction }
+import play.api.{ Configuration, Environment }
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class MenuPerDayController @Inject()(userService: UserService,
-                                     userProfileService: UserProfileService,
-                                     menuService: MenuService,
-                                     menuDishService: MenuDishService,
-                                     menuPerDayService: MenuPerDayService,
-                                     menuPerDayPerPersonService: MenuPerDayPerPersonService,
-                                     val environment: Environment,
-                                     val messagesApi: MessagesApi,
-                                     val configuration: Configuration,
-                                     implicit val connection: DBConnection)
-  extends Controller with Secured with I18nSupport {
+  userProfileService: UserProfileService,
+  menuService: MenuService,
+  menuDishService: MenuDishService,
+  menuPerDayService: MenuPerDayService,
+  menuPerDayPerPersonService: MenuPerDayPerPersonService,
+  val controllerComponents: ControllerComponents,
+  val environment: Environment,
+  val configuration: Configuration)
+  (implicit val connection: DBConnection)
+  extends BaseController with Secured with I18nSupport {
 
   val DateStart = "dateStart"
   val DateEnd = "dateEnd"
 
-  def getAllMenusPerDay: EssentialAction = IsAdminAsync { username =>
-    implicit request => {
+  def getAllMenusPerDay: EssentialAction = adminAction.async { implicit request =>
       val dStart = request.session.get(DateStart).map(java.sql.Date.valueOf).getOrElse(getDateStart)
       val dEnd = request.session.get(DateEnd).map(java.sql.Date.valueOf).getOrElse(getDateEnd)
 
       for {
-        currentUser <- userService.getByEmailAddress(username)
+        currentUser <- userService.getByEmailAddress(request.email)
         menusPerDay <- menuPerDayPerPersonService.getAllMenuWithNamePerDayFilterDateRange(dStart, dEnd)
           .map(_.toArray)
       } yield
         Ok(views.html.admin.menuPerDay.menusPerDay(
-          getCurrentUser(currentUser, isAdmin = true, username),
+          getCurrentUser(currentUser, isAdmin = true, request.email),
           new SimpleDateFormat("dd-MM-yyyy").format(dStart),
           new SimpleDateFormat("dd-MM-yyyy").format(dEnd),
           ListMenusPerDayForm.listMenusPerDayForm,
           menusPerDay))
-    }
   }
 
-  def filterMenusPerDay: EssentialAction = IsAdminAsync { _ =>
-    implicit request => {
+  def filterMenusPerDay: EssentialAction = adminAction.async { implicit request =>
       FilterMenusPerDayForm
         .filterMenusPerDayForm
         .bindFromRequest
@@ -70,22 +67,20 @@ class MenuPerDayController @Inject()(userService: UserService,
               Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay())
                 .withSession(session))
           })
-    }
   }
 
-  def createNewMenuPerDay: EssentialAction = IsAdminAsync { username =>
+  def createNewMenuPerDay: EssentialAction = adminAction.async { implicit request =>
     val currentDate = new SimpleDateFormat("dd-MM-yyyy").format(new Date())
-    implicit request => {
       MenuPerDayForm
         .menuPerDayForm
         .bindFromRequest
         .fold(
           formWithErrors => {
             for {
-              currentUser <- userService.getByEmailAddress(username)
+              currentUser <- userService.getByEmailAddress(request.email)
               menusUuidAndNames <- menuService.getAllMenusUuidAndNames
             } yield BadRequest(views.html.admin.menuPerDay.newMenuPerDay(
-              getCurrentUser(currentUser, isAdmin = true, username),
+              getCurrentUser(currentUser, isAdmin = true, request.email),
               currentDate,
               formWithErrors,
               menusUuidAndNames,
@@ -96,130 +91,119 @@ class MenuPerDayController @Inject()(userService: UserService,
               Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay())
                 .flashing("success" -> "New schedule created!"))
           })
-    }
   }
 
-  def getNewMenuPerDay: EssentialAction = IsAdminAsync { username =>
+  def getNewMenuPerDay: EssentialAction = adminAction.async { implicit request =>
     val currentDate = new SimpleDateFormat("dd-MM-yyyy").format(new Date())
-    implicit request => {
       for {
-        currentUser <- userService.getByEmailAddress(username)
+        currentUser <- userService.getByEmailAddress(request.email)
         menusUuidAndNames <- menuService.getAllMenusUuidAndNames
       } yield
         Ok(views.html.admin.menuPerDay.newMenuPerDay(
-          getCurrentUser(currentUser, isAdmin = true, username),
+          getCurrentUser(currentUser, isAdmin = true, request.email),
           currentDate,
           MenuPerDayForm.menuPerDayForm,
           menusUuidAndNames,
           Location.values))
-    }
   }
 
-  def deleteMenusPerDay(): EssentialAction = IsAdminAsync { username =>
-    implicit request => {
-      ListMenusPerDayForm
-        .listMenusPerDayForm
-        .bindFromRequest
-        .fold(
-          formWithErrors => {
-            for {
-              currentUser <- userService.getByEmailAddress(username)
-              menusPerDay <- menuPerDayPerPersonService.getAllMenuWithNamePerDay.map(_.toArray)
-            } yield BadRequest(
-              views.html.admin.menuPerDay.menusPerDay(
-                getCurrentUser(currentUser, isAdmin = true, username),
-                new SimpleDateFormat("dd-MM-yyyy").format(getDateStart),
-                new SimpleDateFormat("dd-MM-yyyy").format(getDateEnd),
-                formWithErrors,
-                menusPerDay))
-          },
-          menusPerDayData =>
-            deleteSeveral(menusPerDayData).map(_ =>
-              Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay())
-                .flashing("success" -> "Schedule(s) deleted!"))
-        )
-    }
-  }
-
-  def getMenuPerDayDetails(uuid: UUID): EssentialAction = IsAdminAsync { username =>
-    implicit request => {
-      for {
-        currentUser <- userService.getByEmailAddress(username)
-        menusUuidAndNames <- menuService.getAllMenusUuidAndNames
-        menuPerDayOption <- menuPerDayService.getMenuPerDayByUuid(uuid)
-        dietRestrictions <- userProfileService.getRestrictionsByMenuPerDay(uuid)
-        peopleAttending <- menuPerDayPerPersonService.getListOfPeopleByMenuPerDay(uuid)
-      } yield
-        Ok(views.html.admin.menuPerDay.menuPerDayDetails(
-          getCurrentUser(currentUser, isAdmin = true, username),
-          MenuPerDayForm.menuPerDayForm,
-          menusUuidAndNames,
-          menuPerDayOption,
-          dietRestrictions,
-          peopleAttending,
-          Location.values
-        ))
-    }
-  }
-
-  def deleteMenuPerDay(uuid: UUID): EssentialAction = IsAdminAsync { username =>
-    implicit request => {
-      MenuPerDayForm
-        .menuPerDayForm
-        .bindFromRequest
-        .fold(
-          formWithErrors => {
-            for {
-              currentUser <- userService.getByEmailAddress(username)
-              menusUuidAndNames <- menuService.getAllMenusUuidAndNames
-              menuPerDayOption <- menuPerDayService.getMenuPerDayByUuid(uuid)
-              dietRestrictions <- userProfileService.getRestrictionsByMenuPerDay(uuid)
-              peopleAttending <- menuPerDayPerPersonService.getListOfPeopleByMenuPerDay(uuid)
-            } yield BadRequest(views.html.admin.menuPerDay.menuPerDayDetails(
-              getCurrentUser(currentUser, isAdmin = true, username),
+  def deleteMenusPerDay(): EssentialAction = adminAction.async { implicit request =>
+    ListMenusPerDayForm
+      .listMenusPerDayForm
+      .bindFromRequest
+      .fold(
+        formWithErrors => {
+          for {
+            currentUser <- userService.getByEmailAddress(request.email)
+            menusPerDay <- menuPerDayPerPersonService.getAllMenuWithNamePerDay.map(_.toArray)
+          } yield BadRequest(
+            views.html.admin.menuPerDay.menusPerDay(
+              getCurrentUser(currentUser, isAdmin = true, request.email),
+              new SimpleDateFormat("dd-MM-yyyy").format(getDateStart),
+              new SimpleDateFormat("dd-MM-yyyy").format(getDateEnd),
               formWithErrors,
-              menusUuidAndNames,
-              menuPerDayOption,
-              dietRestrictions,
-              peopleAttending,
-              Location.values))
-          },
-          _ => {
-            delete(uuid).map(_ =>
-              Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay())
-                .flashing("success" -> "Schedule deleted!"))
-          })
-    }
+              menusPerDay))
+        },
+        menusPerDayData =>
+          deleteSeveral(menusPerDayData).map(_ =>
+            Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay())
+              .flashing("success" -> "Schedule(s) deleted!"))
+      )
   }
 
-  def saveMenuPerDayDetails(uuid: UUID): EssentialAction = IsAdminAsync { username =>
-    implicit request => {
-      MenuPerDayForm
-        .menuPerDayForm
-        .bindFromRequest
-        .fold(
-          formWithErrors => {
-            for {
-              currentUser <- userService.getByEmailAddress(username)
-              menusUuidAndNames <- menuService.getAllMenusUuidAndNames
-              menuPerDayOption <- menuPerDayService.getMenuPerDayByUuid(uuid)
-              dietRestrictions <- userProfileService.getRestrictionsByMenuPerDay(uuid)
-              peopleAttending <- menuPerDayPerPersonService.getListOfPeopleByMenuPerDay(uuid)
-            } yield BadRequest(views.html.admin.menuPerDay.menuPerDayDetails(
-              getCurrentUser(currentUser, isAdmin = true, username),
-              formWithErrors,
-              menusUuidAndNames,
-              menuPerDayOption,
-              dietRestrictions,
-              peopleAttending,
-              Location.values))
-          },
-          menuPerDayData => {
-            menuPerDayService.insertOrUpdate(uuid, getNewMenuPerDay(menuPerDayData)).map(_ =>
-              Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay())
-                .flashing("success" -> "Schedule updated!"))
-          })
-    }
+  def getMenuPerDayDetails(uuid: UUID): EssentialAction = adminAction.async { implicit request =>
+    for {
+      currentUser <- userService.getByEmailAddress(request.email)
+      menusUuidAndNames <- menuService.getAllMenusUuidAndNames
+      menuPerDayOption <- menuPerDayService.getMenuPerDayByUuid(uuid)
+      dietRestrictions <- userProfileService.getRestrictionsByMenuPerDay(uuid)
+      peopleAttending <- menuPerDayPerPersonService.getListOfPeopleByMenuPerDay(uuid)
+    } yield
+      Ok(views.html.admin.menuPerDay.menuPerDayDetails(
+        getCurrentUser(currentUser, isAdmin = true, request.email),
+        MenuPerDayForm.menuPerDayForm,
+        menusUuidAndNames,
+        menuPerDayOption,
+        dietRestrictions,
+        peopleAttending,
+        Location.values
+      ))
+  }
+
+  def deleteMenuPerDay(uuid: UUID): EssentialAction = adminAction.async { implicit request =>
+    MenuPerDayForm
+      .menuPerDayForm
+      .bindFromRequest
+      .fold(
+        formWithErrors => {
+          for {
+            currentUser <- userService.getByEmailAddress(request.email)
+            menusUuidAndNames <- menuService.getAllMenusUuidAndNames
+            menuPerDayOption <- menuPerDayService.getMenuPerDayByUuid(uuid)
+            dietRestrictions <- userProfileService.getRestrictionsByMenuPerDay(uuid)
+            peopleAttending <- menuPerDayPerPersonService.getListOfPeopleByMenuPerDay(uuid)
+          } yield BadRequest(views.html.admin.menuPerDay.menuPerDayDetails(
+            getCurrentUser(currentUser, isAdmin = true, request.email),
+            formWithErrors,
+            menusUuidAndNames,
+            menuPerDayOption,
+            dietRestrictions,
+            peopleAttending,
+            Location.values))
+        },
+        _ => {
+          delete(uuid).map(_ =>
+            Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay())
+              .flashing("success" -> "Schedule deleted!"))
+        })
+  }
+
+  def saveMenuPerDayDetails(uuid: UUID): EssentialAction = adminAction.async {implicit request =>
+    MenuPerDayForm
+      .menuPerDayForm
+      .bindFromRequest
+      .fold(
+        formWithErrors => {
+          for {
+            currentUser <- userService.getByEmailAddress(request.email)
+            menusUuidAndNames <- menuService.getAllMenusUuidAndNames
+            menuPerDayOption <- menuPerDayService.getMenuPerDayByUuid(uuid)
+            dietRestrictions <- userProfileService.getRestrictionsByMenuPerDay(uuid)
+            peopleAttending <- menuPerDayPerPersonService.getListOfPeopleByMenuPerDay(uuid)
+          } yield BadRequest(views.html.admin.menuPerDay.menuPerDayDetails(
+            getCurrentUser(currentUser, isAdmin = true, request.email),
+            formWithErrors,
+            menusUuidAndNames,
+            menuPerDayOption,
+            dietRestrictions,
+            peopleAttending,
+            Location.values))
+        },
+        menuPerDayData => {
+          menuPerDayService.insertOrUpdate(uuid, getNewMenuPerDay(menuPerDayData)).map(_ =>
+            Redirect(lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay())
+              .flashing("success" -> "Schedule updated!"))
+        })
   }
 
   private def deleteSeveral(form: ListMenusPerDayForm) =

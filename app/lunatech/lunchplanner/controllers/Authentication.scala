@@ -1,10 +1,11 @@
 package lunatech.lunchplanner.controllers
 
-import com.google.inject.Inject
+import javax.inject.Inject
+
 import com.lunatech.openconnect.Authenticate
 import lunatech.lunchplanner.services.UserService
-import play.api.mvc.{Action, AnyContent, Controller, EssentialAction}
-import play.api.{Configuration, Environment, Mode}
+import play.api.mvc.{ AbstractController, Action, AnyContent, BaseController, ControllerComponents, EssentialAction }
+import play.api.{ Configuration, Environment, Mode }
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -13,11 +14,12 @@ class Authentication @Inject()(
   userService: UserService,
   configuration: Configuration,
   environment: Environment,
-  auth: Authenticate) extends Controller {
+  auth: Authenticate,
+  val controllerComponents: ControllerComponents) extends BaseController {
 
   def login: EssentialAction = Action { implicit request =>
     if (environment.mode == Mode.Prod) {
-      val clientId: String = configuration.getString("google.clientId").get
+      val clientId: String = configuration.get[String]("google.clientId")
       Ok(views.html.login(clientId)).withSession("state" -> auth.generateState)
     } else {
       Redirect(routes.Application.index()).withSession("email" -> "developer@lunatech.com")

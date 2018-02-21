@@ -6,7 +6,7 @@
 
 @import lunatech.lunchplanner.data.Location
 
-@(admin: User, menuPerDayForm: Form[MenuPerDayForm], menuOptions: Seq[(String,String)], menuPerDayOption: Option[MenuPerDay], dietRestrictionsSummary: MenuPerDayDietRestrictions, listPeopleAttending: Seq[MenuPerDayAttendant], locations: List[Location])(implicit messages: play.api.i18n.Messages)
+@(admin: User, menuPerDayForm: Form[MenuPerDayForm], menuOptions: Seq[(String,String)], menuPerDayOption: Option[MenuPerDay], dietRestrictionsSummary: MenuPerDayDietRestrictions, listPeopleAttending: Seq[MenuPerDayAttendant], locations: List[Location])(implicit messages: MessagesProvider)
 @main("Menu schedule details", admin) {
 <!-- Nav tabs -->
 <ul class="nav nav-tabs">

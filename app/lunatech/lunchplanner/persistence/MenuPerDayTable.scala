@@ -6,7 +6,7 @@ import java.util.UUID
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.{Menu, MenuPerDay}
 import org.joda.time.DateTime
-import slick.driver.PostgresDriver.api._
+import slick.jdbc.PostgresProfile.api._
 import slick.jdbc.GetResult
 import slick.lifted.{ForeignKeyQuery, ProvenShape, TableQuery}
 

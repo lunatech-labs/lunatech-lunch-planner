@@ -4,7 +4,7 @@ import java.util.UUID
 
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.Menu
-import slick.driver.PostgresDriver.api._
+import slick.jdbc.PostgresProfile.api._
 import slick.lifted.{ ProvenShape, TableQuery }
 
 import scala.concurrent.ExecutionContext.Implicits.global

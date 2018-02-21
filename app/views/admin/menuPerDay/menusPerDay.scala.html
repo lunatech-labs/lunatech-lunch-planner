@@ -3,7 +3,7 @@
 @import lunatech.lunchplanner.models.MenuWithNamePerDay
 @import lunatech.lunchplanner.viewModels.ListMenusPerDayForm
 
-@(admin: User, defaultDateStart: String, defaultDateEnd: String, listMenusPerDayForm: Form[ListMenusPerDayForm], listOfMenusPerDay: Array[MenuWithNamePerDay])(implicit messages: play.api.i18n.Messages, flash: play.api.mvc.Flash)
+@(admin: User, defaultDateStart: String, defaultDateEnd: String, listMenusPerDayForm: Form[ListMenusPerDayForm], listOfMenusPerDay: Array[MenuWithNamePerDay])(implicit messages: MessagesProvider, flash: play.api.mvc.Flash)
 @main("New schedule", admin) {
 <!-- Nav tabs -->
 <ul class="nav nav-tabs">

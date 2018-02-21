@@ -3,7 +3,7 @@ package lunatech.lunchplanner.services
 import java.io.ByteArrayOutputStream
 import java.sql.Date
 
-import com.google.inject.Inject
+import javax.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models._
 import org.apache.poi.ss.usermodel.CellStyle

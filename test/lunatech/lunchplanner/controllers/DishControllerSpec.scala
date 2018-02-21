@@ -1,20 +1,19 @@
 package lunatech.lunchplanner.controllers
 
-import java.util
 import java.util.UUID
 
 import akka.stream.Materializer
 import com.typesafe.config.ConfigFactory
-import lunatech.lunchplanner.common.{ControllerSpec, DBConnection}
+import lunatech.lunchplanner.common.{ ControllerSpec, DBConnection }
 import lunatech.lunchplanner.data.ControllersData._
 import lunatech.lunchplanner.models.User
 import lunatech.lunchplanner.persistence.DishTable
-import lunatech.lunchplanner.services.{DishService, MenuDishService, UserService}
+import lunatech.lunchplanner.services.{ DishService, MenuDishService, UserService }
 import org.mockito.Mockito._
-import play.api.i18n.{DefaultLangs, DefaultMessagesApi}
+import play.api.mvc.ControllerComponents
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{call, status, _}
-import play.api.{Configuration, Environment}
+import play.api.test.Helpers.{ call, status, _ }
+import play.api.{ Configuration, Environment }
 import slick.lifted.TableQuery
 
 import scala.concurrent.Future
@@ -30,16 +29,12 @@ class DishControllerSpec extends ControllerSpec {
   val dishService = mock[DishService]
   val menuDishService = mock[MenuDishService]
   val environment = mock[Environment]
-  val messagesApi = new DefaultMessagesApi(Environment.simple(), config, new DefaultLangs(config))
-  val configuration = mock[Configuration]
+  val controllerComponents = app.injector.instanceOf[ControllerComponents]
+  val configuration = app.injector.instanceOf[Configuration]
   val connection = mock[DBConnection]
 
-  val dishTable: TableQuery[DishTable] = TableQuery[DishTable]
+  val dishTable = TableQuery[DishTable]
 
-  val adminList: util.ArrayList[String] = new java.util.ArrayList[String]()
-  adminList.add("developer@lunatech.com")
-
-  when(configuration.getStringList("administrators")).thenReturn(Some(adminList))
   when(userService.getByEmailAddress("developer@lunatech.com")).thenReturn(Future.successful(Some(developer)))
   when(dishService.getAll).thenReturn(Future.successful(Seq(dish1, dish2, dish3, dish4, dish5)))
 
@@ -47,10 +42,9 @@ class DishControllerSpec extends ControllerSpec {
     userService,
     dishService,
     menuDishService,
+    controllerComponents,
     environment,
-    messagesApi,
-    configuration,
-    connection)
+    configuration)(connection)
 
   "Dish controller" should {
 
