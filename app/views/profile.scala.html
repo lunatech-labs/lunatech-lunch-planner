@@ -3,7 +3,7 @@
 @import lunatech.lunchplanner.models.UserProfile
 @import lunatech.lunchplanner.viewModels.ProfileForm
 
-@(user: User, profileForm: Form[ProfileForm], userProfile: UserProfile)(implicit messages: play.api.i18n.Messages, flash: play.api.mvc.Flash)
+@(user: User, profileForm: Form[ProfileForm], userProfile: UserProfile)(implicit messages: MessagesProvider, flash: play.api.mvc.Flash)
 
 @main("Profile", user) {
 

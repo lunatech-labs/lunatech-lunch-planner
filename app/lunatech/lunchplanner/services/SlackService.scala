@@ -2,10 +2,10 @@ package lunatech.lunchplanner.services
 
 import java.text.SimpleDateFormat
 import java.util.UUID
+import javax.inject.Inject
 
-import com.google.inject.Inject
 import lunatech.lunchplanner.models.MenuPerDayPerPerson
-import lunatech.lunchplanner.viewModels.{Attachments, AttachmentsActions, SlackForm}
+import lunatech.lunchplanner.viewModels.{ Attachments, AttachmentsActions, SlackForm }
 import play.api.Configuration
 import play.api.http.ContentTypes
 import play.api.libs.json.JsValue
@@ -21,7 +21,7 @@ class SlackService @Inject()(val userService: UserService,
                              val ws: WSClient,
                              val configuration: Configuration) {
 
-  val token = configuration.getString("slack.api.token").getOrElse(throw new IllegalStateException(s"No value for slack.api.token"))
+  val token = configuration.get[String]("slack.api.token")
   val sdf = new SimpleDateFormat("dd-MM-yyyy")
 
   /**
@@ -111,10 +111,10 @@ class SlackService @Inject()(val userService: UserService,
 
       val value = slackResponse.action.head.value
       if (value.contains("~")) {
-        configuration.getString("slack.bot.response.notAttending.text").get
+        configuration.get[String]("slack.bot.response.notAttending.text")
       } else {
         val response = uuidAndMenuName.filter(_._1 == UUID.fromString(value)).head._2
-        configuration.getString("slack.bot.response.text").get.format(response)
+        configuration.get[String]("slack.bot.response.text").format(response)
       }
 
     }
@@ -129,7 +129,7 @@ class SlackService @Inject()(val userService: UserService,
 
   private def doPost(url: String, requestBody: Map[String, Seq[String]]) = {
     ws.url(url)
-      .withHeaders(HeaderNames.CONTENT_TYPE -> ContentTypes.FORM)
+      .withHttpHeaders(HeaderNames.CONTENT_TYPE -> ContentTypes.FORM)
       .post(requestBody)
   }
 
@@ -159,10 +159,7 @@ class SlackService @Inject()(val userService: UserService,
   }
 
   private def getString(key: String): String = {
-    configuration.getString(key) match {
-      case Some(s) => s
-      case None => ""
-    }
+    configuration.get[String](key)
   }
 
 }

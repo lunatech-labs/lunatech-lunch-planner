@@ -3,7 +3,7 @@
 @import lunatech.lunchplanner.viewModels.MenuPerDayForm
 
 @import lunatech.lunchplanner.data.Location
-@(admin: User, date: String, menuPerDayForm: Form[MenuPerDayForm], menuOptions: Seq[(String,String)], locations: List[Location])(implicit messages: play.api.i18n.Messages)
+@(admin: User, date: String, menuPerDayForm: Form[MenuPerDayForm], menuOptions: Seq[(String,String)], locations: List[Location])(implicit messages: MessagesProvider)
 @main("Menu scheduling", admin) {
 <!-- Nav tabs -->
 <ul class="nav nav-tabs">

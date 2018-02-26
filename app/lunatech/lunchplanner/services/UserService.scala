@@ -15,7 +15,7 @@ class UserService @Inject() (configuration: Configuration, implicit val connecti
   def getByEmailAddress(emailAddress: String): Future[Option[User]] = UserTable.getByEmailAddress(emailAddress)
 
   def isAdminUser(emailAddress: String): Boolean =
-    configuration.getStringList("administrators").get.contains(emailAddress)
+    configuration.get[Seq[String]]("administrators").contains(emailAddress)
 
   def addIfNew(emailAddress: String): Future[User] = {
     val name = getUserNameFromEmail(emailAddress)
@@ -34,7 +34,7 @@ class UserService @Inject() (configuration: Configuration, implicit val connecti
     })
   }
 
-  def getAllEmailAddresses(): Future[Seq[String]] = {
+  def getAllEmailAddresses: Future[Seq[String]] = {
     UserTable.getAll.flatMap { users =>
       val emailAddresses = users.map(user => user.emailAddress)
 

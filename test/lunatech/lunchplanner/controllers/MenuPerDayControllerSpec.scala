@@ -1,32 +1,25 @@
 package lunatech.lunchplanner.controllers
 
-import java.util
 import java.util.UUID
 
 import akka.stream.Materializer
 import com.typesafe.config.ConfigFactory
-import lunatech.lunchplanner.common.{ControllerSpec, DBConnection}
+import lunatech.lunchplanner.common.{ ControllerSpec, DBConnection }
 import lunatech.lunchplanner.data.ControllersData._
 import lunatech.lunchplanner.models.User
 import lunatech.lunchplanner.persistence.DishTable
 import lunatech.lunchplanner.services._
 import org.mockito.Matchers.any
 import org.mockito.Mockito._
-import play.api.i18n.{DefaultLangs, DefaultMessagesApi}
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import play.api.{Configuration, Environment}
+import play.api.{ Configuration, Environment }
 import slick.lifted.TableQuery
-import play.api.inject.bind
+import play.api.mvc.ControllerComponents
 
 import scala.concurrent.Future
 
 class MenuPerDayControllerSpec extends ControllerSpec {
-
-  implicit override lazy val app = new GuiceApplicationBuilder()
-      .overrides(bind[MenuPerDayController].toInstance(controller))
-      .build()
 
   implicit lazy val materializer: Materializer = app.materializer
 
@@ -42,18 +35,14 @@ class MenuPerDayControllerSpec extends ControllerSpec {
   val menuPerDayService = mock[MenuPerDayService]
   val menuPerDayPerPersonService = mock[MenuPerDayPerPersonService]
   val environment = mock[Environment]
-  val messagesApi = new DefaultMessagesApi(Environment.simple(), config, new DefaultLangs(config))
-  val configuration = mock[Configuration]
+  val controllerComponents = app.injector.instanceOf[ControllerComponents]
+  val configuration = app.injector.instanceOf[Configuration]
   val connection = mock[DBConnection]
 
-  val dishTable: TableQuery[DishTable] = TableQuery[DishTable]
+  val dishTable = TableQuery[DishTable]
 
-  val adminList: util.ArrayList[String] = new java.util.ArrayList[String]()
-  adminList.add("developer@lunatech.com")
+  val uuid = UUID.randomUUID.toString
 
-  val uuid = UUID.randomUUID().toString
-
-  when(configuration.getStringList("administrators")).thenReturn(Some(adminList))
   when(userService.getByEmailAddress("developer@lunatech.com")).thenReturn(Future.successful(Some(developer)))
   when(menuPerDayPerPersonService.getAllMenuWithNamePerDayFilterDateRange(any[java.sql.Date], any[java.sql.Date]))
     .thenReturn(Future.successful(Seq(schedule1, schedule2)))
@@ -66,10 +55,9 @@ class MenuPerDayControllerSpec extends ControllerSpec {
     menuDishService,
     menuPerDayService,
     menuPerDayPerPersonService,
+    controllerComponents,
     environment,
-    messagesApi,
-    configuration,
-    connection)
+    configuration)(connection)
 
   "Menu per day controller" should {
     "display list of menus per day (schedules)" in {

@@ -17,5 +17,5 @@ trait ControllerSpec
   with GuiceOneAppPerSuite
   with Writeables {
 
-  val defaultTimeout = 10.seconds
+  val defaultTimeout: FiniteDuration = 10.seconds
 }

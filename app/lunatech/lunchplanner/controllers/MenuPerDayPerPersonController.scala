@@ -5,28 +5,28 @@ import javax.inject.Inject
 
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.MenuPerDayPerPerson
-import lunatech.lunchplanner.services.{MenuPerDayPerPersonService, MenuPerDayService, UserService}
+import lunatech.lunchplanner.services.{ MenuPerDayPerPersonService, MenuPerDayService, UserService }
 import lunatech.lunchplanner.viewModels.MenuPerDayPerPersonForm
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.I18nSupport
 import play.api.libs.json.Json
-import play.api.mvc.{Action, Controller, EssentialAction}
-import play.api.{Configuration, Environment}
+import play.api.mvc.{ BaseController, ControllerComponents, EssentialAction }
+import play.api.{ Configuration, Environment }
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class MenuPerDayPerPersonController @Inject()(userService: UserService,
-                                              menuPerDayService: MenuPerDayService,
-                                              menuPerDayPerPersonService: MenuPerDayPerPersonService,
-                                              val environment: Environment,
-                                              val messagesApi: MessagesApi,
-                                              val configuration: Configuration,
-                                              implicit val connection: DBConnection) extends Controller with Secured with I18nSupport {
+class MenuPerDayPerPersonController @Inject()(
+  userService: UserService,
+  menuPerDayService: MenuPerDayService,
+  menuPerDayPerPersonService: MenuPerDayPerPersonService,
+  val controllerComponents: ControllerComponents,
+  val environment: Environment,
+  val configuration: Configuration,
+  implicit val connection: DBConnection) extends BaseController with Secured with I18nSupport {
 
-  def createNewMenuPerDayPerPerson: EssentialAction = IsAuthenticatedAsync { username =>
-    implicit request => {
+  def createNewMenuPerDayPerPerson: EssentialAction = userAction.async { implicit request =>
       for {
-        currentUser <- userService.getByEmailAddress(username)
+        currentUser <- userService.getByEmailAddress(request.email)
         result <- MenuPerDayPerPersonForm
           .menuPerDayPerPersonForm
           .bindFromRequest
@@ -34,23 +34,22 @@ class MenuPerDayPerPersonController @Inject()(userService: UserService,
             formWithErrors =>
               for {
                 menusPerDayPerPerson <- menuPerDayPerPersonService.getAllMenuWithNamePerDayWithDishesPerPerson(
-                  getCurrentUser(currentUser, isAdmin = false, username).uuid)
+                  getCurrentUser(currentUser, isAdmin = false, request.email).uuid)
               } yield {
                 BadRequest(views.html.menuPerDayPerPerson(
-                  getCurrentUser(currentUser, isAdmin = userService.isAdminUser(currentUser.get.emailAddress), username),
+                  getCurrentUser(currentUser, isAdmin = userService.isAdminUser(currentUser.get.emailAddress), request.email),
                   menusPerDayPerPerson.toArray,
                   formWithErrors
                 ))
               },
             formData => {
-              updateData(getCurrentUser(currentUser, isAdmin = false, username).uuid, formData).map { _ =>
+              updateData(getCurrentUser(currentUser, isAdmin = false, request.email).uuid, formData).map { _ =>
                 Redirect(lunatech.lunchplanner.controllers.routes.Application.index())
                   .flashing("success" -> "Meals updated!")
               }
             }
           )
       } yield result
-    }
   }
 
   def getAttendeesEmailAddressesForUpcomingLunch: EssentialAction = Action.async {

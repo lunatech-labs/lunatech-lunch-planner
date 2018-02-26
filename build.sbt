@@ -2,7 +2,9 @@ name := """lunatech-lunch-planner"""
 
 version := "1.0-SNAPSHOT"
 
-scalaVersion := "2.11.8"
+dockerImageCreationTask := (publishLocal in Docker).value
+
+scalaVersion := "2.12.4"
 
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala)
@@ -11,29 +13,26 @@ lazy val root = (project in file("."))
   )
   .enablePlugins(DockerComposePlugin)
 
-dockerImageCreationTask := (publishLocal in Docker).value
-
 libraryDependencies ++= Seq(
-  cache,
+  ehcache,
   ws,
   evolutions,
-  "com.typesafe.play" %% "play-slick" % "2.0.2",
-  "com.typesafe.play" %% "play-slick-evolutions" % "2.0.2",
+  guice,
+  "com.typesafe.play" %% "play-json" % "2.6.8",
+  "com.typesafe.play" %% "play-slick" % "3.0.3",
+  "com.typesafe.play" %% "play-slick-evolutions" % "3.0.3",
   "org.postgresql" % "postgresql" % "9.3-1102-jdbc41",
-  "com.typesafe.slick" %% "slick" % "3.1.1",
+  "com.typesafe.slick" %% "slick" % "3.2.1",
   "com.google.api-client" % "google-api-client" % "1.22.0",
   "com.google.http-client" % "google-http-client-jackson" % "1.22.0",
-  "com.lunatech" %% "play-googleopenconnect" % "1.3-SNAPSHOT",
-  "com.adrianhurt" %% "play-bootstrap" % "1.1.1-P25-B3",
-  "com.enragedginger" %% "akka-quartz-scheduler" % "1.6.0-akka-2.4.x",
+  "com.lunatech" %% "play-googleopenconnect" % "2.2",
+  "com.adrianhurt" %% "play-bootstrap" % "1.2-P26-B3",
   "org.scalaz" %% "scalaz-core" % "7.2.10",
-  "com.typesafe.play" %% "play-mailer" % "5.0.0",
-  "com.github.nscala-time" %% "nscala-time" % "2.16.0",
   "org.apache.poi" % "poi-ooxml" % "3.16",
   "com.enragedginger" %% "akka-quartz-scheduler" % "1.6.0-akka-2.4.x",
-  "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % Test,
+  "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test,
   "org.mockito" % "mockito-all" % "1.10.19" % Test
 )
 
-resolvers += "Lunatech Artifactory" at "http://artifactory.lunatech.com/artifactory/snapshots-public"
+resolvers += "Lunatech Artifactory" at "http://artifactory.lunatech.com/artifactory/releases-public"
 resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"

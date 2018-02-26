@@ -6,7 +6,6 @@ import lunatech.lunchplanner.common.{ AcceptanceSpec, DBConnection, TestDatabase
 import lunatech.lunchplanner.models.Dish
 
 import scala.concurrent.Await
-import scala.concurrent.duration._
 
 class DishTableSpec extends AcceptanceSpec with TestDatabaseProvider {
   implicit private val dbConnection = app.injector.instanceOf[DBConnection]

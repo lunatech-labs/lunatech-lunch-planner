@@ -3,7 +3,7 @@ package lunatech.lunchplanner.slack
 import java.util.TimeZone
 
 import akka.actor.{Actor, ActorSystem, Props}
-import com.google.inject.Inject
+import javax.inject.Inject
 import com.typesafe.akka.extension.quartz.QuartzSchedulerExtension
 import lunatech.lunchplanner.services.{MenuPerDayPerPersonService, SlackService, UserService}
 import play.api.inject.ApplicationLifecycle
@@ -30,14 +30,14 @@ class LunchBotScheduler @Inject()(userService: UserService,
   val scheduleName = "EveryTuesday"
   val lunchBotActor = system.actorOf(Props.create(classOf[LunchBotActor],
                                     client,
-                                    conf.getString("slack.bot.host").get,
+                                    conf.get[String]("slack.bot.host"),
                                     userService,
                                     menuPerDayPerPersonService,
                                     slackService))
 
   scheduler.createSchedule(scheduleName,
     None,
-    conf.getString("slack.bot.cron").get,
+    conf.get[String]("slack.bot.cron"),
     None,
     TimeZone.getDefault)
 
