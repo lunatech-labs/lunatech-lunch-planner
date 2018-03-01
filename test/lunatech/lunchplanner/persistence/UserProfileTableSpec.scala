@@ -10,14 +10,14 @@ import shapeless.contrib.scalacheck._
 
 object UserProfileTableSpec extends Properties("UserProfile") with PropertyTestingConfig {
 
-  import TableDataGenerator._
+  import lunatech.lunchplanner.data.TableDataGenerator._
 
   override def afterAll(): Unit = dbConnection.db.close()
 
   property("add a new user profile") = forAll { (user: User, userProfile: UserProfile) =>
     val result = addUserAndProfileToDB(user, userProfile)
 
-    cleanUserProfileTableProps
+    cleanUserAndProfileTable
 
     result
   }
@@ -27,7 +27,7 @@ object UserProfileTableSpec extends Properties("UserProfile") with PropertyTesti
 
     val result = Await.result(UserProfileTable.getByUserUUID(user.uuid), defaultTimeout).get
 
-    cleanUserProfileTableProps
+    cleanUserAndProfileTable
 
     result == userProfile.copy(userUuid = user.uuid)
   }
@@ -37,7 +37,7 @@ object UserProfileTableSpec extends Properties("UserProfile") with PropertyTesti
 
     val result = Await.result(UserProfileTable.getAll, defaultTimeout)
 
-    cleanUserProfileTableProps
+    cleanUserAndProfileTable
 
     result == Seq(userProfile.copy(userUuid = user.uuid))
   }
@@ -76,10 +76,5 @@ object UserProfileTableSpec extends Properties("UserProfile") with PropertyTesti
   private def addUserAndProfileToDB(user: User, userProfile: UserProfile) = {
     Await.result(UserTable.add(user), defaultTimeout)
     Await.result(UserProfileTable.insertOrUpdate(userProfile.copy(userUuid = user.uuid)), defaultTimeout)
-  }
-
-  private def cleanUserProfileTableProps = {
-    cleanUserAndProfileTable
-    true
   }
 }

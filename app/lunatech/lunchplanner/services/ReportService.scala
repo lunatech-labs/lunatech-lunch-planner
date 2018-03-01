@@ -21,27 +21,12 @@ import scala.concurrent.Future
   * @param connection
   */
 class ReportService @Inject()(
-                               menuPerDayPerPersonService: MenuPerDayPerPersonService,
-                               menuPerDayService: MenuPerDayService,
-                               implicit val connection: DBConnection) {
+  menuPerDayPerPersonService: MenuPerDayPerPersonService,
+  menuPerDayService: MenuPerDayService)
+  (implicit val connection: DBConnection) {
 
   implicit def ordered: Ordering[Date] = new Ordering[Date] {
     override def compare(x: Date, y: Date): Int = x compareTo y
-  }
-
-  def getReport(month: Int, year: Int): Future[Report] = {
-    val baseDate = DateTime.now.withMonthOfYear(month).withYear(year)
-    val sDate = baseDate.withDayOfMonth(1)
-    val eDate = sDate.plusMonths(1).minusDays(1)
-
-    val attendees = menuPerDayService.getAllOrderedByDateFilterDateRange(new Date(sDate.getMillis), new Date(eDate.getMillis)).flatMap {
-      Future.traverse(_) { (menuPerDay: MenuPerDay) =>
-        menuPerDayPerPersonService.getListOfPeopleByMenuPerDayForReport(menuPerDay)
-      }
-    }.map(_.flatten)
-    attendees.map(menuAttendant => Report(menuAttendant.groupBy(_.date.toString).mapValues(_.map(_.name)).toSeq.sortBy { case (date, _) =>
-      date
-    }))
   }
 
   def getReportByLocationAndDate(month: Int, year: Int): Future[ReportByDateAndLocation] = {

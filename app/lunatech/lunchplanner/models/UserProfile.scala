@@ -2,8 +2,8 @@ package lunatech.lunchplanner.models
 
 import java.util.UUID
 
-case class UserProfile (
-  userUuid: UUID,
+final case class UserProfile (
+  userUuid: UUID = UUID.randomUUID(),
   vegetarian: Boolean = false,
   seaFoodRestriction: Boolean = false,
   porkRestriction: Boolean = false,

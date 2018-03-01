@@ -31,7 +31,7 @@ class Authentication @Inject()(
 
     response.flatMap {
       case Left(parameters) =>
-        userService.addIfNew(emailAddress = parameters.head._2).map(_ =>
+        userService.addUserIfNew(emailAddress = parameters.head._2).map(_ =>
           Redirect(routes.Application.index()).withSession(parameters.toArray: _*))
       case Right(message) => Future.successful(Redirect(routes.Authentication.login())
         .withNewSession.flashing("error" -> message.toString()))

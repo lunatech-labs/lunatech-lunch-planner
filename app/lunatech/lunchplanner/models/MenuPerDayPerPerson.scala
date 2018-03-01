@@ -2,14 +2,14 @@ package lunatech.lunchplanner.models
 
 import java.util.UUID
 
-case class MenuPerDayPerPerson(
+final case class MenuPerDayPerPerson(
   uuid: UUID = UUID.randomUUID(),
   menuPerDayUuid: UUID,
   userUuid: UUID,
   isAttending: Boolean
 )
 
-case class MenuWithNamePerDayPerPerson(
+final case class MenuWithNamePerDayPerPerson(
   menuPerDayUuid: UUID,
   menuDate: String,
   menuName: String,
@@ -18,7 +18,7 @@ case class MenuWithNamePerDayPerPerson(
   location: String
 )
 
-case class MenuWithNameWithDishesPerPerson(
+final case class MenuWithNameWithDishesPerPerson(
   menuPerDayUuid: UUID,
   menuDate: String,
   menuName: String,

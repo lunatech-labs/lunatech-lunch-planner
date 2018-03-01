@@ -15,8 +15,8 @@ import scala.concurrent.Future
 class MenuPerDayPerPersonService  @Inject() (
   dishService: DishService,
   menuService: MenuService,
-  menuPerDayService: MenuPerDayService,
-  implicit val connection: DBConnection) {
+  menuPerDayService: MenuPerDayService)
+  (implicit val connection: DBConnection) {
 
   def add(menuPerDayPerPerson: MenuPerDayPerPerson): Future[MenuPerDayPerPerson] =
     MenuPerDayPerPersonTable.add(menuPerDayPerPerson)
@@ -113,7 +113,10 @@ class MenuPerDayPerPersonService  @Inject() (
 
   def getListOfPeopleByMenuPerDay(menuPerDayUuid: UUID): Future[Seq[MenuPerDayAttendant]] = {
     MenuPerDayPerPersonTable.getAttendeesByMenuPerDayUuid(menuPerDayUuid)
-      .map(_.map(user => MenuPerDayAttendant(user._1.name, user._2.otherRestriction.getOrElse(""))))
+      .map(_.map {
+        case (user: User, userProfile: UserProfile) =>
+          MenuPerDayAttendant(user.name, userProfile.otherRestriction.getOrElse(""))
+      })
   }
 
   def getListOfPeopleByMenuPerDayForReport(menuPerDay: MenuPerDay): Future[Seq[MenuPerDayReport]] = {
@@ -128,7 +131,7 @@ class MenuPerDayPerPersonService  @Inject() (
 
   def getNotAttendingByDate(date: Date): Future[Seq[MenuPerDayReport]] = {
     MenuPerDayPerPersonTable.getNotAttendingByDate(date)
-      .map(_.map(user => MenuPerDayReport(user._1.name, date)))
+      .map(_.map(user => MenuPerDayReport(user.name, date)))
   }
 
   private def isAttending(menuPerDayPerPerson: Option[MenuPerDayPerPerson]): Option[Boolean] = {

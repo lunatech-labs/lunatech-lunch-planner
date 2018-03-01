@@ -3,14 +3,14 @@ package lunatech.lunchplanner.models
 import java.sql.Date
 import java.util.UUID
 
-case class MenuPerDay(
+final case class MenuPerDay(
   uuid: UUID = UUID.randomUUID(),
   menuUuid: UUID,
   date: Date,
   location: String
 )
 
-case class MenuWithNamePerDay(
+final case class MenuWithNamePerDay(
   uuid: UUID,
   menuUuid: UUID,
   menuDate: String,
@@ -19,7 +19,7 @@ case class MenuWithNamePerDay(
   location: String
 )
 
-case class MenuPerDayDietRestrictions(
+final case class MenuPerDayDietRestrictions(
   menuPerDayUuid: UUID,
   vegetarian: Int = 0,
   seaFoodRestriction: Int = 0,
@@ -30,7 +30,7 @@ case class MenuPerDayDietRestrictions(
   lactoseRestriction: Int = 0
 )
 
-case class MenuPerDayAttendant(name: String, otherRestrictions: String)
+final case class MenuPerDayAttendant(name: String, otherRestrictions: String)
 
-case class MenuPerDayReport(name: String, date: Date)
-case class MenuPerDayReportByDateAndLocation(date: Date, location: String, attendeeName: String)
+final case class MenuPerDayReport(name: String, date: Date)
+final case class MenuPerDayReportByDateAndLocation(date: Date, location: String, attendeeName: String)

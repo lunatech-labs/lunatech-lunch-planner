@@ -11,8 +11,8 @@ import lunatech.lunchplanner.persistence.MenuPerDayTable
 import scala.concurrent.Future
 
 class MenuPerDayService @Inject() (
-  menuService: MenuService,
-  implicit val connection: DBConnection) {
+  menuService: MenuService)
+  (implicit val connection: DBConnection) {
 
   def add(menuPerDay: MenuPerDay): Future[MenuPerDay] = {
     MenuPerDayTable.add(menuPerDay)

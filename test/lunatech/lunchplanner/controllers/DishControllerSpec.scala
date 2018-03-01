@@ -19,26 +19,26 @@ import slick.lifted.TableQuery
 import scala.concurrent.Future
 
 class DishControllerSpec extends ControllerSpec {
-  implicit lazy val materializer: Materializer = app.materializer
+  implicit lazy private val materializer: Materializer = app.materializer
 
-  val config = Configuration(ConfigFactory.load())
+  private val config = Configuration(ConfigFactory.load())
 
   private val developer = User(UUID.randomUUID(), "Developer", "developer@lunatech.com")
 
-  val userService = mock[UserService]
-  val dishService = mock[DishService]
-  val menuDishService = mock[MenuDishService]
-  val environment = mock[Environment]
-  val controllerComponents = app.injector.instanceOf[ControllerComponents]
-  val configuration = app.injector.instanceOf[Configuration]
-  val connection = mock[DBConnection]
+  private val userService = mock[UserService]
+  private val dishService = mock[DishService]
+  private val menuDishService = mock[MenuDishService]
+  private val environment = mock[Environment]
+  private val controllerComponents = app.injector.instanceOf[ControllerComponents]
+  private val configuration = app.injector.instanceOf[Configuration]
+  private val connection = mock[DBConnection]
 
-  val dishTable = TableQuery[DishTable]
+  private val dishTable = TableQuery[DishTable]
 
   when(userService.getByEmailAddress("developer@lunatech.com")).thenReturn(Future.successful(Some(developer)))
   when(dishService.getAll).thenReturn(Future.successful(Seq(dish1, dish2, dish3, dish4, dish5)))
 
-  val controller = new DishController(
+  private val controller = new DishController(
     userService,
     dishService,
     menuDishService,

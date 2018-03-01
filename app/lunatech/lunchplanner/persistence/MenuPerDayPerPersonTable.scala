@@ -73,19 +73,14 @@ object MenuPerDayPerPersonTable {
     connection.db.run(query.result)
   }
 
-  def getNotAttendingByDate(date: Date)(implicit connection: DBConnection): Future[Seq[(User, UserProfile)]] = {
-    implicit val result = GetResult(r => (User(uuid = UUID.fromString(r.<<), name = r.<<, emailAddress = r.<<, isAdmin = r.<<),
-            UserProfile(userUuid = UUID.fromString(r.<<), vegetarian = r.<<, seaFoodRestriction = r.<<, porkRestriction = r.<<, beefRestriction = r.<<,
-              chickenRestriction = r.<<, glutenRestriction = r.<<, lactoseRestriction = r.<<, otherRestriction = Option(r.<<)
-            )
-          ))
+  def getNotAttendingByDate(date: Date)(implicit connection: DBConnection): Future[Seq[User]] = {
+    implicit val result = GetResult(r => User(uuid = UUID.fromString(r.<<), name = r.<<, emailAddress = r.<<, isAdmin = r.<<))
 
-    val query = sql"""SELECT DISTINCT ON (u."uuid") u.*, up.*
+    val query = sql"""SELECT DISTINCT ON (u."uuid") u.*
                             FROM "MenuPerDayPerPerson" mpdpp
                             JOIN "MenuPerDay" mpd ON mpdpp."menuPerDayUuid" = mpd."uuid"
                             JOIN "User" u ON mpdpp."userUuid" = u."uuid"
-                            JOIN "UserProfile" up ON u."uuid" = up."userUuid"
-                            WHERE mpdpp."isAttending" = FALSE AND mpd."date" = '#$date'""".as[(User, UserProfile)]
+                            WHERE mpdpp."isAttending" = FALSE AND mpd."date" = '#$date'""".as[User]
 
     connection.db.run(query)
   }

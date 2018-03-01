@@ -11,7 +11,7 @@ import shapeless.contrib.scalacheck._
 
 object MenuPerDayPerPersonTableSpec extends Properties("MenuPerDayPerPerson") with PropertyTestingConfig {
 
-  import TableDataGenerator._
+  import lunatech.lunchplanner.data.TableDataGenerator._
 
   override def afterAll(): Unit = dbConnection.db.close()
 
@@ -23,7 +23,8 @@ object MenuPerDayPerPersonTableSpec extends Properties("MenuPerDayPerPerson") wi
       val menuPerDayPerPersonToAdd = menuPerDayPerPerson.copy(menuPerDayUuid = menuPerDay.uuid, userUuid = user.uuid)
       val result = Await.result(MenuPerDayPerPersonTable.add(menuPerDayPerPersonToAdd), defaultTimeout)
 
-      cleanMenuPerDayPerPersonTableProps
+      cleanMenuPerDayPerPersonTable
+
       result == menuPerDayPerPersonToAdd
   }
 
@@ -33,7 +34,8 @@ object MenuPerDayPerPersonTableSpec extends Properties("MenuPerDayPerPerson") wi
       val menuPerDayPerPersonAdded = addUserAndMenuDataToDB(user, menu, menuPerDay, menuPerDayPerPerson)
       val result = Await.result(MenuPerDayPerPersonTable.exists(menuPerDayPerPersonAdded.uuid), defaultTimeout)
 
-      cleanMenuPerDayPerPersonTableProps
+      cleanMenuPerDayPerPersonTable
+
       result
   }
 
@@ -43,7 +45,7 @@ object MenuPerDayPerPersonTableSpec extends Properties("MenuPerDayPerPerson") wi
       val menuPerDayPerPersonToAdd = addUserAndMenuDataToDB(user, menu, menuPerDay, menuPerDayPerPerson)
       val result = Await.result(MenuPerDayPerPersonTable.getByUuid(menuPerDayPerPersonToAdd.uuid), defaultTimeout).get
 
-      cleanMenuPerDayPerPersonTableProps
+      cleanMenuPerDayPerPersonTable
 
       result == menuPerDayPerPersonToAdd
   }
@@ -54,7 +56,7 @@ object MenuPerDayPerPersonTableSpec extends Properties("MenuPerDayPerPerson") wi
       val menuPerDayPerPersonAdded = addUserAndMenuDataToDB(user, menu, menuPerDay, menuPerDayPerPerson)
       val result = Await.result(MenuPerDayPerPersonTable.getByMenuPerDayUuid(menuPerDay.uuid), defaultTimeout)
 
-      cleanMenuPerDayPerPersonTableProps
+      cleanMenuPerDayPerPersonTable
 
       result == Seq(menuPerDayPerPersonAdded)
   }
@@ -64,7 +66,7 @@ object MenuPerDayPerPersonTableSpec extends Properties("MenuPerDayPerPerson") wi
 
     val result = Await.result(MenuPerDayPerPersonTable.getByMenuPerDayUuid(menuPerDay.uuid), defaultTimeout)
 
-    cleanMenuPerDayPerPersonTableProps
+    cleanMenuPerDayPerPersonTable
 
     result == Seq.empty[MenuPerDayPerPerson]
   }
@@ -75,7 +77,8 @@ object MenuPerDayPerPersonTableSpec extends Properties("MenuPerDayPerPerson") wi
       val menuPerDayPerPersonAdded = addUserAndMenuDataToDB(user, menu, menuPerDay, menuPerDayPerPerson)
       val result = Await.result(MenuPerDayPerPersonTable.getByUserUuid(user.uuid), defaultTimeout)
 
-      cleanMenuPerDayPerPersonTableProps
+      cleanMenuPerDayPerPersonTable
+
       result == Seq(menuPerDayPerPersonAdded)
   }
 
@@ -84,7 +87,7 @@ object MenuPerDayPerPersonTableSpec extends Properties("MenuPerDayPerPerson") wi
 
     val result = Await.result(MenuPerDayPerPersonTable.getByUserUuid(user.uuid), defaultTimeout)
 
-    cleanMenuPerDayPerPersonTableProps
+    cleanMenuPerDayPerPersonTable
 
     result == Seq.empty[MenuPerDayPerPerson]
   }
@@ -95,7 +98,7 @@ object MenuPerDayPerPersonTableSpec extends Properties("MenuPerDayPerPerson") wi
       val menuPerDayPerPersonToAdd = addUserAndMenuDataToDB(user, menu, menuPerDay, menuPerDayPerPerson)
       val result = Await.result(MenuPerDayPerPersonTable.getAll, defaultTimeout)
 
-      cleanMenuPerDayPerPersonTableProps
+      cleanMenuPerDayPerPersonTable
 
       result == Seq(menuPerDayPerPersonToAdd)
   }
@@ -108,7 +111,7 @@ object MenuPerDayPerPersonTableSpec extends Properties("MenuPerDayPerPerson") wi
         Await.result(MenuPerDayPerPersonTable.getByUserUuidAndMenuPerDayUuid(user.uuid, menuPerDay.uuid), defaultTimeout)
           .get
 
-      cleanMenuPerDayPerPersonTableProps
+      cleanMenuPerDayPerPersonTable
 
       result == menuPerDayPerPersonToAdd
   }
@@ -119,7 +122,7 @@ object MenuPerDayPerPersonTableSpec extends Properties("MenuPerDayPerPerson") wi
       val menuPerDayPerPersonToAdd = addUserAndMenuDataToDB(user, menu, menuPerDay, menuPerDayPerPerson)
       val result = Await.result(MenuPerDayPerPersonTable.remove(menuPerDayPerPersonToAdd.uuid), defaultTimeout)
 
-      cleanMenuPerDayPerPersonTableProps
+      cleanMenuPerDayPerPersonTable
 
       result ==  1
   }
@@ -140,7 +143,7 @@ object MenuPerDayPerPersonTableSpec extends Properties("MenuPerDayPerPerson") wi
       addUserAndMenuDataToDB(user, menu, menuPerDay, menuPerDayPerPerson)
       val result = Await.result(MenuPerDayPerPersonTable.removeByMenuPerDayUuid(menuPerDay.uuid), defaultTimeout)
 
-      cleanMenuPerDayPerPersonTableProps
+      cleanMenuPerDayPerPersonTable
 
       result ==  1
   }
@@ -164,7 +167,7 @@ object MenuPerDayPerPersonTableSpec extends Properties("MenuPerDayPerPerson") wi
 
       val result = Await.result(MenuPerDayPerPersonTable.getAttendeesByMenuPerDayUuid(menuPerDay.uuid), defaultTimeout)
 
-      cleanMenuPerDayPerPersonTableProps
+      cleanMenuPerDayPerPersonTable
 
       result == Seq((user, userProfileToAdd))
   }
@@ -181,10 +184,5 @@ object MenuPerDayPerPersonTableSpec extends Properties("MenuPerDayPerPerson") wi
     val menuPerDayPerPersonToAdd = menuPerDayPerPerson.copy(menuPerDayUuid = menuPerDay.uuid, userUuid = user.uuid)
     Await.result(MenuPerDayPerPersonTable.add(menuPerDayPerPersonToAdd), defaultTimeout)
     menuPerDayPerPersonToAdd
-  }
-
-  private def cleanMenuPerDayPerPersonTableProps = {
-    cleanMenuPerDayPerPersonTable
-    true
   }
 }

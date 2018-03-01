@@ -11,7 +11,7 @@ import play.api.Configuration
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class UserProfileService @Inject() (configuration: Configuration, implicit val connection: DBConnection) {
+class UserProfileService @Inject() (configuration: Configuration)(implicit val connection: DBConnection) {
 
   def insertOrUpdate(userProfile: UserProfile): Future[Boolean] =
     UserProfileTable.insertOrUpdate(userProfile)

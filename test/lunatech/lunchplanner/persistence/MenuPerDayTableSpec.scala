@@ -12,7 +12,7 @@ import shapeless.contrib.scalacheck._
 
 object MenuPerDayTableSpec extends Properties("MenuPerDay") with PropertyTestingConfig {
 
-  import TableDataGenerator._
+  import lunatech.lunchplanner.data.TableDataGenerator._
 
   override def afterAll(): Unit = dbConnection.db.close()
 
@@ -26,7 +26,7 @@ object MenuPerDayTableSpec extends Properties("MenuPerDay") with PropertyTesting
     val menuPerDayToAdd = menuPerDay.copy(menuUuid = menu.uuid)
     val result = Await.result(MenuPerDayTable.add(menuPerDayToAdd), defaultTimeout)
 
-    cleanMenuPerDayTableProps
+    cleanMenuPerDayTable
 
     result.date.toString == menuPerDayToAdd.date.toString &&
       result.location == menuPerDayToAdd.location &&
@@ -39,7 +39,7 @@ object MenuPerDayTableSpec extends Properties("MenuPerDay") with PropertyTesting
 
     val result = Await.result(MenuPerDayTable.exists(menuPerDayToAdd.uuid), defaultTimeout)
 
-    cleanMenuPerDayTableProps
+    cleanMenuPerDayTable
 
     result
   }
@@ -49,7 +49,7 @@ object MenuPerDayTableSpec extends Properties("MenuPerDay") with PropertyTesting
 
     val result = Await.result(MenuPerDayTable.getByUuid(menuPerDayToAdd.uuid), defaultTimeout).get
 
-    cleanMenuPerDayTableProps
+    cleanMenuPerDayTable
 
     result.date.toString == menuPerDayToAdd.date.toString &&
       result.location == menuPerDayToAdd.location &&
@@ -62,7 +62,7 @@ object MenuPerDayTableSpec extends Properties("MenuPerDay") with PropertyTesting
 
     val result = Await.result(MenuPerDayTable.getByMenuUuid(menu.uuid), defaultTimeout)
 
-    cleanMenuPerDayTableProps
+    cleanMenuPerDayTable
 
     result.map(_.date.toString) == Seq(menuPerDayToAdd).map(_.date.toString)
   }
@@ -72,7 +72,7 @@ object MenuPerDayTableSpec extends Properties("MenuPerDay") with PropertyTesting
 
     val result = Await.result(MenuPerDayTable.getByMenuUuid(menuPerDay.uuid), defaultTimeout)
 
-    cleanMenuPerDayTableProps
+    cleanMenuPerDayTable
 
     result == Seq.empty[MenuPerDay]
   }
@@ -82,7 +82,7 @@ object MenuPerDayTableSpec extends Properties("MenuPerDay") with PropertyTesting
 
     val result = Await.result(MenuPerDayTable.getByDate(menuPerDayToAdd.date), defaultTimeout)
 
-    cleanMenuPerDayTableProps
+    cleanMenuPerDayTable
 
     result.map(_.date.toString) == Seq(menuPerDayToAdd).map(_.date.toString)
   }
@@ -104,7 +104,7 @@ object MenuPerDayTableSpec extends Properties("MenuPerDay") with PropertyTesting
 
     val result = Await.result(MenuPerDayTable.getAll, defaultTimeout)
 
-    cleanMenuPerDayTableProps
+    cleanMenuPerDayTable
 
     result.map(_.date.toString) == Seq(menuPerDayToAdd1, menuPerDayToAdd2).map(_.date.toString)
   }
@@ -120,7 +120,7 @@ object MenuPerDayTableSpec extends Properties("MenuPerDay") with PropertyTesting
 
       val result = Await.result(MenuPerDayTable.getAllOrderedByDateAscending, defaultTimeout)
 
-      cleanMenuPerDayTableProps
+      cleanMenuPerDayTable
 
       result.map(_.date.toString) == Seq(menuPerDayToSmallerDate, menuPerDayToAddBiggerDate).map(_.date.toString)
   }
@@ -139,7 +139,7 @@ object MenuPerDayTableSpec extends Properties("MenuPerDay") with PropertyTesting
 
       val result = Await.result(MenuPerDayTable.getAllFutureAndOrderedByDateAscending, defaultTimeout)
 
-      cleanMenuPerDayTableProps
+      cleanMenuPerDayTable
 
       result.map(_.date.toString) == Seq(menuPerDayToAddFuture).map(_.date.toString)
   }
@@ -181,7 +181,7 @@ object MenuPerDayTableSpec extends Properties("MenuPerDay") with PropertyTesting
 
     val result = Await.result(MenuPerDayTable.getByUuid(menuPerDay.uuid), defaultTimeout).get
 
-    cleanMenuPerDayTableProps
+    cleanMenuPerDayTable
 
     result.date.toLocalDate == new Date(newDate).toLocalDate
   }
@@ -192,10 +192,5 @@ object MenuPerDayTableSpec extends Properties("MenuPerDay") with PropertyTesting
     val menuPerDayToAdd = menuPerDay.copy(menuUuid = menu.uuid)
     Await.result(MenuPerDayTable.add(menuPerDayToAdd), defaultTimeout)
     menuPerDayToAdd
-  }
-
-  private def cleanMenuPerDayTableProps = {
-    cleanMenuPerDayTable
-    true
   }
 }

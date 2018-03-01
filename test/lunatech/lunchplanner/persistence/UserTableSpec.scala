@@ -10,14 +10,14 @@ import shapeless.contrib.scalacheck._
 
 object UserTableSpec extends Properties("UserProfile") with PropertyTestingConfig {
 
-  import TableDataGenerator._
+  import lunatech.lunchplanner.data.TableDataGenerator._
 
   override def afterAll(): Unit = dbConnection.db.close()
 
   property("add a new user") = forAll { user: User =>
     val result = addUserToDB(user)
 
-    cleanUserTableProps
+    cleanUserAndProfileTable
 
     result == user
   }
@@ -27,7 +27,7 @@ object UserTableSpec extends Properties("UserProfile") with PropertyTestingConfi
 
     val result = Await.result(UserTable.exists(user.uuid), defaultTimeout)
 
-    cleanUserTableProps
+    cleanUserAndProfileTable
 
     result
   }
@@ -37,7 +37,7 @@ object UserTableSpec extends Properties("UserProfile") with PropertyTestingConfi
 
     val result = Await.result(UserTable.getByUUID(user.uuid), defaultTimeout).get
 
-    cleanUserTableProps
+    cleanUserAndProfileTable
 
     result == user
   }
@@ -47,7 +47,7 @@ object UserTableSpec extends Properties("UserProfile") with PropertyTestingConfi
 
     val result = Await.result(UserTable.getByEmailAddress(user.emailAddress), defaultTimeout).get
 
-    cleanUserTableProps
+    cleanUserAndProfileTable
 
     result == user
   }
@@ -58,7 +58,7 @@ object UserTableSpec extends Properties("UserProfile") with PropertyTestingConfi
 
     val result = Await.result(UserTable.getAll, defaultTimeout)
 
-    cleanUserTableProps
+    cleanUserAndProfileTable
 
     result == Seq(user1, user2)
   }
@@ -68,7 +68,7 @@ object UserTableSpec extends Properties("UserProfile") with PropertyTestingConfi
 
     val result = Await.result(UserTable.remove(user.uuid), defaultTimeout)
 
-    cleanUserTableProps
+    cleanUserAndProfileTable
 
     result == 1
   }
@@ -82,10 +82,5 @@ object UserTableSpec extends Properties("UserProfile") with PropertyTestingConfi
 
   private def addUserToDB(user: User) = {
     Await.result(UserTable.add(user), defaultTimeout)
-  }
-
-  private def cleanUserTableProps = {
-    cleanDatabase
-    true
   }
 }
