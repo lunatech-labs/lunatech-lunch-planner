@@ -13,14 +13,14 @@ import shapeless.contrib.scalacheck._
 
 object DishTableSpec extends Properties("Dish") with PropertyTestingConfig {
 
-  import TableDataGenerator._
+  import lunatech.lunchplanner.data.TableDataGenerator._
 
   override def afterAll(): Unit = dbConnection.db.close()
 
   property("add a new dish") = forAll { dish: Dish =>
     val result = addDishToDB(dish)
 
-    cleanDishTableProps
+    cleanDishTable
 
     result == dish
   }
@@ -29,7 +29,7 @@ object DishTableSpec extends Properties("Dish") with PropertyTestingConfig {
     addDishToDB(dish)
     val result = Await.result(DishTable.exists(dish.uuid), defaultTimeout)
 
-    cleanDishTableProps
+    cleanDishTable
 
     result
   }
@@ -38,7 +38,7 @@ object DishTableSpec extends Properties("Dish") with PropertyTestingConfig {
     addDishToDB(dish)
     val result = Await.result(DishTable.getByUuid(dish.uuid), defaultTimeout).get
 
-    cleanDishTableProps
+    cleanDishTable
 
     result == dish
   }
@@ -53,7 +53,7 @@ object DishTableSpec extends Properties("Dish") with PropertyTestingConfig {
 
     val result = Await.result(DishTable.getAll, defaultTimeout)
 
-    cleanDishTableProps
+    cleanDishTable
 
     result.lengthCompare(2) == 0 &&
     result.exists(_.uuid == dish1.uuid) &&
@@ -64,7 +64,7 @@ object DishTableSpec extends Properties("Dish") with PropertyTestingConfig {
     addDishToDB(dish)
     val dishesRemoved = Await.result(DishTable.removeByUuid(dish.uuid), defaultTimeout)
 
-    cleanDishTableProps
+    cleanDishTable
 
     dishesRemoved == 1
   }
@@ -72,7 +72,7 @@ object DishTableSpec extends Properties("Dish") with PropertyTestingConfig {
   property("not fail when trying to remove a dish that does not exist") = forAll { dish: Dish =>
     val dishesRemoved = Await.result(DishTable.removeByUuid(UUID.randomUUID), defaultTimeout)
 
-    cleanDishTableProps
+    cleanDishTable
 
     dishesRemoved == 0
   }
@@ -85,17 +85,12 @@ object DishTableSpec extends Properties("Dish") with PropertyTestingConfig {
 
     val updatedDish = Await.result(DishTable.getByUuid(dish.uuid), defaultTimeout).get
 
-    cleanDishTableProps
+    cleanDishTable
 
     updatedDish.description == "updated description"
   }
 
   private def addDishToDB(dish: Dish) = {
     Await.result(DishTable.add(dish), defaultTimeout)
-  }
-
-  private def cleanDishTableProps = {
-    cleanDishTable
-    true
   }
 }

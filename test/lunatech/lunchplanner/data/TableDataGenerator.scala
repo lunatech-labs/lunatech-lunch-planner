@@ -1,4 +1,4 @@
-package lunatech.lunchplanner.persistence
+package lunatech.lunchplanner.data
 
 import java.sql.Date
 
@@ -46,7 +46,7 @@ object TableDataGenerator {
       chickenRestriction = chickenRestriction,
       glutenRestriction = glutenRestriction,
       lactoseRestriction = lactoseRestriction,
-      otherRestriction = otherRestriction
+      otherRestriction = otherRestriction.map(_.replaceAll("\u0000", ""))
     )
   }
 

@@ -12,8 +12,8 @@ import scala.concurrent.Future
 
 class MenuDishService @Inject() (
   dishService: DishService,
-  menuService: MenuService,
-  implicit val connection: DBConnection){
+  menuService: MenuService)
+  (implicit val connection: DBConnection){
 
   def add(menuDish: MenuDish): Future[MenuDish] = {
     MenuDishTable.add(menuDish)

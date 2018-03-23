@@ -10,14 +10,14 @@ import shapeless.contrib.scalacheck._
 
 object MenuDishTableSpec extends Properties("MenuDish") with PropertyTestingConfig {
 
-  import TableDataGenerator._
+  import lunatech.lunchplanner.data.TableDataGenerator._
 
   property("add a new menu dish") = forAll { (dish: Dish, menu: Menu, menuDish: MenuDish) =>
     addMenuAndDishToDB(dish, menu)
     val menuDishToAdd = menuDish.copy(dishUuid = dish.uuid, menuUuid = menu.uuid)
     val result = Await.result(MenuDishTable.add(menuDishToAdd), defaultTimeout)
 
-    cleanMenuDishTableProps
+    cleanMenuDishTable
 
     result == menuDishToAdd
   }
@@ -27,7 +27,8 @@ object MenuDishTableSpec extends Properties("MenuDish") with PropertyTestingConf
 
     val result = Await.result(MenuDishTable.exists(menuDishAdded.uuid), defaultTimeout)
 
-    cleanMenuDishTableProps
+    cleanMenuDishTable
+
     result
   }
 
@@ -36,7 +37,8 @@ object MenuDishTableSpec extends Properties("MenuDish") with PropertyTestingConf
 
     val result = Await.result(MenuDishTable.getByUuid(menuDishToAdd.uuid), defaultTimeout).get
 
-    cleanMenuDishTableProps
+    cleanMenuDishTable
+
     result == menuDishToAdd
   }
 
@@ -45,7 +47,8 @@ object MenuDishTableSpec extends Properties("MenuDish") with PropertyTestingConf
 
     val result = Await.result(MenuDishTable.getByMenuUuid(menu.uuid), defaultTimeout)
 
-    cleanMenuDishTableProps
+    cleanMenuDishTable
+
     result == Seq(menuDishToAdd)
   }
 
@@ -67,7 +70,8 @@ object MenuDishTableSpec extends Properties("MenuDish") with PropertyTestingConf
 
       val result = Await.result(MenuDishTable.getAll, defaultTimeout)
 
-      cleanMenuDishTableProps
+      cleanMenuDishTable
+
       result == Seq(menuDishToAdd1, menuDishToAdd2)
   }
 
@@ -112,10 +116,5 @@ object MenuDishTableSpec extends Properties("MenuDish") with PropertyTestingConf
 
     val menuDishToAdd = menuDish.copy(dishUuid = dish.uuid, menuUuid = menu.uuid)
     Await.result(MenuDishTable.add(menuDishToAdd), defaultTimeout)
-  }
-
-  private def cleanMenuDishTableProps = {
-    cleanMenuDishTable
-    true
   }
 }

@@ -34,8 +34,10 @@ libraryDependencies ++= Seq(
   "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test,
   "org.mockito" % "mockito-all" % "1.10.19" % Test,
   "org.scalacheck" %% "scalacheck" % "1.13.5" % Test,
-  "org.typelevel" %% "shapeless-scalacheck" % "0.6.1" % Test
+  "org.typelevel" %% "shapeless-scalacheck" % "0.6.1" % Test,
+  "wolfendale" %% "scalacheck-gen-regexp" % "0.1.0" % Test
 )
 
 resolvers += "Lunatech Artifactory" at "http://artifactory.lunatech.com/artifactory/releases-public"
 resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
+resolvers += Resolver.bintrayRepo("wolfendale", "maven")

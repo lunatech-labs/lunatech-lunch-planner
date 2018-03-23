@@ -12,7 +12,7 @@ import shapeless.contrib.scalacheck._
 
 object MenuPerDayTableSpec extends Properties("MenuPerDay") with PropertyTestingConfig {
 
-  import TableDataGenerator._
+  import lunatech.lunchplanner.data.TableDataGenerator._
 
   override def afterAll(): Unit = dbConnection.db.close()
 
@@ -26,12 +26,12 @@ object MenuPerDayTableSpec extends Properties("MenuPerDay") with PropertyTesting
     val menuPerDayToAdd = menuPerDay.copy(menuUuid = menu.uuid)
     val result = Await.result(MenuPerDayTable.add(menuPerDayToAdd), defaultTimeout)
 
-    cleanMenuPerDayTableProps
+    cleanMenuPerDayTable
 
     result.date.toString == menuPerDayToAdd.date.toString &&
-    result.location == menuPerDayToAdd.location &&
-    result.menuUuid == menuPerDayToAdd.menuUuid &&
-    result.uuid == menuPerDayToAdd.uuid
+      result.location == menuPerDayToAdd.location &&
+      result.menuUuid == menuPerDayToAdd.menuUuid &&
+      result.uuid == menuPerDayToAdd.uuid
   }
 
   property("query for existing menus per day successfully") = forAll { (menu: Menu, menuPerDay: MenuPerDay) =>
@@ -39,7 +39,7 @@ object MenuPerDayTableSpec extends Properties("MenuPerDay") with PropertyTesting
 
     val result = Await.result(MenuPerDayTable.exists(menuPerDayToAdd.uuid), defaultTimeout)
 
-    cleanMenuPerDayTableProps
+    cleanMenuPerDayTable
 
     result
   }
@@ -49,12 +49,12 @@ object MenuPerDayTableSpec extends Properties("MenuPerDay") with PropertyTesting
 
     val result = Await.result(MenuPerDayTable.getByUuid(menuPerDayToAdd.uuid), defaultTimeout).get
 
-    cleanMenuPerDayTableProps
+    cleanMenuPerDayTable
 
     result.date.toString == menuPerDayToAdd.date.toString &&
-    result.location == menuPerDayToAdd.location &&
-    result.menuUuid == menuPerDayToAdd.menuUuid &&
-    result.uuid == menuPerDayToAdd.uuid
+      result.location == menuPerDayToAdd.location &&
+      result.menuUuid == menuPerDayToAdd.menuUuid &&
+      result.uuid == menuPerDayToAdd.uuid
   }
 
   property("query for menus per day by menu uuid") = forAll { (menu: Menu, menuPerDay: MenuPerDay) =>
@@ -62,17 +62,17 @@ object MenuPerDayTableSpec extends Properties("MenuPerDay") with PropertyTesting
 
     val result = Await.result(MenuPerDayTable.getByMenuUuid(menu.uuid), defaultTimeout)
 
-    cleanMenuPerDayTableProps
+    cleanMenuPerDayTable
 
     result.map(_.date.toString) == Seq(menuPerDayToAdd).map(_.date.toString)
   }
 
   property("query for menus per day by non existent menu uuid") = forAll { (menuPerDay: MenuPerDay) =>
-  // skipping adding menuPerDay to DB
+    // skipping adding menuPerDay to DB
 
     val result = Await.result(MenuPerDayTable.getByMenuUuid(menuPerDay.uuid), defaultTimeout)
 
-    cleanMenuPerDayTableProps
+    cleanMenuPerDayTable
 
     result == Seq.empty[MenuPerDay]
   }
@@ -82,7 +82,7 @@ object MenuPerDayTableSpec extends Properties("MenuPerDay") with PropertyTesting
 
     val result = Await.result(MenuPerDayTable.getByDate(menuPerDayToAdd.date), defaultTimeout)
 
-    cleanMenuPerDayTableProps
+    cleanMenuPerDayTable
 
     result.map(_.date.toString) == Seq(menuPerDayToAdd).map(_.date.toString)
   }
@@ -104,7 +104,7 @@ object MenuPerDayTableSpec extends Properties("MenuPerDay") with PropertyTesting
 
     val result = Await.result(MenuPerDayTable.getAll, defaultTimeout)
 
-    cleanMenuPerDayTableProps
+    cleanMenuPerDayTable
 
     result.map(_.date.toString) == Seq(menuPerDayToAdd1, menuPerDayToAdd2).map(_.date.toString)
   }
@@ -120,7 +120,7 @@ object MenuPerDayTableSpec extends Properties("MenuPerDay") with PropertyTesting
 
       val result = Await.result(MenuPerDayTable.getAllOrderedByDateAscending, defaultTimeout)
 
-      cleanMenuPerDayTableProps
+      cleanMenuPerDayTable
 
       result.map(_.date.toString) == Seq(menuPerDayToSmallerDate, menuPerDayToAddBiggerDate).map(_.date.toString)
   }
@@ -139,7 +139,7 @@ object MenuPerDayTableSpec extends Properties("MenuPerDay") with PropertyTesting
 
       val result = Await.result(MenuPerDayTable.getAllFutureAndOrderedByDateAscending, defaultTimeout)
 
-      cleanMenuPerDayTableProps
+      cleanMenuPerDayTable
 
       result.map(_.date.toString) == Seq(menuPerDayToAddFuture).map(_.date.toString)
   }
@@ -160,15 +160,15 @@ object MenuPerDayTableSpec extends Properties("MenuPerDay") with PropertyTesting
 
   property("remove existing menu per day by menu uuid") = forAll {
     (menu: Menu, menuPerDay1: MenuPerDay, menuPerDay2: MenuPerDay) =>
-    Await.result(MenuTable.add(menu), defaultTimeout)
+      Await.result(MenuTable.add(menu), defaultTimeout)
 
-    val menuPerDayToAdd1 = menuPerDay1.copy(menuUuid = menu.uuid)
-    val menuPerDayToAdd2 = menuPerDay2.copy(menuUuid = menu.uuid)
-    Await.result(MenuPerDayTable.add(menuPerDayToAdd1), defaultTimeout)
-    Await.result(MenuPerDayTable.add(menuPerDayToAdd2), defaultTimeout)
+      val menuPerDayToAdd1 = menuPerDay1.copy(menuUuid = menu.uuid)
+      val menuPerDayToAdd2 = menuPerDay2.copy(menuUuid = menu.uuid)
+      Await.result(MenuPerDayTable.add(menuPerDayToAdd1), defaultTimeout)
+      Await.result(MenuPerDayTable.add(menuPerDayToAdd2), defaultTimeout)
 
-    val result = Await.result(MenuPerDayTable.removeByMenuUuid(menu.uuid), defaultTimeout)
-    result == 2
+      val result = Await.result(MenuPerDayTable.removeByMenuUuid(menu.uuid), defaultTimeout)
+      result == 2
   }
 
   property("update an existing menu per day by uuid") = forAll { (menu: Menu, menuPerDay: MenuPerDay) =>
@@ -181,7 +181,7 @@ object MenuPerDayTableSpec extends Properties("MenuPerDay") with PropertyTesting
 
     val result = Await.result(MenuPerDayTable.getByUuid(menuPerDay.uuid), defaultTimeout).get
 
-    cleanMenuPerDayTableProps
+    cleanMenuPerDayTable
 
     result.date.toLocalDate == new Date(newDate).toLocalDate
   }
@@ -192,10 +192,5 @@ object MenuPerDayTableSpec extends Properties("MenuPerDay") with PropertyTesting
     val menuPerDayToAdd = menuPerDay.copy(menuUuid = menu.uuid)
     Await.result(MenuPerDayTable.add(menuPerDayToAdd), defaultTimeout)
     menuPerDayToAdd
-  }
-
-  private def cleanMenuPerDayTableProps = {
-    cleanMenuPerDayTable
-    true
   }
 }

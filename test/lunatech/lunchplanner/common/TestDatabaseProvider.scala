@@ -37,9 +37,9 @@ trait TestDatabaseProvider {
   def cleanUserAndProfileTable: Unit = {
     Await.result(
       for {
-      _ <- jdbc.run(userProfileTable.delete)
-      _ <- jdbc.run(userTable.delete)
-    } yield (), defaultTimeout)
+        _ <- jdbc.run(userProfileTable.delete)
+        _ <- jdbc.run(userTable.delete)
+      } yield (), defaultTimeout)
   }
 
   def cleanMenuTable: Int = Await.result(jdbc.run(menuTable.delete), defaultTimeout)

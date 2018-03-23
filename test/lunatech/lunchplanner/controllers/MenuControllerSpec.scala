@@ -21,29 +21,29 @@ import scala.concurrent.Future
 
 class MenuControllerSpec extends ControllerSpec {
 
-  implicit lazy val materializer: Materializer = app.materializer
+  implicit lazy private val materializer: Materializer = app.materializer
 
-  val config = Configuration(ConfigFactory.load)
+  private val config = Configuration(ConfigFactory.load)
 
   private val developer = User(UUID.randomUUID, "Developer", "developer@lunatech.com")
 
-  val userService = mock[UserService]
-  val dishService = mock[DishService]
-  val menuService = mock[MenuService]
-  val menuDishService = mock[MenuDishService]
-  val menuPerDayService = mock[MenuPerDayService]
-  val menuPerDayPerPersonService = mock[MenuPerDayPerPersonService]
-  val environment = mock[Environment]
-  val controllerComponents = app.injector.instanceOf[ControllerComponents]
-  val configuration = app.injector.instanceOf[Configuration]
-  val connection = mock[DBConnection]
+  private val userService = mock[UserService]
+  private val dishService = mock[DishService]
+  private val menuService = mock[MenuService]
+  private val menuDishService = mock[MenuDishService]
+  private val menuPerDayService = mock[MenuPerDayService]
+  private val menuPerDayPerPersonService = mock[MenuPerDayPerPersonService]
+  private val environment = mock[Environment]
+  private val controllerComponents = app.injector.instanceOf[ControllerComponents]
+  private val configuration = app.injector.instanceOf[Configuration]
+  private val connection = mock[DBConnection]
 
-  val dishTable = TableQuery[DishTable]
+  private val dishTable = TableQuery[DishTable]
 
   when(userService.getByEmailAddress("developer@lunatech.com")).thenReturn(Future.successful(Some(developer)))
   when(menuDishService.getAllWithListOfDishes).thenReturn(Future.successful(Seq(menuDish1, menuDish2)))
 
-  val controller = new MenuController(
+  private val controller = new MenuController(
     userService,
     dishService,
     menuService,

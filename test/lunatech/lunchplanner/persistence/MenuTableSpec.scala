@@ -10,14 +10,14 @@ import scala.concurrent.Await
 
 object MenuTableSpec extends Properties("MenuTable") with PropertyTestingConfig {
 
-  import TableDataGenerator._
+  import lunatech.lunchplanner.data.TableDataGenerator._
 
   override def afterAll(): Unit = dbConnection.db.close()
 
   property("add a new menu") = forAll { menu: Menu =>
     val result = addMenuToDB(menu)
 
-    cleanMenuTableProps
+    cleanMenuTable
 
     result == menu
   }
@@ -27,7 +27,7 @@ object MenuTableSpec extends Properties("MenuTable") with PropertyTestingConfig 
 
     val result = Await.result(MenuTable.exists(menu.uuid), defaultTimeout)
 
-    cleanMenuTableProps
+    cleanMenuTable
 
     result
   }
@@ -37,7 +37,7 @@ object MenuTableSpec extends Properties("MenuTable") with PropertyTestingConfig 
 
     val result = Await.result(MenuTable.getByUUID(menu.uuid), defaultTimeout).get
 
-    cleanMenuTableProps
+    cleanMenuTable
 
     result == menu
   }
@@ -48,7 +48,7 @@ object MenuTableSpec extends Properties("MenuTable") with PropertyTestingConfig 
 
     val result = Await.result(MenuTable.getAll, defaultTimeout)
 
-    cleanMenuTableProps
+    cleanMenuTable
 
     result == Seq(menu1, menu2)
   }
@@ -76,17 +76,12 @@ object MenuTableSpec extends Properties("MenuTable") with PropertyTestingConfig 
 
     val updatedMenu = Await.result(MenuTable.getByUUID(menu.uuid), defaultTimeout).get
 
-    cleanMenuTableProps
+    cleanMenuTable
 
     updatedMenu.name == "updated name"
   }
 
   private def addMenuToDB(menu: Menu) = {
     Await.result(MenuTable.add(menu), defaultTimeout)
-  }
-
-  private def cleanMenuTableProps = {
-    cleanMenuTable
-    true
   }
 }

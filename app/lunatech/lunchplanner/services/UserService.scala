@@ -10,14 +10,14 @@ import play.api.Configuration
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class UserService @Inject() (configuration: Configuration, implicit val connection: DBConnection) {
+class UserService @Inject() (configuration: Configuration)(implicit val connection: DBConnection) {
 
   def getByEmailAddress(emailAddress: String): Future[Option[User]] = UserTable.getByEmailAddress(emailAddress)
 
   def isAdminUser(emailAddress: String): Boolean =
     configuration.get[Seq[String]]("administrators").contains(emailAddress)
 
-  def addIfNew(emailAddress: String): Future[User] = {
+  def addUserIfNew(emailAddress: String): Future[Boolean] = {
     val name = getUserNameFromEmail(emailAddress)
     val newUser = User(name = name, emailAddress = emailAddress)
 
@@ -25,23 +25,21 @@ class UserService @Inject() (configuration: Configuration, implicit val connecti
       if (!exist) {
         UserTable.add(newUser).map(user => {
           UserProfileTable.insertOrUpdate(UserProfile(newUser.uuid))
-          user }
-          )
+          true
+        })
       }
       else {
-        Future.successful(newUser)
+        Future.successful(false)
       }
     })
   }
 
   def getAllEmailAddresses: Future[Seq[String]] = {
-    UserTable.getAll.flatMap { users =>
-      val emailAddresses = users.map(user => user.emailAddress)
-
-      Future.successful(emailAddresses)
+    UserTable.getAll.map { users =>
+      users.map(user => user.emailAddress)
     }
   }
 
-  private def getUserNameFromEmail(emailAddress: String) =
+  private[services] def getUserNameFromEmail(emailAddress: String) =
     emailAddress.split("@").head.split("\\.").map(w => w.head.toUpper + w.tail ).mkString(" ")
 }

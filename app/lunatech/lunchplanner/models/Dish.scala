@@ -6,7 +6,7 @@ import play.api.libs.json.{Json, OFormat}
 
 import scala.collection.mutable.ListBuffer
 
-case class Dish (
+final case class Dish (
   uuid: UUID = UUID.randomUUID(),
   name: String,
   description: String,
@@ -20,7 +20,7 @@ case class Dish (
   remarks: Option[String] = None
 )
 
-case class DishIsSelected (
+final case class DishIsSelected (
   uuid: UUID = UUID.randomUUID(),
   name: String,
   isSelected: Boolean
