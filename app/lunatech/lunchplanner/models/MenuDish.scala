@@ -3,19 +3,19 @@ package lunatech.lunchplanner.models
 import java.util.UUID
 
 final case class MenuDish(
-  uuid: UUID = UUID.randomUUID(),
-  menuUuid: UUID,
-  dishUuid: UUID
+    uuid: UUID = UUID.randomUUID(),
+    menuUuid: UUID,
+    dishUuid: UUID
 )
 
 final case class MenuWithDishes(
-  uuid: UUID,
-  name: String,
-  listOfDishes: Seq[Dish]
+    uuid: UUID,
+    name: String,
+    listOfDishes: Seq[Dish]
 )
 
 final case class MenuWithAllDishesAndIsSelected(
-  uuid: UUID,
-  name: String,
-  listOfDishes: Seq[DishIsSelected]
+    uuid: UUID,
+    name: String,
+    listOfDishes: Seq[DishIsSelected]
 )

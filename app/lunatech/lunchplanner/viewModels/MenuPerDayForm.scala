@@ -10,13 +10,14 @@ import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
 import play.api.libs.json.{Json, OFormat}
 
 case class MenuPerDayForm(
-  menuUuid: UUID,
-  date: Date,
-  location: String
+    menuUuid: UUID,
+    date: Date,
+    location: String
 )
 
 object MenuPerDayForm {
-  implicit val menuPerDayFormFormat: OFormat[MenuPerDayForm] = Json.format[MenuPerDayForm]
+  implicit val menuPerDayFormFormat: OFormat[MenuPerDayForm] =
+    Json.format[MenuPerDayForm]
 
   val menuPerDayForm = Form(
     mapping(
@@ -26,15 +27,19 @@ object MenuPerDayForm {
     )(MenuPerDayForm.apply)(MenuPerDayForm.unapply)
   )
 
-  def officeLocationConstraint: Constraint[String] = Constraint[String]("constraint.officelocation")({ text =>
-    Location.forName(text) match {
-      case Some(_) => Valid
-      case None => Invalid(ValidationError(s"$text is not a valid office location"))
-    }
-  })
+  def officeLocationConstraint: Constraint[String] =
+    Constraint[String]("constraint.officelocation")({ text =>
+      Location.forName(text) match {
+        case Some(_) => Valid
+        case None =>
+          Invalid(ValidationError(s"$text is not a valid office location"))
+      }
+    })
 }
 
-case class ListMenusPerDayForm(listUuids: List[UUID], dateStart: Date, dateEnd: Date)
+case class ListMenusPerDayForm(listUuids: List[UUID],
+                               dateStart: Date,
+                               dateEnd: Date)
 
 object ListMenusPerDayForm {
   val listMenusPerDayForm = Form(
