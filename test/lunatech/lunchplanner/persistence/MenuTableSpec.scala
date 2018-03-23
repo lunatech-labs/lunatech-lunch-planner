@@ -1,62 +1,92 @@
 package lunatech.lunchplanner.persistence
 
-import java.util.UUID
-
-import lunatech.lunchplanner.common.{ AcceptanceSpec, DBConnection, TestDatabaseProvider }
+import lunatech.lunchplanner.common.PropertyTestingConfig
 import lunatech.lunchplanner.models.Menu
+import org.scalacheck._
+import org.scalacheck.Prop._
+import shapeless.contrib.scalacheck._
 
 import scala.concurrent.Await
-import scala.concurrent.duration._
 
-class MenuTableSpec extends AcceptanceSpec with TestDatabaseProvider {
+object MenuTableSpec extends Properties("MenuTable") with PropertyTestingConfig {
 
-  implicit private val dbConnection = app.injector.instanceOf[DBConnection]
+  import TableDataGenerator._
 
-  override def beforeAll {
-    cleanDatabase()
+  override def afterAll(): Unit = dbConnection.db.close()
+
+  property("add a new menu") = forAll { menu: Menu =>
+    val result = addMenuToDB(menu)
+
+    cleanMenuTableProps
+
+    result == menu
   }
 
-  private val newMenu = Menu(name = "Main menu")
+  property("query for existing menus successfully") = forAll { menu: Menu =>
+    addMenuToDB(menu)
 
-  "A Menu table" must {
-    "add a new menu" in {
-      val result = Await.result(MenuTable.add(newMenu), defaultTimeout)
-      result mustBe newMenu
-    }
+    val result = Await.result(MenuTable.exists(menu.uuid), defaultTimeout)
 
-    "query for existing menus successfully" in {
-      val result = Await.result(MenuTable.exists(newMenu.uuid), defaultTimeout)
-      result mustBe true
-    }
+    cleanMenuTableProps
 
-    "query for menus by uuid" in {
-      val result = Await.result(MenuTable.getByUUID(newMenu.uuid), defaultTimeout)
-      result mustBe Some(newMenu)
-    }
+    result
+  }
 
-    "query all menus" in {
-      val result = Await.result(MenuTable.getAll, defaultTimeout)
-      result mustBe Vector(newMenu)
-    }
+  property("query for menus by uuid") = forAll { menu: Menu =>
+    addMenuToDB(menu)
 
-    "remove an existing menu by uuid" in {
-      val result = Await.result(MenuTable.remove(newMenu.uuid), defaultTimeout)
-      result mustBe 1
-    }
+    val result = Await.result(MenuTable.getByUUID(menu.uuid), defaultTimeout).get
 
-    "not fail when trying to remove a menu that does not exist" in {
-      val result = Await.result(MenuTable.remove(UUID.randomUUID()), defaultTimeout)
-      result mustBe 0
-    }
+    cleanMenuTableProps
 
-    "update an existing menu by uuid" in {
-      val newMenuUpdated = newMenu.copy(name = "updated name")
+    result == menu
+  }
 
-      val result = Await.result(MenuTable.insertOrUpdate(newMenuUpdated), defaultTimeout)
-      result mustBe true
+  property("query for menus by uuid") = forAll { (menu1: Menu, menu2: Menu) =>
+    addMenuToDB(menu1)
+    addMenuToDB(menu2)
 
-      val updatedMenu = Await.result(MenuTable.getByUUID(newMenuUpdated.uuid), defaultTimeout)
-      updatedMenu.get.name mustBe "updated name"
-    }
+    val result = Await.result(MenuTable.getAll, defaultTimeout)
+
+    cleanMenuTableProps
+
+    result == Seq(menu1, menu2)
+  }
+
+  property("remove an existing menu by uuid") = forAll { menu: Menu =>
+    addMenuToDB(menu)
+
+    val result = Await.result(MenuTable.remove(menu.uuid), defaultTimeout)
+    result == 1
+  }
+
+  property("not fail when trying to remove a menu that does not exist") = forAll { menu: Menu =>
+    // skip adding menu to DB
+
+    val result = Await.result(MenuTable.remove(menu.uuid), defaultTimeout)
+    result == 0
+  }
+
+  property("update an existing menu by uuid") = forAll { menu: Menu =>
+    addMenuToDB(menu)
+
+    val menuUpdated = menu.copy(name = "updated name")
+    val result = Await.result(MenuTable.insertOrUpdate(menuUpdated), defaultTimeout)
+    assert(result)
+
+    val updatedMenu = Await.result(MenuTable.getByUUID(menu.uuid), defaultTimeout).get
+
+    cleanMenuTableProps
+
+    updatedMenu.name == "updated name"
+  }
+
+  private def addMenuToDB(menu: Menu) = {
+    Await.result(MenuTable.add(menu), defaultTimeout)
+  }
+
+  private def cleanMenuTableProps = {
+    cleanMenuTable
+    true
   }
 }

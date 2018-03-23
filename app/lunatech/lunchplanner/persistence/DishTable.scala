@@ -49,7 +49,7 @@ object DishTable {
     connection.db.run(dishTable.filter(_.uuid === uuid).exists.result)
   }
 
-  def getByUUID(uuid: UUID)(implicit connection: DBConnection): Future[Option[Dish]] = {
+  def getByUuid(uuid: UUID)(implicit connection: DBConnection): Future[Option[Dish]] = {
     exists(uuid).flatMap {
       case true =>
         val query = dishTable.filter(x => x.uuid === uuid)
@@ -58,51 +58,11 @@ object DishTable {
     }
   }
 
-  def getByName(name: String)(implicit connection: DBConnection): Future[Option[Dish]] = {
-    val query = dishTable.filter(_.name === name)
-    connection.db.run(query.result.headOption)
-  }
-
-  def getAllVegetarianDishes()(implicit connection: DBConnection): Future[Seq[Dish]] = {
-    val query = dishTable.filter(_.isVegetarian)
-    connection.db.run(query.result)
-  }
-
-  def getAllSeaFoodDishes()(implicit connection: DBConnection): Future[Seq[Dish]] = {
-    val query = dishTable.filter(_.hasSeaFood)
-    connection.db.run(query.result)
-  }
-
-  def getAllPorkDishes()(implicit connection: DBConnection): Future[Seq[Dish]] = {
-    val query = dishTable.filter(_.hasPork)
-    connection.db.run(query.result)
-  }
-
-  def getAllBeefDishes()(implicit connection: DBConnection): Future[Seq[Dish]] = {
-    val query = dishTable.filter(_.hasBeef)
-    connection.db.run(query.result)
-  }
-
-  def getAllChickenDishes()(implicit connection: DBConnection): Future[Seq[Dish]] = {
-    val query = dishTable.filter(_.hasChicken)
-    connection.db.run(query.result)
-  }
-
-  def getAllGlutenFreeDishes()(implicit connection: DBConnection): Future[Seq[Dish]] = {
-    val query = dishTable.filter(_.isGlutenFree)
-    connection.db.run(query.result)
-  }
-
-  def getAllLactoseDishes()(implicit connection: DBConnection): Future[Seq[Dish]] = {
-    val query = dishTable.filter(_.hasLactose)
-    connection.db.run(query.result)
-  }
-
   def getAll(implicit connection: DBConnection): Future[Seq[Dish]] = {
     connection.db.run(dishTable.result)
   }
 
-  def remove(uuid: UUID)(implicit connection: DBConnection): Future[Int] = {
+  def removeByUuid(uuid: UUID)(implicit connection: DBConnection): Future[Int] = {
     exists(uuid).flatMap {
       case true =>
         val query = dishTable.filter(x => x.uuid === uuid).delete

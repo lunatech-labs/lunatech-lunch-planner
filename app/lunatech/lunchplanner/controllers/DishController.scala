@@ -5,10 +5,11 @@ import javax.inject.Inject
 
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.Dish
+import lunatech.lunchplanner.models._
 import lunatech.lunchplanner.services.{ DishService, MenuDishService, UserService }
 import lunatech.lunchplanner.viewModels.{ DishForm, ListDishesForm }
 import play.api.i18n.I18nSupport
-import play.api.mvc.{ AbstractController, Action, AnyContent, BaseController, ControllerComponents }
+import play.api.mvc.{ Action, AnyContent, BaseController, ControllerComponents }
 import play.api.{ Configuration, Environment }
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -125,8 +126,8 @@ class DishController @Inject() (
 
   private def getDish(dishForm: DishForm) =
     Dish(
-      name = dishForm.name,
-      description = dishForm.description,
+      name = dishForm.name.normalize,
+      description = dishForm.description.normalize,
       isVegetarian = dishForm.isVegetarian,
       hasSeaFood = dishForm.hasSeaFood,
       hasPork = dishForm.hasPork,
@@ -134,5 +135,5 @@ class DishController @Inject() (
       hasChicken = dishForm.hasChicken,
       isGlutenFree = dishForm.isGlutenFree,
       hasLactose = dishForm.hasLactose,
-      remarks = dishForm.remarks)
+      remarks = dishForm.remarks.map(_.normalize))
 }

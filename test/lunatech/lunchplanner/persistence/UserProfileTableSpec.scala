@@ -1,58 +1,85 @@
 package lunatech.lunchplanner.persistence
 
-import java.sql.Date
-import java.util.UUID
-
-import lunatech.lunchplanner.common.{ AcceptanceSpec, DBConnection, TestDatabaseProvider }
+import lunatech.lunchplanner.common.PropertyTestingConfig
 import lunatech.lunchplanner.models.{ Menu, MenuPerDay, MenuPerDayPerPerson, User, UserProfile }
+import org.scalacheck._
+import org.scalacheck.Prop._
 
 import scala.concurrent.Await
+import shapeless.contrib.scalacheck._
 
-class UserProfileTableSpec extends AcceptanceSpec with TestDatabaseProvider {
+object UserProfileTableSpec extends Properties("UserProfile") with PropertyTestingConfig {
 
-  implicit private val dbConnection = app.injector.instanceOf[DBConnection]
+  import TableDataGenerator._
 
-  private val newUser = User(UUID.randomUUID(), "Leonor Boga", "leonor.boga@lunatech.com")
-  private val newUserProfile = UserProfile(userUuid = newUser.uuid, vegetarian = true)
+  override def afterAll(): Unit = dbConnection.db.close()
 
-  override def beforeAll {
-    cleanDatabase()
-    Await.result(UserTable.add(newUser), defaultTimeout)
+  property("add a new user profile") = forAll { (user: User, userProfile: UserProfile) =>
+    val result = addUserAndProfileToDB(user, userProfile)
+
+    cleanUserProfileTableProps
+
+    result
   }
 
-  "A UserProfile table" must {
-    "add a new user profile" in {
-      val result = Await.result(UserProfileTable.insertOrUpdate(newUserProfile), defaultTimeout)
-      result mustBe true
-    }
+  property("get user profile by user uuid") = forAll { (user: User, userProfile: UserProfile) =>
+    addUserAndProfileToDB(user, userProfile)
 
-    "get user profile by user uuid" in {
-      val result = Await.result(UserProfileTable.getByUserUUID(newUser.uuid), defaultTimeout)
-      result mustBe Some(newUserProfile)
-    }
+    val result = Await.result(UserProfileTable.getByUserUUID(user.uuid), defaultTimeout).get
 
-    "get all user profiles" in {
-      val result = Await.result(UserProfileTable.getAll, defaultTimeout)
-      result mustBe Seq(newUserProfile)
-    }
+    cleanUserProfileTableProps
 
-    "remove user profile" in {
-      val result = Await.result(UserProfileTable.remove(newUser.uuid), defaultTimeout)
-      result mustBe 1
-    }
+    result == userProfile.copy(userUuid = user.uuid)
+  }
 
-    "give summary of diet restrictions by menuPerDay" in {
-      val newMenu = Menu(name = "Main menu")
-      val newMenuPerDay = MenuPerDay(menuUuid = newMenu.uuid, date = new Date(99999999), location = "Rotterdam")
-      val newMenuPerDayPerPerson = MenuPerDayPerPerson(menuPerDayUuid = newMenuPerDay.uuid, userUuid = newUser.uuid, isAttending = false)
+  property("get all user profiles") = forAll { (user: User, userProfile: UserProfile) =>
+    addUserAndProfileToDB(user, userProfile)
 
-      Await.result(UserProfileTable.insertOrUpdate(newUserProfile), defaultTimeout)
-      Await.result(MenuTable.add(newMenu), defaultTimeout)
-      Await.result(MenuPerDayTable.add(newMenuPerDay), defaultTimeout)
-      Await.result(MenuPerDayPerPersonTable.add(newMenuPerDayPerPerson), defaultTimeout)
+    val result = Await.result(UserProfileTable.getAll, defaultTimeout)
 
-      val result = Await.result(UserProfileTable.getRestrictionsByMenuPerDay(newMenuPerDay.uuid), defaultTimeout)
-      result mustBe Vector((1, 0, 0, 0, 0, 0, 0))
-    }
+    cleanUserProfileTableProps
+
+    result == Seq(userProfile.copy(userUuid = user.uuid))
+  }
+
+  property("remove user profile") = forAll { (user: User, userProfile: UserProfile) =>
+    addUserAndProfileToDB(user, userProfile)
+
+    val result = Await.result(UserProfileTable.removeByUserUuid(user.uuid), defaultTimeout)
+
+    result == 1
+  }
+
+  property("get summary of diet restrictions by menuPerDay") = forAll {
+    (user: User, userProfile: UserProfile, menu: Menu, menuPerDay: MenuPerDay, menuPerDayPerPerson: MenuPerDayPerPerson) =>
+
+      addUserAndProfileToDB(user, userProfile)
+      Await.result(MenuTable.add(menu), defaultTimeout)
+      Await.result(MenuPerDayTable.add(menuPerDay.copy(menuUuid = menu.uuid)), defaultTimeout)
+      Await.result(MenuPerDayPerPersonTable.add(menuPerDayPerPerson.copy(menuPerDayUuid = menuPerDay.uuid, userUuid = user.uuid)), defaultTimeout)
+
+      val result = Await.result(UserProfileTable.getRestrictionsByMenuPerDay(menuPerDay.uuid), defaultTimeout).head
+
+      cleanDatabase
+
+      result._1 == booleanToInt(userProfile.vegetarian) &&
+      result._2 == booleanToInt(userProfile.seaFoodRestriction) &&
+      result._3 == booleanToInt(userProfile.porkRestriction) &&
+      result._4 == booleanToInt(userProfile.beefRestriction) &&
+      result._5 == booleanToInt(userProfile.chickenRestriction) &&
+      result._6 == booleanToInt(userProfile.glutenRestriction) &&
+      result._7 == booleanToInt(userProfile.lactoseRestriction)
+  }
+
+  private def booleanToInt(boolean: Boolean): Int = if (boolean) 1 else 0
+
+  private def addUserAndProfileToDB(user: User, userProfile: UserProfile) = {
+    Await.result(UserTable.add(user), defaultTimeout)
+    Await.result(UserProfileTable.insertOrUpdate(userProfile.copy(userUuid = user.uuid)), defaultTimeout)
+  }
+
+  private def cleanUserProfileTableProps = {
+    cleanUserAndProfileTable
+    true
   }
 }

@@ -18,6 +18,6 @@ trait Secured extends GoogleSecured {
 
   def getCurrentUser(optionUser: Option[User], isAdmin: Boolean, emailAddress: String): User = {
     val user = optionUser.map(_.copy(isAdmin = isAdmin))
-    user.getOrElse(User(emailAddress = emailAddress))
+    user.getOrElse(User(name = "", emailAddress = emailAddress))
   }
 }

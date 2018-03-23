@@ -56,17 +56,17 @@ object MenuDishTable {
     connection.db.run(menuDishTable.result)
   }
 
-  def remove(uuid: UUID)(implicit connection: DBConnection): Future[Int] = {
+  def removeByUuid(uuid: UUID)(implicit connection: DBConnection): Future[Int] = {
     val query = menuDishTable.filter(x => x.uuid === uuid).delete
     connection.db.run(query)
   }
 
-  def removeByMenuUuid(menuUuid: UUID)(implicit connection: DBConnection) = {
+  def removeByMenuUuid(menuUuid: UUID)(implicit connection: DBConnection): Future[Int] = {
     val query = menuDishTable.filter(x => x.menuUuid === menuUuid).delete
     connection.db.run(query)
   }
 
-  def removeByDishUuid(dishUuid: UUID)(implicit connection: DBConnection) = {
+  def removeByDishUuid(dishUuid: UUID)(implicit connection: DBConnection): Future[Int] = {
     val query = menuDishTable.filter(x => x.dishUuid === dishUuid).delete
     connection.db.run(query)
   }
