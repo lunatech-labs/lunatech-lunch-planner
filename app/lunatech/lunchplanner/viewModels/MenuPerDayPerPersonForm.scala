@@ -8,12 +8,13 @@ import play.api.data.format.Formats._
 import play.api.libs.json.{Json, OFormat}
 
 case class MenuPerDayPerPersonForm(
-  menuPerDayUuids: List[UUID],
-  menuPerDayUuidsNotAttending: List[String]
+    menuPerDayUuids: List[UUID],
+    menuPerDayUuidsNotAttending: List[String]
 )
 
 object MenuPerDayPerPersonForm {
-  implicit val menuPerDayPerPersonFormFormat: OFormat[MenuPerDayPerPersonForm] = Json.format[MenuPerDayPerPersonForm]
+  implicit val menuPerDayPerPersonFormFormat: OFormat[MenuPerDayPerPersonForm] =
+    Json.format[MenuPerDayPerPersonForm]
 
   val menuPerDayPerPersonForm = Form(
     mapping(

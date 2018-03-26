@@ -41,3 +41,5 @@ libraryDependencies ++= Seq(
 resolvers += "Lunatech Artifactory" at "http://artifactory.lunatech.com/artifactory/releases-public"
 resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
 resolvers += Resolver.bintrayRepo("wolfendale", "maven")
+
+addCommandAlias("validate", ";scalafmt;coverage;test;dependencyCheck")

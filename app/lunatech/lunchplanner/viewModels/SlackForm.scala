@@ -14,10 +14,9 @@ case class AttachmentsActions(name: String = "decision",
                               value: String = "")
 
 case class Profile(name: Option[String], email: Option[String])
-case class Member(id: String,
-                  profile: Profile)
+case class Member(id: String, profile: Profile)
 
-case class ResponseAction(name: String, `type`:String, value: String)
+case class ResponseAction(name: String, `type`: String, value: String)
 case class SlackUser(id: String, name: String)
 case class SlackResponse(user: SlackUser, action: Seq[ResponseAction])
 
@@ -57,24 +56,24 @@ object SlackForm {
 
   implicit val profileReads: Reads[Profile] = (
     (JsPath \ "name").readNullable[String] and
-    (JsPath \ "email").readNullable[String]
-  ) (Profile.apply _)
+      (JsPath \ "email").readNullable[String]
+  )(Profile.apply _)
 
   implicit val memberReads: Reads[Member] = (
     (JsPath \ "id").read[String] and
-    (JsPath \ "profile").read[Profile]
-  ) (Member.apply _)
+      (JsPath \ "profile").read[Profile]
+  )(Member.apply _)
 
   implicit val responseActionReads: Reads[ResponseAction] = (
     (JsPath \ "name").read[String] and
-    (JsPath \ "type").read[String] and
-    (JsPath \ "value").read[String]
-  ) (ResponseAction.apply _)
+      (JsPath \ "type").read[String] and
+      (JsPath \ "value").read[String]
+  )(ResponseAction.apply _)
 
   implicit val slackUserReads: Reads[SlackUser] = (
     (JsPath \ "id").read[String] and
       (JsPath \ "name").read[String]
-  ) (SlackUser.apply _)
+  )(SlackUser.apply _)
 
   def jsonToString(attachments: Seq[Attachments]): String = {
     Json.toJson(attachments).toString

@@ -5,7 +5,11 @@ import java.util.UUID
 import javax.inject.Inject
 
 import lunatech.lunchplanner.models.MenuPerDayPerPerson
-import lunatech.lunchplanner.viewModels.{ Attachments, AttachmentsActions, SlackForm }
+import lunatech.lunchplanner.viewModels.{
+  Attachments,
+  AttachmentsActions,
+  SlackForm
+}
 import play.api.Configuration
 import play.api.http.ContentTypes
 import play.api.libs.json.JsValue
@@ -15,11 +19,12 @@ import play.mvc.Http.HeaderNames
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class SlackService @Inject()(val userService: UserService,
-                             val menuPerDayPerPersonService: MenuPerDayPerPersonService,
-                             val menuPerDayService: MenuPerDayService,
-                             val ws: WSClient,
-                             val configuration: Configuration) {
+class SlackService @Inject()(
+    val userService: UserService,
+    val menuPerDayPerPersonService: MenuPerDayPerPersonService,
+    val menuPerDayService: MenuPerDayService,
+    val ws: WSClient,
+    val configuration: Configuration) {
 
   val token = configuration.get[String]("slack.api.token")
   val sdf = new SimpleDateFormat("dd-MM-yyyy")
@@ -34,7 +39,12 @@ class SlackService @Inject()(val userService: UserService,
       response <- doPost(getString("slack.api.usersList.url"), requestBody)
     } yield {
       val members = SlackForm.jsonToMemberObject(response.json)
-      members.filter(member => member.profile.email.isDefined && emails.contains(member.profile.email.get)).map(_.id)
+      members
+        .filter(
+          member =>
+            member.profile.email.isDefined && emails.contains(
+              member.profile.email.get))
+        .map(_.id)
     }
   }
 
@@ -44,9 +54,9 @@ class SlackService @Inject()(val userService: UserService,
     */
   def openConversation(userIds: Seq[String]): Future[Seq[String]] = {
     val responses = userIds.map { userId =>
-      val requestBody = Map("token" -> Seq(token),
-                            "users" -> Seq(userId))
-      val response = doPost(getString("slack.api.conversations.open"), requestBody)
+      val requestBody = Map("token" -> Seq(token), "users" -> Seq(userId))
+      val response =
+        doPost(getString("slack.api.conversations.open"), requestBody)
       response.map(r => (r.json \ "channel" \ "id").as[String])
     }
 
@@ -60,19 +70,21 @@ class SlackService @Inject()(val userService: UserService,
     val text = getString("slack.bot.message.text")
 
     getAttachments.flatMap { attachments =>
-      if(!attachments.isEmpty) {
+      if (!attachments.isEmpty) {
         val responses = channelIds.map { channelId =>
-          val requestBody = Map("token" -> Seq(token),
-            "channel" -> Seq(channelId),
-            "text" -> Seq(text),
-            "attachments" -> Seq(SlackForm.jsonToString(attachments))
-          )
-          val response = doPost(getString("slack.api.postMessage.url"), requestBody)
+          val requestBody =
+            Map("token" -> Seq(token),
+                "channel" -> Seq(channelId),
+                "text" -> Seq(text),
+                "attachments" -> Seq(SlackForm.jsonToString(attachments)))
+          val response =
+            doPost(getString("slack.api.postMessage.url"), requestBody)
           response.map(r => r.json)
         }
         Future.successful(s"Message sent to ${responses.length} people!")
       } else {
-        Future.successful("No message sent because there's no upcoming lunch this coming Friday")
+        Future.successful(
+          "No message sent because there's no upcoming lunch this coming Friday")
       }
     }
   }
@@ -95,8 +107,8 @@ class SlackService @Inject()(val userService: UserService,
             value.split("~").foreach { uuid =>
               menuPerDayPerPersonService.add(
                 MenuPerDayPerPerson(menuPerDayUuid = UUID.fromString(uuid),
-                  userUuid = u.uuid,
-                  isAttending = false)
+                                    userUuid = u.uuid,
+                                    isAttending = false)
               )
             }
           } else {
@@ -113,14 +125,16 @@ class SlackService @Inject()(val userService: UserService,
       if (value.contains("~")) {
         configuration.get[String]("slack.bot.response.notAttending.text")
       } else {
-        val response = uuidAndMenuName.filter(_._1 == UUID.fromString(value)).head._2
+        val response =
+          uuidAndMenuName.filter(_._1 == UUID.fromString(value)).head._2
         configuration.get[String]("slack.bot.response.text").format(response)
       }
 
     }
   }
 
-  private def getEmailAddressBySlackUserId(slackUserId: String): Future[String] = {
+  private def getEmailAddressBySlackUserId(
+      slackUserId: String): Future[String] = {
     val requestBody = Map("token" -> Seq(token), "user" -> Seq(slackUserId))
     for {
       response <- doPost(getString("slack.api.usersInfo.url"), requestBody)
@@ -137,20 +151,28 @@ class SlackService @Inject()(val userService: UserService,
     val menuForUpcomingSchedule = menuPerDayService.getMenuForUpcomingSchedule
     menuForUpcomingSchedule.flatMap { menuWithMenuNameList =>
       if (!menuWithMenuNameList.isEmpty) {
-        val actions = menuWithMenuNameList.map(menu =>
-          AttachmentsActions(text = getString("slack.bot.button.yes.text").format(menu._2, menu._1.location),
-            value = menu._1.uuid.toString)
-        ) :+ AttachmentsActions(text = getString("slack.bot.button.no.text"),
-                                style = "danger",
-                                value = if (menuWithMenuNameList.length == 1) {
-                                  s"${menuWithMenuNameList.head._1.uuid}~"
-                                } else {
-                                  menuWithMenuNameList.map(_._1.uuid).mkString("~")
-                                })
+        val actions = menuWithMenuNameList.map(
+          menu =>
+            AttachmentsActions(
+              text = getString("slack.bot.button.yes.text")
+                .format(menu._2, menu._1.location),
+              value = menu._1.uuid.toString)) :+ AttachmentsActions(
+          text = getString("slack.bot.button.no.text"),
+          style = "danger",
+          value = if (menuWithMenuNameList.length == 1) {
+            s"${menuWithMenuNameList.head._1.uuid}~"
+          } else {
+            menuWithMenuNameList.map(_._1.uuid).mkString("~")
+          }
+        )
         Future.successful(
-          Seq(Attachments(getString("slack.bot.attachment.text").format(menuWithMenuNameList.map(s => s"${s._2} in ${s._1.location}").mkString(" and ")),
-            "callback_id",
-            actions))
+          Seq(
+            Attachments(getString("slack.bot.attachment.text").format(
+                          menuWithMenuNameList
+                            .map(s => s"${s._2} in ${s._1.location}")
+                            .mkString(" and ")),
+                        "callback_id",
+                        actions))
         )
       } else {
         Future.successful(Seq())
@@ -163,5 +185,3 @@ class SlackService @Inject()(val userService: UserService,
   }
 
 }
-
-

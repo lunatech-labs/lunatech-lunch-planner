@@ -3,14 +3,15 @@ package lunatech.lunchplanner.persistence
 import java.util.UUID
 
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.{ User, UserProfile }
+import lunatech.lunchplanner.models.{User, UserProfile}
 import slick.jdbc.PostgresProfile.api._
-import slick.lifted.{ ForeignKeyQuery, ProvenShape, TableQuery }
+import slick.lifted.{ForeignKeyQuery, ProvenShape, TableQuery}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class UserProfileTable(tag: Tag) extends Table[UserProfile](tag, "UserProfile") {
+class UserProfileTable(tag: Tag)
+    extends Table[UserProfile](tag, "UserProfile") {
   private val userTable = TableQuery[UserTable]
 
   def userUuid: Rep[UUID] = column[UUID]("userUuid", O.PrimaryKey)
@@ -31,16 +32,27 @@ class UserProfileTable(tag: Tag) extends Table[UserProfile](tag, "UserProfile") 
 
   def otherRestriction: Rep[String] = column[String]("otherRestriction")
 
-  def userProfileUserForeignKey: ForeignKeyQuery[UserTable, User] = foreignKey("userProfileUser_fkey_", userUuid, userTable)(_.uuid)
+  def userProfileUserForeignKey: ForeignKeyQuery[UserTable, User] =
+    foreignKey("userProfileUser_fkey_", userUuid, userTable)(_.uuid)
 
   def * : ProvenShape[UserProfile] =
-    (userUuid, vegetarian, seaFoodRestriction, porkRestriction, beefRestriction, chickenRestriction, glutenRestriction, lactoseRestriction, otherRestriction.?) <> ((UserProfile.apply _).tupled, UserProfile.unapply)
+    (userUuid,
+     vegetarian,
+     seaFoodRestriction,
+     porkRestriction,
+     beefRestriction,
+     chickenRestriction,
+     glutenRestriction,
+     lactoseRestriction,
+     otherRestriction.?) <> ((UserProfile.apply _).tupled, UserProfile.unapply)
 }
 
 object UserProfileTable {
-  val userProfileTable: TableQuery[UserProfileTable] = TableQuery[UserProfileTable]
+  val userProfileTable: TableQuery[UserProfileTable] =
+    TableQuery[UserProfileTable]
 
-  def getByUserUUID(userUuid: UUID)(implicit connection: DBConnection): Future[Option[UserProfile]] = {
+  def getByUserUUID(userUuid: UUID)(
+      implicit connection: DBConnection): Future[Option[UserProfile]] = {
     val query = userProfileTable.filter(x => x.userUuid === userUuid)
     connection.db.run(query.result.headOption)
   }
@@ -48,17 +60,21 @@ object UserProfileTable {
   def getAll(implicit connection: DBConnection): Future[Seq[UserProfile]] =
     connection.db.run(userProfileTable.result)
 
-  def removeByUserUuid(userUuid: UUID)(implicit connection: DBConnection): Future[Int] = {
+  def removeByUserUuid(userUuid: UUID)(
+      implicit connection: DBConnection): Future[Int] = {
     val query = userProfileTable.filter(x => x.userUuid === userUuid).delete
     connection.db.run(query)
   }
 
-  def insertOrUpdate(userProfile: UserProfile)(implicit connection: DBConnection): Future[Boolean] = {
+  def insertOrUpdate(userProfile: UserProfile)(
+      implicit connection: DBConnection): Future[Boolean] = {
     val query = userProfileTable.insertOrUpdate(userProfile)
     connection.db.run(query).map(_ == 1)
   }
 
-  def getRestrictionsByMenuPerDay(menuPerDayUuid: UUID)(implicit connection: DBConnection): Future[Vector[(Int, Int, Int, Int, Int, Int, Int)]] = {
+  def getRestrictionsByMenuPerDay(menuPerDayUuid: UUID)(
+      implicit connection: DBConnection)
+    : Future[Vector[(Int, Int, Int, Int, Int, Int, Int)]] = {
     val query = sql"""SELECT
          SUM(case when vegetarian then 1 else 0 end) as "vegetarianCount",
          SUM(case when "seaFoodRestriction" then 1 else 0 end) as "seaFoodCount",
@@ -70,9 +86,9 @@ object UserProfileTable {
          FROM "MenuPerDayPerPerson" mpd
          JOIN "UserProfile" up on mpd."userUuid" = up."userUuid"
          WHERE mpd."menuPerDayUuid" = '#$menuPerDayUuid'
-         GROUP BY mpd."menuPerDayUuid"""".as[(Int, Int, Int, Int, Int, Int, Int)]
+         GROUP BY mpd."menuPerDayUuid""""
+      .as[(Int, Int, Int, Int, Int, Int, Int)]
 
     connection.db.run(query)
   }
 }
-

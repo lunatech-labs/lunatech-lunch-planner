@@ -3,13 +3,13 @@ package lunatech.lunchplanner.viewModels
 import java.util.UUID
 
 import play.api.data.Form
-import play.api.data.Forms.{ list, mapping, of, _ }
+import play.api.data.Forms.{list, mapping, of, _}
 import play.api.data.format.Formats._
-import play.api.libs.json.{ Json, OFormat }
+import play.api.libs.json.{Json, OFormat}
 
 case class MenuForm(
-  menuName: String,
-  dishesUuid: List[UUID]
+    menuName: String,
+    dishesUuid: List[UUID]
 )
 
 object MenuForm {

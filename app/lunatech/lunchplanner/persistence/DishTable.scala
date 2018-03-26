@@ -5,7 +5,7 @@ import java.util.UUID
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.Dish
 import slick.jdbc.PostgresProfile.api._
-import slick.lifted.{ ProvenShape, TableQuery }
+import slick.lifted.{ProvenShape, TableQuery}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -34,7 +34,17 @@ class DishTable(tag: Tag) extends Table[Dish](tag, "Dish") {
   def remarks: Rep[String] = column[String]("remarks")
 
   def * : ProvenShape[Dish] =
-    (uuid, name, description, isVegetarian, hasSeaFood, hasPork, hasBeef, hasChicken, isGlutenFree, hasLactose, remarks.?) <> ((Dish.apply _).tupled, Dish.unapply)
+    (uuid,
+     name,
+     description,
+     isVegetarian,
+     hasSeaFood,
+     hasPork,
+     hasBeef,
+     hasChicken,
+     isGlutenFree,
+     hasLactose,
+     remarks.?) <> ((Dish.apply _).tupled, Dish.unapply)
 }
 
 object DishTable {
@@ -49,7 +59,8 @@ object DishTable {
     connection.db.run(dishTable.filter(_.uuid === uuid).exists.result)
   }
 
-  def getByUuid(uuid: UUID)(implicit connection: DBConnection): Future[Option[Dish]] = {
+  def getByUuid(uuid: UUID)(
+      implicit connection: DBConnection): Future[Option[Dish]] = {
     exists(uuid).flatMap {
       case true =>
         val query = dishTable.filter(x => x.uuid === uuid)
@@ -62,7 +73,8 @@ object DishTable {
     connection.db.run(dishTable.result)
   }
 
-  def removeByUuid(uuid: UUID)(implicit connection: DBConnection): Future[Int] = {
+  def removeByUuid(uuid: UUID)(
+      implicit connection: DBConnection): Future[Int] = {
     exists(uuid).flatMap {
       case true =>
         val query = dishTable.filter(x => x.uuid === uuid).delete
@@ -71,7 +83,8 @@ object DishTable {
     }
   }
 
-  def insertOrUpdate(dish: Dish)(implicit connection: DBConnection): Future[Boolean] = {
+  def insertOrUpdate(dish: Dish)(
+      implicit connection: DBConnection): Future[Boolean] = {
     val query = dishTable.insertOrUpdate(dish)
     connection.db.run(query).map(_ == 1)
   }

@@ -4,7 +4,12 @@ import java.sql.Date
 import java.util.UUID
 
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.{MenuPerDay, MenuPerDayPerPerson, User, UserProfile}
+import lunatech.lunchplanner.models.{
+  MenuPerDay,
+  MenuPerDayPerPerson,
+  User,
+  UserProfile
+}
 import slick.jdbc.PostgresProfile.api._
 import slick.jdbc.GetResult
 import slick.lifted.{ForeignKeyQuery, ProvenShape, TableQuery}
@@ -12,7 +17,8 @@ import slick.lifted.{ForeignKeyQuery, ProvenShape, TableQuery}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class MenuPerDayPerPersonTable(tag: Tag) extends Table[MenuPerDayPerPerson](tag, "MenuPerDayPerPerson") {
+class MenuPerDayPerPersonTable(tag: Tag)
+    extends Table[MenuPerDayPerPerson](tag, "MenuPerDayPerPerson") {
   private val menuPerDayTable = TableQuery[MenuPerDayTable]
   private val userTable = TableQuery[UserTable]
 
@@ -24,27 +30,35 @@ class MenuPerDayPerPersonTable(tag: Tag) extends Table[MenuPerDayPerPerson](tag,
 
   def isAttending: Rep[Boolean] = column[Boolean]("isAttending")
 
-  def menuPerDayPerPersonMenuPerDayForeignKey: ForeignKeyQuery[MenuPerDayTable, MenuPerDay] =
-    foreignKey("menuPerDayPerPersonMenuPerDay_fkey_", menuPerDayUuid, menuPerDayTable)(_.uuid)
+  def menuPerDayPerPersonMenuPerDayForeignKey
+    : ForeignKeyQuery[MenuPerDayTable, MenuPerDay] =
+    foreignKey("menuPerDayPerPersonMenuPerDay_fkey_",
+               menuPerDayUuid,
+               menuPerDayTable)(_.uuid)
 
   def menuPerDayPerPersonUserForeignKey: ForeignKeyQuery[UserTable, User] =
     foreignKey("menuPerDayPerPersonUser_fkey_", userUuid, userTable)(_.uuid)
 
-  def * : ProvenShape[MenuPerDayPerPerson] = (uuid, menuPerDayUuid, userUuid, isAttending) <> ((MenuPerDayPerPerson.apply _).tupled, MenuPerDayPerPerson.unapply)
+  def * : ProvenShape[MenuPerDayPerPerson] =
+    (uuid, menuPerDayUuid, userUuid, isAttending) <> ((MenuPerDayPerPerson.apply _).tupled, MenuPerDayPerPerson.unapply)
 }
 
 object MenuPerDayPerPersonTable {
-  val menuPerDayPerPersonTable: TableQuery[MenuPerDayPerPersonTable] = TableQuery[MenuPerDayPerPersonTable]
+  val menuPerDayPerPersonTable: TableQuery[MenuPerDayPerPersonTable] =
+    TableQuery[MenuPerDayPerPersonTable]
 
-  def add(menuPerDayPerPerson: MenuPerDayPerPerson)(implicit connection: DBConnection): Future[MenuPerDayPerPerson] = {
+  def add(menuPerDayPerPerson: MenuPerDayPerPerson)(
+      implicit connection: DBConnection): Future[MenuPerDayPerPerson] = {
     val query = menuPerDayPerPersonTable returning menuPerDayPerPersonTable += menuPerDayPerPerson
     connection.db.run(query)
   }
   def exists(uuid: UUID)(implicit connection: DBConnection): Future[Boolean] = {
-    connection.db.run(menuPerDayPerPersonTable.filter(_.uuid === uuid).exists.result)
+    connection.db.run(
+      menuPerDayPerPersonTable.filter(_.uuid === uuid).exists.result)
   }
 
-  def getByUuid(uuid: UUID)(implicit connection: DBConnection): Future[Option[MenuPerDayPerPerson]] = {
+  def getByUuid(uuid: UUID)(implicit connection: DBConnection)
+    : Future[Option[MenuPerDayPerPerson]] = {
     exists(uuid).flatMap {
       case true =>
         val query = menuPerDayPerPersonTable.filter(x => x.uuid === uuid)
@@ -53,85 +67,117 @@ object MenuPerDayPerPersonTable {
     }
   }
 
-  def getByMenuPerDayUuid(menuPerDayUuid: UUID)(implicit connection: DBConnection): Future[Seq[MenuPerDayPerPerson]] = {
-    val query = menuPerDayPerPersonTable.filter(_.menuPerDayUuid === menuPerDayUuid)
+  def getByMenuPerDayUuid(menuPerDayUuid: UUID)(
+      implicit connection: DBConnection): Future[Seq[MenuPerDayPerPerson]] = {
+    val query =
+      menuPerDayPerPersonTable.filter(_.menuPerDayUuid === menuPerDayUuid)
     connection.db.run(query.result)
   }
 
-  def getAttendeeCountByMenuPerDayUuid(menuPerDayUuid: UUID)(implicit connection: DBConnection): Future[Int] = {
-    val query = menuPerDayPerPersonTable.filter(_.menuPerDayUuid === menuPerDayUuid).filter(_.isAttending === true).length
+  def getAttendeeCountByMenuPerDayUuid(menuPerDayUuid: UUID)(
+      implicit connection: DBConnection): Future[Int] = {
+    val query = menuPerDayPerPersonTable
+      .filter(_.menuPerDayUuid === menuPerDayUuid)
+      .filter(_.isAttending === true)
+      .length
     connection.db.run(query.result)
   }
 
-  def getAttendeesByMenuPerDayUuid(menuPerDayUuid: UUID)(implicit connection: DBConnection): Future[Seq[(User, UserProfile)]] = {
+  def getAttendeesByMenuPerDayUuid(menuPerDayUuid: UUID)(
+      implicit connection: DBConnection): Future[Seq[(User, UserProfile)]] = {
     val query = for {
-      mpdpp <- menuPerDayPerPersonTable.filter(mpdppt => mpdppt.menuPerDayUuid === menuPerDayUuid && mpdppt.isAttending)
+      mpdpp <- menuPerDayPerPersonTable.filter(mpdppt =>
+        mpdppt.menuPerDayUuid === menuPerDayUuid && mpdppt.isAttending)
       user <- UserTable.userTable if mpdpp.userUuid === user.uuid
-      userProfile <- UserProfileTable.userProfileTable if user.uuid === userProfile.userUuid
+      userProfile <- UserProfileTable.userProfileTable
+      if user.uuid === userProfile.userUuid
     } yield (user, userProfile)
 
     connection.db.run(query.result)
   }
 
-  def getNotAttendingByDate(date: Date)(implicit connection: DBConnection): Future[Seq[User]] = {
-    implicit val result = GetResult(r => User(uuid = UUID.fromString(r.<<), name = r.<<, emailAddress = r.<<, isAdmin = r.<<))
+  def getNotAttendingByDate(date: Date)(
+      implicit connection: DBConnection): Future[Seq[User]] = {
+    implicit val result = GetResult(
+      r =>
+        User(uuid = UUID.fromString(r.<<),
+             name = r.<<,
+             emailAddress = r.<<,
+             isAdmin = r.<<))
 
     val query = sql"""SELECT DISTINCT ON (u."uuid") u.*
                             FROM "MenuPerDayPerPerson" mpdpp
                             JOIN "MenuPerDay" mpd ON mpdpp."menuPerDayUuid" = mpd."uuid"
                             JOIN "User" u ON mpdpp."userUuid" = u."uuid"
-                            WHERE mpdpp."isAttending" = FALSE AND mpd."date" = '#$date'""".as[User]
+                            WHERE mpdpp."isAttending" = FALSE AND mpd."date" = '#$date'"""
+      .as[User]
 
     connection.db.run(query)
   }
 
-  def getAllUpcomingSchedulesByUser(userUuid: UUID)(implicit connection: DBConnection) : Future[Seq[MenuPerDayPerPerson]] = {
-    implicit val getMenuPerDayPerPersonResult = GetResult(r =>
-      MenuPerDayPerPerson(UUID.fromString(r.<<), UUID.fromString(r.<<), UUID.fromString(r.<<), r.<<)
-    )
-    val query = sql"""SELECT mpdpp."uuid", mpdpp."menuPerDayUuid", mpdpp."userUuid", mpdpp."isAttending"
+  def getAllUpcomingSchedulesByUser(userUuid: UUID)(
+      implicit connection: DBConnection): Future[Seq[MenuPerDayPerPerson]] = {
+    implicit val getMenuPerDayPerPersonResult = GetResult(
+      r =>
+        MenuPerDayPerPerson(UUID.fromString(r.<<),
+                            UUID.fromString(r.<<),
+                            UUID.fromString(r.<<),
+                            r.<<))
+    val query =
+      sql"""SELECT mpdpp."uuid", mpdpp."menuPerDayUuid", mpdpp."userUuid", mpdpp."isAttending"
                             FROM "MenuPerDayPerPerson" mpdpp
                             JOIN "MenuPerDay" mpd ON mpdpp."menuPerDayUuid" = mpd."uuid"
                             WHERE mpdpp."userUuid"='#$userUuid'
-                            AND mpd."date" >= current_date""".as[MenuPerDayPerPerson]
+                            AND mpd."date" >= current_date"""
+        .as[MenuPerDayPerPerson]
 
     connection.db.run(query)
   }
 
-  def getByUserUuid(userUuid: UUID)(implicit connection: DBConnection): Future[Seq[MenuPerDayPerPerson]] = {
+  def getByUserUuid(userUuid: UUID)(
+      implicit connection: DBConnection): Future[Seq[MenuPerDayPerPerson]] = {
     val query = menuPerDayPerPersonTable.filter(_.userUuid === userUuid)
     connection.db.run(query.result)
   }
 
-  def getByUserUuidAndMenuPerDayUuid(userUuid: UUID, menuPerDayUuid: UUID)(implicit connection: DBConnection): Future[Option[MenuPerDayPerPerson]] = {
-    val query = menuPerDayPerPersonTable.filter(_.userUuid === userUuid).filter(_.menuPerDayUuid === menuPerDayUuid)
+  def getByUserUuidAndMenuPerDayUuid(userUuid: UUID, menuPerDayUuid: UUID)(
+      implicit connection: DBConnection)
+    : Future[Option[MenuPerDayPerPerson]] = {
+    val query = menuPerDayPerPersonTable
+      .filter(_.userUuid === userUuid)
+      .filter(_.menuPerDayUuid === menuPerDayUuid)
     connection.db.run(query.result.headOption)
   }
 
-  def getAll(implicit connection: DBConnection): Future[Seq[MenuPerDayPerPerson]] = {
+  def getAll(
+      implicit connection: DBConnection): Future[Seq[MenuPerDayPerPerson]] = {
     connection.db.run(menuPerDayPerPersonTable.result)
   }
 
-  def remove(uuid: UUID)(implicit connection: DBConnection): Future[Int]  = {
+  def remove(uuid: UUID)(implicit connection: DBConnection): Future[Int] = {
     val query = menuPerDayPerPersonTable.filter(x => x.uuid === uuid).delete
     connection.db.run(query)
   }
 
-  def removeByMenuPerDayUuid(menuPerDayUuid: UUID)(implicit connection: DBConnection): Future[Int] = {
-    val query = menuPerDayPerPersonTable.filter(x => x.menuPerDayUuid === menuPerDayUuid).delete
+  def removeByMenuPerDayUuid(menuPerDayUuid: UUID)(
+      implicit connection: DBConnection): Future[Int] = {
+    val query = menuPerDayPerPersonTable
+      .filter(x => x.menuPerDayUuid === menuPerDayUuid)
+      .delete
     connection.db.run(query)
   }
 
   /**
     * Get attendees for upcoming Friday lunch. The '5' refers to Friday.
     */
-  def getAttendeesEmailAddressesForUpcomingLunch(implicit connection: DBConnection): Future[Seq[String]] = {
+  def getAttendeesEmailAddressesForUpcomingLunch(
+      implicit connection: DBConnection): Future[Seq[String]] = {
     val query = sql"""SELECT u."emailAddress" FROM "MenuPerDayPerPerson" mpdpp
                       JOIN "User" u ON mpdpp."userUuid"=u."uuid"
                       JOIN "MenuPerDay" mpd ON mpdpp."menuPerDayUuid"=mpd."uuid"
-                      WHERE mpd."date" = (SELECT current_date - cast(extract(dow FROM current_date) AS int) + 5)""".as[String]
+                      WHERE mpd."date" = (SELECT current_date - cast(extract(dow FROM current_date) AS int) + 5)"""
+      .as[String]
     connection.db.run(query)
   }
 
 }
-

@@ -21,6 +21,17 @@ object Month {
   val NOVEMBER = BaseMonth("November")
   val DECEMBER = BaseMonth("December")
 
-  def values: List[BaseMonth] = List(JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER,
-                                     OCTOBER, NOVEMBER, DECEMBER)
+  def values: List[BaseMonth] =
+    List(JANUARY,
+         FEBRUARY,
+         MARCH,
+         APRIL,
+         MAY,
+         JUNE,
+         JULY,
+         AUGUST,
+         SEPTEMBER,
+         OCTOBER,
+         NOVEMBER,
+         DECEMBER)
 }
