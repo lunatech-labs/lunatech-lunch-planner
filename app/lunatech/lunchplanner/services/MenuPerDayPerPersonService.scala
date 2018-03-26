@@ -86,8 +86,10 @@ class MenuPerDayPerPersonService @Inject()(
     MenuPerDayPerPersonTable.getByUserUuidAndMenuPerDayUuid(userUuid,
                                                             menuPerDayUuid)
 
-  def delete(menuPerDayPerPersonUuid: UUID): Future[Int] =
-    MenuPerDayPerPersonTable.remove(menuPerDayPerPersonUuid)
+  def delete(menuPerDayPerPersonUuids: Seq[UUID]): Future[Seq[Int]] =
+    Future.sequence {
+      menuPerDayPerPersonUuids.map(MenuPerDayPerPersonTable.remove)
+    }
 
   def getAllMenuWithNamePerDay: Future[Seq[MenuWithNamePerDay]] = {
     menuPerDayService.getAllFutureAndOrderedByDate

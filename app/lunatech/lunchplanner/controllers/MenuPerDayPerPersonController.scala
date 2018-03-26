@@ -80,45 +80,47 @@ class MenuPerDayPerPersonController @Inject()(
 
   private def updateData(userUuid: UUID,
                          form: MenuPerDayPerPersonForm): Future[Boolean] = {
-    updateMenusPerDayPerPerson(form.menuPerDayUuids,
-                               form.menuPerDayUuidsNotAttending,
-                               userUuid)
-    Future.successful(true)
-  }
-
-  private def updateMenusPerDayPerPerson(menuPerDayUuidList: List[UUID],
-                                         uuidsNotAttending: List[String],
-                                         userUuid: UUID) = {
-    remove(userUuid)
-    addAttending(menuPerDayUuidList, userUuid)
-    addNotAttending(uuidsNotAttending, userUuid)
+    for {
+      _ <- remove(userUuid)
+      _ <- addAttending(form.menuPerDayUuids, userUuid)
+      _ <- addNotAttending(form.menuPerDayUuidsNotAttending, userUuid)
+    } yield true
   }
 
   private def remove(userUuid: UUID) = {
     for {
       allMenuPerDayPerPerson <- menuPerDayPerPersonService
         .getAllUpcomingSchedulesByUser(userUuid)
+      _ <- menuPerDayPerPersonService.delete(allMenuPerDayPerPerson.map(_.uuid))
     } yield {
-      allMenuPerDayPerPerson.foreach { menuPerDayPerPerson =>
-        menuPerDayPerPersonService.delete(menuPerDayPerPerson.uuid)
+      true
+    }
+  }
+
+  private def addAttending(
+      menuPerDayUuidList: List[UUID],
+      userUuid: UUID): Future[List[MenuPerDayPerPerson]] = {
+    Future.sequence {
+      for {
+        menuPerDayUuid <- menuPerDayUuidList
+      } yield {
+        val newMenuPerDayPerPerson = MenuPerDayPerPerson(menuPerDayUuid =
+                                                           menuPerDayUuid,
+                                                         userUuid = userUuid,
+                                                         isAttending = true)
+        menuPerDayPerPersonService.add(newMenuPerDayPerPerson)
       }
     }
   }
 
-  private def addAttending(menuPerDayUuidList: List[UUID], userUuid: UUID) = {
-    menuPerDayUuidList.foreach { menuPerDayUuid =>
-      val newMenuPerDayPerPerson = MenuPerDayPerPerson(menuPerDayUuid =
-                                                         menuPerDayUuid,
-                                                       userUuid = userUuid,
-                                                       isAttending = true)
-      menuPerDayPerPersonService.add(newMenuPerDayPerPerson)
-    }
-  }
-
-  private def addNotAttending(uuidsNotAttending: List[String],
-                              userUuid: UUID): Unit = {
-    uuidsNotAttending.foreach { uuids =>
-      uuids.split("~").foreach { uuid =>
+  private def addNotAttending(
+      uuidsNotAttending: List[String],
+      userUuid: UUID): Future[List[MenuPerDayPerPerson]] = {
+    Future.sequence {
+      for {
+        uuids <- uuidsNotAttending
+        uuid <- uuids.split("~")
+      } yield {
         val newMenuPerDayPerPerson =
           MenuPerDayPerPerson(menuPerDayUuid = UUID.fromString(uuid),
                               userUuid = userUuid,
