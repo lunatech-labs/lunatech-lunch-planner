@@ -22,7 +22,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-json" % "2.6.8",
   "com.typesafe.play" %% "play-slick" % "3.0.3",
   "com.typesafe.play" %% "play-slick-evolutions" % "3.0.3",
-  "com.typesafe.slick" %% "slick-hikaricp" % "3.2.0",
+  "com.typesafe.slick" %% "slick-hikaricp" % "3.2.2",
   "org.postgresql" % "postgresql" % "9.3-1102-jdbc41",
   "com.google.api-client" % "google-api-client" % "1.22.0",
   "com.google.http-client" % "google-http-client-jackson" % "1.22.0",
