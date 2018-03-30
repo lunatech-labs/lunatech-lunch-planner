@@ -51,10 +51,10 @@ object ControllersData {
   val schedule1 = MenuWithNamePerDay(UUID.randomUUID(), menu1.uuid, "10-02-2017", menu1.name, 7, "Amsterdam")
   val schedule2 = MenuWithNamePerDay(UUID.randomUUID(), menu2.uuid, "05-04-2017", menu2.name, 9, "Rotterdam")
 
-  val user1 = User(name = "user 1", emailAddress = "user1@lunatech.com", isAdmin = true)
-  val user2 = User(name = "user 2", emailAddress = "user2@lunatech.com")
-  val user3 = User(name = "user 3", emailAddress = "user3@lunatech.com")
-  val user4 = User(name = "user 4", emailAddress = "user4@lunatech.com")
+  val user1 = User(name = "user 1", emailAddress = "user1@lunatech.nl", isAdmin = true)
+  val user2 = User(name = "user 2", emailAddress = "user2@lunatech.nl")
+  val user3 = User(name = "user 3", emailAddress = "user3@lunatech.nl")
+  val user4 = User(name = "user 4", emailAddress = "user4@lunatech.nl")
 
   val userProfile1 = UserProfile(vegetarian = true)
   val userProfile2 = UserProfile(glutenRestriction = true)

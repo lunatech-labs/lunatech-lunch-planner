@@ -5,7 +5,8 @@ import java.util.UUID
 final case class MenuDish(
     uuid: UUID = UUID.randomUUID(),
     menuUuid: UUID,
-    dishUuid: UUID
+    dishUuid: UUID,
+    isDeleted: Boolean = false
 )
 
 final case class MenuWithDishes(

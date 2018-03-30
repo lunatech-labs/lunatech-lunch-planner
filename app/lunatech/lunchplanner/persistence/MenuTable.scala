@@ -10,13 +10,15 @@ import slick.lifted.{ProvenShape, TableQuery}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class MenuTable(tag: Tag) extends Table[Menu](tag, "Menu") {
+class MenuTable(tag: Tag) extends Table[Menu](tag, _tableName = "Menu") {
   def uuid: Rep[UUID] = column[UUID]("uuid", O.PrimaryKey)
 
   def name: Rep[String] = column[String]("name")
 
+  def isDeleted: Rep[Boolean] = column[Boolean]("isDeleted")
+
   def * : ProvenShape[Menu] =
-    (uuid, name) <> ((Menu.apply _).tupled, Menu.unapply)
+    (uuid, name, isDeleted) <> ((Menu.apply _).tupled, Menu.unapply)
 }
 
 object MenuTable {
@@ -27,18 +29,10 @@ object MenuTable {
     connection.db.run(query)
   }
 
-  def exists(uuid: UUID)(implicit connection: DBConnection): Future[Boolean] = {
-    connection.db.run(menuTable.filter(_.uuid === uuid).exists.result)
-  }
-
   def getByUUID(uuid: UUID)(
       implicit connection: DBConnection): Future[Option[Menu]] = {
-    exists(uuid).flatMap {
-      case true =>
-        val query = menuTable.filter(x => x.uuid === uuid)
-        connection.db.run(query.result.headOption)
-      case false => Future(None)
-    }
+    val query = menuTable.filter(x => x.uuid === uuid)
+    connection.db.run(query.result.headOption)
   }
 
   def getByName(name: String)(
@@ -48,16 +42,13 @@ object MenuTable {
   }
 
   def getAll(implicit connection: DBConnection): Future[Seq[Menu]] = {
-    connection.db.run(menuTable.result)
+    connection.db.run(menuTable.filter(_.isDeleted === false).result)
   }
 
-  def remove(uuid: UUID)(implicit connection: DBConnection): Future[Int] = {
-    exists(uuid).flatMap {
-      case true =>
-        val query = menuTable.filter(x => x.uuid === uuid).delete
-        connection.db.run(query)
-      case false => Future(0)
-    }
+  def removeByUuid(uuid: UUID)(
+      implicit connection: DBConnection): Future[Int] = {
+    val query = menuTable.filter(_.uuid === uuid).map(_.isDeleted).update(true)
+    connection.db.run(query)
   }
 
   def insertOrUpdate(menu: Menu)(
@@ -65,5 +56,4 @@ object MenuTable {
     val query = menuTable.insertOrUpdate(menu)
     connection.db.run(query).map(_ == 1)
   }
-
 }

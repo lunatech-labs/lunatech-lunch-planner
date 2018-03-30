@@ -11,5 +11,6 @@ final case class UserProfile(
     chickenRestriction: Boolean = false,
     glutenRestriction: Boolean = false,
     lactoseRestriction: Boolean = false,
-    otherRestriction: Option[String] = None
+    otherRestriction: Option[String] = None,
+    isDeleted: Boolean = false
 )

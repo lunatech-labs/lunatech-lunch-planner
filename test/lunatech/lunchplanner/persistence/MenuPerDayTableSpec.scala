@@ -10,7 +10,7 @@ import org.scalacheck.{ Gen, Properties }
 import scala.concurrent.Await
 import shapeless.contrib.scalacheck._
 
-object MenuPerDayTableSpec extends Properties("MenuPerDay") with PropertyTestingConfig {
+object MenuPerDayTableSpec extends Properties(name = "MenuPerDay") with PropertyTestingConfig {
 
   import lunatech.lunchplanner.data.TableDataGenerator._
 
@@ -32,16 +32,6 @@ object MenuPerDayTableSpec extends Properties("MenuPerDay") with PropertyTesting
       result.location == menuPerDayToAdd.location &&
       result.menuUuid == menuPerDayToAdd.menuUuid &&
       result.uuid == menuPerDayToAdd.uuid
-  }
-
-  property("query for existing menus per day successfully") = forAll { (menu: Menu, menuPerDay: MenuPerDay) =>
-    val menuPerDayToAdd = addMenuAndMenuPerDayToDB(menu, menuPerDay)
-
-    val result = Await.result(MenuPerDayTable.exists(menuPerDayToAdd.uuid), defaultTimeout)
-
-    cleanMenuPerDayTable
-
-    result
   }
 
   property("query for menus per day by uuid") = forAll { (menu: Menu, menuPerDay: MenuPerDay) =>
@@ -148,7 +138,9 @@ object MenuPerDayTableSpec extends Properties("MenuPerDay") with PropertyTesting
     val menuPerDayToAdd = addMenuAndMenuPerDayToDB(menu, menuPerDay)
 
     val result = Await.result(MenuPerDayTable.removeByUuid(menuPerDayToAdd.uuid), defaultTimeout)
-    result == 1
+    val getByUuid = Await.result(MenuPerDayTable.getByUuid(menuPerDayToAdd.uuid), defaultTimeout).get
+
+    result == 1 && getByUuid.isDeleted
   }
 
   property("not fail when trying to remove a menu per day that does not exist") = forAll { menuPerDay: MenuPerDay =>

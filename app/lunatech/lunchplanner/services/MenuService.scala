@@ -30,5 +30,5 @@ class MenuService @Inject()(implicit val connection: DBConnection) {
     MenuTable.insertOrUpdate(menu.copy(uuid = menuUuid))
   }
 
-  def delete(uuid: UUID): Future[Int] = MenuTable.remove(uuid)
+  def delete(uuid: UUID): Future[Int] = MenuTable.removeByUuid(uuid)
 }

@@ -15,7 +15,7 @@ object UserServicePropertySpec extends Properties("UserService") with PropertyTe
 
   private val emailAddressGen: Gen[String] = {
     for {
-      email <- RegexpGen.from("^[a-zA-Z-]+[.][a-zA-Z-]+([.][a-zA-Z-]+)?@lunatech.com")
+      email <- RegexpGen.from("^[a-zA-Z-]+[.][a-zA-Z-]+([.][a-zA-Z-]+)?@lunatech.nl")
     } yield email.normalize
   }
 

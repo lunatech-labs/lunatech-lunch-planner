@@ -10,7 +10,7 @@ import slick.lifted.{ProvenShape, TableQuery}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class DishTable(tag: Tag) extends Table[Dish](tag, "Dish") {
+class DishTable(tag: Tag) extends Table[Dish](tag, _tableName = "Dish") {
   def uuid: Rep[UUID] = column[UUID]("uuid", O.PrimaryKey)
 
   def name: Rep[String] = column[String]("name")
@@ -33,6 +33,8 @@ class DishTable(tag: Tag) extends Table[Dish](tag, "Dish") {
 
   def remarks: Rep[String] = column[String]("remarks")
 
+  def isDeleted: Rep[Boolean] = column[Boolean]("isDeleted")
+
   def * : ProvenShape[Dish] =
     (uuid,
      name,
@@ -44,7 +46,8 @@ class DishTable(tag: Tag) extends Table[Dish](tag, "Dish") {
      hasChicken,
      isGlutenFree,
      hasLactose,
-     remarks.?) <> ((Dish.apply _).tupled, Dish.unapply)
+     remarks.?,
+     isDeleted) <> ((Dish.apply _).tupled, Dish.unapply)
 }
 
 object DishTable {
@@ -55,32 +58,20 @@ object DishTable {
     connection.db.run(query)
   }
 
-  def exists(uuid: UUID)(implicit connection: DBConnection): Future[Boolean] = {
-    connection.db.run(dishTable.filter(_.uuid === uuid).exists.result)
-  }
-
   def getByUuid(uuid: UUID)(
       implicit connection: DBConnection): Future[Option[Dish]] = {
-    exists(uuid).flatMap {
-      case true =>
-        val query = dishTable.filter(x => x.uuid === uuid)
-        connection.db.run(query.result.headOption)
-      case false => Future(None)
-    }
+    val query = dishTable.filter(dish => dish.uuid === uuid)
+    connection.db.run(query.result.headOption)
   }
 
   def getAll(implicit connection: DBConnection): Future[Seq[Dish]] = {
-    connection.db.run(dishTable.result)
+    connection.db.run(dishTable.filter(_.isDeleted === false).result)
   }
 
   def removeByUuid(uuid: UUID)(
       implicit connection: DBConnection): Future[Int] = {
-    exists(uuid).flatMap {
-      case true =>
-        val query = dishTable.filter(x => x.uuid === uuid).delete
-        connection.db.run(query)
-      case false => Future(0)
-    }
+    val query = dishTable.filter(_.uuid === uuid).map(_.isDeleted).update(true)
+    connection.db.run(query)
   }
 
   def insertOrUpdate(dish: Dish)(

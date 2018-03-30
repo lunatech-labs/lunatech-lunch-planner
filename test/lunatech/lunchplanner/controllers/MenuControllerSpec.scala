@@ -25,7 +25,7 @@ class MenuControllerSpec extends ControllerSpec {
 
   private val config = Configuration(ConfigFactory.load)
 
-  private val developer = User(UUID.randomUUID, "Developer", "developer@lunatech.com")
+  private val developer = User(UUID.randomUUID, "Developer", "developer@lunatech.nl")
 
   private val userService = mock[UserService]
   private val dishService = mock[DishService]
@@ -40,7 +40,7 @@ class MenuControllerSpec extends ControllerSpec {
 
   private val dishTable = TableQuery[DishTable]
 
-  when(userService.getByEmailAddress("developer@lunatech.com")).thenReturn(Future.successful(Some(developer)))
+  when(userService.getByEmailAddress("developer@lunatech.nl")).thenReturn(Future.successful(Some(developer)))
   when(menuDishService.getAllWithListOfDishes).thenReturn(Future.successful(Seq(menuDish1, menuDish2)))
 
   private val controller = new MenuController(
@@ -57,7 +57,7 @@ class MenuControllerSpec extends ControllerSpec {
   "Menu controller" should {
 
     "display list of menus" in new WithApplication() {
-      val request = FakeRequest().withSession("email" -> "developer@lunatech.com")
+      val request = FakeRequest().withSession("email" -> "developer@lunatech.nl")
       val result = call(controller.getAllMenus, request)
 
       status(result) mustBe 200

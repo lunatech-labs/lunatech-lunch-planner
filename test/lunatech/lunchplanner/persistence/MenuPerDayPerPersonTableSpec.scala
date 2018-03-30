@@ -9,7 +9,7 @@ import org.scalacheck.Prop._
 import scala.concurrent.Await
 import shapeless.contrib.scalacheck._
 
-object MenuPerDayPerPersonTableSpec extends Properties("MenuPerDayPerPerson") with PropertyTestingConfig {
+object MenuPerDayPerPersonTableSpec extends Properties(name = "MenuPerDayPerPerson") with PropertyTestingConfig {
 
   import lunatech.lunchplanner.data.TableDataGenerator._
 
@@ -26,17 +26,6 @@ object MenuPerDayPerPersonTableSpec extends Properties("MenuPerDayPerPerson") wi
       cleanMenuPerDayPerPersonTable
 
       result == menuPerDayPerPersonToAdd
-  }
-
-  property("query for existing menus per day per person successfully") = forAll {
-    (user: User, menu: Menu, menuPerDay: MenuPerDay, menuPerDayPerPerson: MenuPerDayPerPerson) =>
-
-      val menuPerDayPerPersonAdded = addUserAndMenuDataToDB(user, menu, menuPerDay, menuPerDayPerPerson)
-      val result = Await.result(MenuPerDayPerPersonTable.exists(menuPerDayPerPersonAdded.uuid), defaultTimeout)
-
-      cleanMenuPerDayPerPersonTable
-
-      result
   }
 
   property("query for menus per day per person by uuid") = forAll {
@@ -120,7 +109,7 @@ object MenuPerDayPerPersonTableSpec extends Properties("MenuPerDayPerPerson") wi
     (user: User, menu: Menu, menuPerDay: MenuPerDay, menuPerDayPerPerson: MenuPerDayPerPerson) =>
 
       val menuPerDayPerPersonToAdd = addUserAndMenuDataToDB(user, menu, menuPerDay, menuPerDayPerPerson)
-      val result = Await.result(MenuPerDayPerPersonTable.remove(menuPerDayPerPersonToAdd.uuid), defaultTimeout)
+      val result = Await.result(MenuPerDayPerPersonTable.removeByUuid(menuPerDayPerPersonToAdd.uuid), defaultTimeout)
 
       cleanMenuPerDayPerPersonTable
 
@@ -132,28 +121,7 @@ object MenuPerDayPerPersonTableSpec extends Properties("MenuPerDayPerPerson") wi
 
       // skipped adding data to the DB
 
-      val result = Await.result(MenuPerDayPerPersonTable.remove(menuPerDayPerPerson.uuid), defaultTimeout)
-
-      result == 0
-  }
-
-  property("remove an existing menu per day per person by menu per day uuid") = forAll {
-    (user: User, menu: Menu, menuPerDay: MenuPerDay, menuPerDayPerPerson: MenuPerDayPerPerson) =>
-
-      addUserAndMenuDataToDB(user, menu, menuPerDay, menuPerDayPerPerson)
-      val result = Await.result(MenuPerDayPerPersonTable.removeByMenuPerDayUuid(menuPerDay.uuid), defaultTimeout)
-
-      cleanMenuPerDayPerPersonTable
-
-      result ==  1
-  }
-
-  property("not fail when trying to remove menu per day per person by menu per day that does not exist") = forAll {
-    (user: User, menu: Menu, menuPerDay: MenuPerDay, menuPerDayPerPerson: MenuPerDayPerPerson) =>
-
-      // skipped adding data to the DB
-
-      val result = Await.result(MenuPerDayPerPersonTable.removeByMenuPerDayUuid(menuPerDayPerPerson.uuid), defaultTimeout)
+      val result = Await.result(MenuPerDayPerPersonTable.removeByUuid(menuPerDayPerPerson.uuid), defaultTimeout)
 
       result == 0
   }
