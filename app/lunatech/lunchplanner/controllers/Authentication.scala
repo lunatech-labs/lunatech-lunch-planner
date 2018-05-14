@@ -30,7 +30,7 @@ class Authentication @Inject()(userService: UserService,
       Ok(views.html.login(clientId)).withSession("state" -> auth.generateState)
     } else {
       Redirect(routes.Application.index())
-        .withSession("email" -> "developer@lunatech.com")
+        .withSession("email" -> "developer@lunatech.nl")
     }
   }
 
