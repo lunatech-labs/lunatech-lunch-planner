@@ -14,11 +14,10 @@ import slick.jdbc.PostgresProfile.api._
 import slick.jdbc.GetResult
 import slick.lifted.{ForeignKeyQuery, ProvenShape, TableQuery}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class MenuPerDayPerPersonTable(tag: Tag)
-    extends Table[MenuPerDayPerPerson](tag, "MenuPerDayPerPerson") {
+    extends Table[MenuPerDayPerPerson](tag, _tableName = "MenuPerDayPerPerson") {
   private val menuPerDayTable = TableQuery[MenuPerDayTable]
   private val userTable = TableQuery[UserTable]
 
@@ -32,12 +31,14 @@ class MenuPerDayPerPersonTable(tag: Tag)
 
   def menuPerDayPerPersonMenuPerDayForeignKey
     : ForeignKeyQuery[MenuPerDayTable, MenuPerDay] =
-    foreignKey("menuPerDayPerPersonMenuPerDay_fkey_",
-               menuPerDayUuid,
-               menuPerDayTable)(_.uuid)
+    foreignKey(name = "menuPerDayPerPersonMenuPerDay_fkey_",
+               sourceColumns = menuPerDayUuid,
+               targetTableQuery = menuPerDayTable)(_.uuid)
 
   def menuPerDayPerPersonUserForeignKey: ForeignKeyQuery[UserTable, User] =
-    foreignKey("menuPerDayPerPersonUser_fkey_", userUuid, userTable)(_.uuid)
+    foreignKey(name = "menuPerDayPerPersonUser_fkey_",
+               sourceColumns = userUuid,
+               targetTableQuery = userTable)(_.uuid)
 
   def * : ProvenShape[MenuPerDayPerPerson] =
     (uuid, menuPerDayUuid, userUuid, isAttending) <> ((MenuPerDayPerPerson.apply _).tupled, MenuPerDayPerPerson.unapply)
@@ -52,32 +53,23 @@ object MenuPerDayPerPersonTable {
     val query = menuPerDayPerPersonTable returning menuPerDayPerPersonTable += menuPerDayPerPerson
     connection.db.run(query)
   }
-  def exists(uuid: UUID)(implicit connection: DBConnection): Future[Boolean] = {
-    connection.db.run(
-      menuPerDayPerPersonTable.filter(_.uuid === uuid).exists.result)
-  }
 
   def getByUuid(uuid: UUID)(implicit connection: DBConnection)
     : Future[Option[MenuPerDayPerPerson]] = {
-    exists(uuid).flatMap {
-      case true =>
-        val query = menuPerDayPerPersonTable.filter(x => x.uuid === uuid)
-        connection.db.run(query.result.headOption)
-      case false => Future(None)
-    }
+    val query = menuPerDayPerPersonTable.filter(x => x.uuid === uuid)
+    connection.db.run(query.result.headOption)
   }
 
   def getByMenuPerDayUuid(menuPerDayUuid: UUID)(
       implicit connection: DBConnection): Future[Seq[MenuPerDayPerPerson]] = {
-    val query =
-      menuPerDayPerPersonTable.filter(_.menuPerDayUuid === menuPerDayUuid)
+    val query = menuPerDayPerPersonTable.filter(mpdpp => mpdpp.menuPerDayUuid === menuPerDayUuid)
     connection.db.run(query.result)
   }
 
   def getAttendeeCountByMenuPerDayUuid(menuPerDayUuid: UUID)(
       implicit connection: DBConnection): Future[Int] = {
     val query = menuPerDayPerPersonTable
-      .filter(_.menuPerDayUuid === menuPerDayUuid)
+      .filter(mpdpp => mpdpp.menuPerDayUuid === menuPerDayUuid)
       .filter(_.isAttending === true)
       .length
     connection.db.run(query.result)
@@ -88,7 +80,8 @@ object MenuPerDayPerPersonTable {
     val query = for {
       mpdpp <- menuPerDayPerPersonTable.filter(mpdppt =>
         mpdppt.menuPerDayUuid === menuPerDayUuid && mpdppt.isAttending)
-      user <- UserTable.userTable if mpdpp.userUuid === user.uuid
+      user <- UserTable.userTable
+      if mpdpp.userUuid === user.uuid
       userProfile <- UserProfileTable.userProfileTable
       if user.uuid === userProfile.userUuid
     } yield (user, userProfile)
@@ -126,7 +119,7 @@ object MenuPerDayPerPersonTable {
     val query =
       sql"""SELECT mpdpp."uuid", mpdpp."menuPerDayUuid", mpdpp."userUuid", mpdpp."isAttending"
                             FROM "MenuPerDayPerPerson" mpdpp
-                            JOIN "MenuPerDay" mpd ON mpdpp."menuPerDayUuid" = mpd."uuid"
+                            JOIN "MenuPerDay" mpd ON mpdpp."menuPerDayUuid" = mpd."uuid" AND mpd."isDeleted" = FALSE
                             WHERE mpdpp."userUuid"='#$userUuid'
                             AND mpd."date" >= current_date"""
         .as[MenuPerDayPerPerson]
@@ -154,30 +147,27 @@ object MenuPerDayPerPersonTable {
     connection.db.run(menuPerDayPerPersonTable.result)
   }
 
-  def remove(uuid: UUID)(implicit connection: DBConnection): Future[Int] = {
-    val query = menuPerDayPerPersonTable.filter(x => x.uuid === uuid).delete
+  def removeByUuid(uuid: UUID)(implicit connection: DBConnection): Future[Int] = {
+    val query = menuPerDayPerPersonTable.filter(_.uuid === uuid).delete
     connection.db.run(query)
   }
 
   def removeByMenuPerDayUuid(menuPerDayUuid: UUID)(
-      implicit connection: DBConnection): Future[Int] = {
-    val query = menuPerDayPerPersonTable
-      .filter(x => x.menuPerDayUuid === menuPerDayUuid)
-      .delete
+    implicit connection: DBConnection): Future[Int] = {
+    val query = menuPerDayPerPersonTable.filter(_.menuPerDayUuid === menuPerDayUuid).delete
     connection.db.run(query)
   }
 
-  /**
+    /**
     * Get attendees for upcoming Friday lunch. The '5' refers to Friday.
     */
   def getAttendeesEmailAddressesForUpcomingLunch(
       implicit connection: DBConnection): Future[Seq[String]] = {
     val query = sql"""SELECT u."emailAddress" FROM "MenuPerDayPerPerson" mpdpp
-                      JOIN "User" u ON mpdpp."userUuid"=u."uuid"
-                      JOIN "MenuPerDay" mpd ON mpdpp."menuPerDayUuid"=mpd."uuid"
+                      JOIN "User" u ON mpdpp."userUuid"=u."uuid" AND u."isDeleted" = FALSE
+                      JOIN "MenuPerDay" mpd ON mpdpp."menuPerDayUuid"=mpd."uuid" AND mpd."isDeleted" = FALSE
                       WHERE mpd."date" = (SELECT current_date - cast(extract(dow FROM current_date) AS int) + 5)"""
       .as[String]
     connection.db.run(query)
   }
-
 }

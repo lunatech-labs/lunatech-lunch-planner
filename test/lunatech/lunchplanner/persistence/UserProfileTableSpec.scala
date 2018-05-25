@@ -8,7 +8,7 @@ import org.scalacheck.Prop._
 import scala.concurrent.Await
 import shapeless.contrib.scalacheck._
 
-object UserProfileTableSpec extends Properties("UserProfile") with PropertyTestingConfig {
+object UserProfileTableSpec extends Properties(name = "UserProfile") with PropertyTestingConfig {
 
   import lunatech.lunchplanner.data.TableDataGenerator._
 
@@ -46,8 +46,9 @@ object UserProfileTableSpec extends Properties("UserProfile") with PropertyTesti
     addUserAndProfileToDB(user, userProfile)
 
     val result = Await.result(UserProfileTable.removeByUserUuid(user.uuid), defaultTimeout)
+    val getByUuid = Await.result(UserProfileTable.getByUserUUID(user.uuid), defaultTimeout).get
 
-    result == 1
+    result == 1 && getByUuid.isDeleted
   }
 
   property("get summary of diet restrictions by menuPerDay") = forAll {
@@ -73,7 +74,7 @@ object UserProfileTableSpec extends Properties("UserProfile") with PropertyTesti
 
   private def booleanToInt(boolean: Boolean): Int = if (boolean) 1 else 0
 
-  private def addUserAndProfileToDB(user: User, userProfile: UserProfile) = {
+  private def addUserAndProfileToDB(user: User, userProfile: UserProfile): Boolean = {
     Await.result(UserTable.add(user), defaultTimeout)
     Await.result(UserProfileTable.insertOrUpdate(userProfile.copy(userUuid = user.uuid)), defaultTimeout)
   }

@@ -1,6 +1,6 @@
 package lunatech.lunchplanner.common
 
-import org.scalatest.{ BeforeAndAfterAll, Suite, SuiteMixin }
+import org.scalatest.{ BeforeAndAfterAll, MustMatchers, Suite, SuiteMixin }
 import slick.jdbc.JdbcBackend
 
 trait PropertyTestingConfig

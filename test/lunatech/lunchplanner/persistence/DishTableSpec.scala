@@ -11,7 +11,7 @@ import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import shapeless.contrib.scalacheck._
 
-object DishTableSpec extends Properties("Dish") with PropertyTestingConfig {
+object DishTableSpec extends Properties(name = "Dish") with PropertyTestingConfig {
 
   import lunatech.lunchplanner.data.TableDataGenerator._
 
@@ -23,15 +23,6 @@ object DishTableSpec extends Properties("Dish") with PropertyTestingConfig {
     cleanDishTable
 
     result == dish
-  }
-
-  property("query existing dishes successfully") = forAll { dish: Dish =>
-    addDishToDB(dish)
-    val result = Await.result(DishTable.exists(dish.uuid), defaultTimeout)
-
-    cleanDishTable
-
-    result
   }
 
   property("query dishes by uuid") = forAll { dish: Dish =>
@@ -63,10 +54,11 @@ object DishTableSpec extends Properties("Dish") with PropertyTestingConfig {
   property("remove existing dishes by uuid") = forAll { dish: Dish =>
     addDishToDB(dish)
     val dishesRemoved = Await.result(DishTable.removeByUuid(dish.uuid), defaultTimeout)
+    val getByUuis = Await.result(DishTable.getByUuid(dish.uuid), defaultTimeout).get
 
     cleanDishTable
 
-    dishesRemoved == 1
+    dishesRemoved == 1 && getByUuis.isDeleted
   }
 
   property("not fail when trying to remove a dish that does not exist") = forAll { dish: Dish =>
@@ -90,7 +82,5 @@ object DishTableSpec extends Properties("Dish") with PropertyTestingConfig {
     updatedDish.description == "updated description"
   }
 
-  private def addDishToDB(dish: Dish) = {
-    Await.result(DishTable.add(dish), defaultTimeout)
-  }
+  private def addDishToDB(dish: Dish): Dish = Await.result(DishTable.add(dish), defaultTimeout)
 }

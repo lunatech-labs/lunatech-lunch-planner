@@ -17,7 +17,7 @@ class UserServiceSpec extends BehaviorTestingConfig {
   private val userService = new UserService(configuration)
 
   override def beforeAll: Unit = {
-    when(configuration.get[Seq[String]]("administrators")).thenReturn(Seq("developer@lunatech.com", "user1@lunatech.com"))
+    when(configuration.get[Seq[String]]("administrators")).thenReturn(Seq("developer@lunatech.nl", "user1@lunatech.nl"))
 
     Await.result(
       for {

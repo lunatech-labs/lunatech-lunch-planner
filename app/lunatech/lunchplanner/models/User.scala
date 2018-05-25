@@ -6,5 +6,6 @@ final case class User(
     uuid: UUID = UUID.randomUUID(),
     name: String,
     emailAddress: String,
-    isAdmin: Boolean = false
+    isAdmin: Boolean = false,
+    isDeleted: Boolean = false
 )

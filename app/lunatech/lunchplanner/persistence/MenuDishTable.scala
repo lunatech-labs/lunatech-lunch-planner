@@ -7,10 +7,10 @@ import lunatech.lunchplanner.models.{Dish, Menu, MenuDish}
 import slick.jdbc.PostgresProfile.api._
 import slick.lifted.{ForeignKeyQuery, ProvenShape, TableQuery}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class MenuDishTable(tag: Tag) extends Table[MenuDish](tag, "MenuDish") {
+class MenuDishTable(tag: Tag)
+    extends Table[MenuDish](tag, _tableName = "MenuDish") {
   private val menuTable = TableQuery[MenuTable]
   private val dishTable = TableQuery[DishTable]
 
@@ -20,13 +20,19 @@ class MenuDishTable(tag: Tag) extends Table[MenuDish](tag, "MenuDish") {
 
   def dishUuid: Rep[UUID] = column[UUID]("dishUuid")
 
+  def isDeleted: Rep[Boolean] = column[Boolean]("isDeleted")
+
   def menuDishMenuForeignKey: ForeignKeyQuery[MenuTable, Menu] =
-    foreignKey("menuDishMenu_fkey_", menuUuid, menuTable)(_.uuid)
+    foreignKey(name = "menuDishMenu_fkey_",
+               sourceColumns = menuUuid,
+               targetTableQuery = menuTable)(_.uuid)
   def menuDishDishForeignKey: ForeignKeyQuery[DishTable, Dish] =
-    foreignKey("menuDishDish_fkey_", dishUuid, dishTable)(_.uuid)
+    foreignKey(name = "menuDishDish_fkey_",
+               sourceColumns = dishUuid,
+               targetTableQuery = dishTable)(_.uuid)
 
   def * : ProvenShape[MenuDish] =
-    (uuid, menuUuid, dishUuid) <> ((MenuDish.apply _).tupled, MenuDish.unapply)
+    (uuid, menuUuid, dishUuid, isDeleted) <> ((MenuDish.apply _).tupled, MenuDish.unapply)
 }
 
 object MenuDishTable {
@@ -38,45 +44,45 @@ object MenuDishTable {
     connection.db.run(query)
   }
 
-  def exists(uuid: UUID)(implicit connection: DBConnection): Future[Boolean] = {
-    connection.db.run(menuDishTable.filter(_.uuid === uuid).exists.result)
-  }
-
   def getByUuid(uuid: UUID)(
       implicit connection: DBConnection): Future[Option[MenuDish]] = {
-    exists(uuid).flatMap {
-      case true =>
-        val query = menuDishTable.filter(x => x.uuid === uuid)
-        connection.db.run(query.result.headOption)
-      case false => Future(None)
-    }
+    val query = menuDishTable.filter(menu => menu.uuid === uuid)
+    connection.db.run(query.result.headOption)
   }
 
   def getByMenuUuid(menuUuid: UUID)(
       implicit connection: DBConnection): Future[Seq[MenuDish]] = {
-    val query = menuDishTable.filter(_.menuUuid === menuUuid)
+    val query = menuDishTable.filter(menu =>
+      menu.menuUuid === menuUuid && menu.isDeleted === false)
     connection.db.run(query.result)
   }
 
   def getAll(implicit connection: DBConnection): Future[Seq[MenuDish]] = {
-    connection.db.run(menuDishTable.result)
+    connection.db.run(menuDishTable.filter(_.isDeleted === false).result)
   }
 
   def removeByUuid(uuid: UUID)(
       implicit connection: DBConnection): Future[Int] = {
-    val query = menuDishTable.filter(x => x.uuid === uuid).delete
+    val query =
+      menuDishTable.filter(_.uuid === uuid).map(_.isDeleted).update(true)
     connection.db.run(query)
   }
 
   def removeByMenuUuid(menuUuid: UUID)(
       implicit connection: DBConnection): Future[Int] = {
-    val query = menuDishTable.filter(x => x.menuUuid === menuUuid).delete
+    val query = menuDishTable
+      .filter(_.menuUuid === menuUuid)
+      .map(_.isDeleted)
+      .update(true)
     connection.db.run(query)
   }
 
   def removeByDishUuid(dishUuid: UUID)(
       implicit connection: DBConnection): Future[Int] = {
-    val query = menuDishTable.filter(x => x.dishUuid === dishUuid).delete
+    val query = menuDishTable
+      .filter(_.dishUuid === dishUuid)
+      .map(_.isDeleted)
+      .update(true)
     connection.db.run(query)
   }
 }

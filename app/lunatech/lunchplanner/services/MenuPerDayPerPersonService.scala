@@ -88,7 +88,7 @@ class MenuPerDayPerPersonService @Inject()(
 
   def delete(menuPerDayPerPersonUuids: Seq[UUID]): Future[Seq[Int]] =
     Future.sequence {
-      menuPerDayPerPersonUuids.map(MenuPerDayPerPersonTable.remove)
+      menuPerDayPerPersonUuids.map(MenuPerDayPerPersonTable.removeByUuid)
     }
 
   def getAllMenuWithNamePerDay: Future[Seq[MenuWithNamePerDay]] = {

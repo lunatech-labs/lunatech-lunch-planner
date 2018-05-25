@@ -11,7 +11,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class UserProfileTable(tag: Tag)
-    extends Table[UserProfile](tag, "UserProfile") {
+    extends Table[UserProfile](tag, _tableName = "UserProfile") {
   private val userTable = TableQuery[UserTable]
 
   def userUuid: Rep[UUID] = column[UUID]("userUuid", O.PrimaryKey)
@@ -32,8 +32,12 @@ class UserProfileTable(tag: Tag)
 
   def otherRestriction: Rep[String] = column[String]("otherRestriction")
 
+  def isDeleted: Rep[Boolean] = column[Boolean]("isDeleted")
+
   def userProfileUserForeignKey: ForeignKeyQuery[UserTable, User] =
-    foreignKey("userProfileUser_fkey_", userUuid, userTable)(_.uuid)
+    foreignKey(name = "userProfileUser_fkey_",
+               sourceColumns = userUuid,
+               targetTableQuery = userTable)(_.uuid)
 
   def * : ProvenShape[UserProfile] =
     (userUuid,
@@ -44,7 +48,8 @@ class UserProfileTable(tag: Tag)
      chickenRestriction,
      glutenRestriction,
      lactoseRestriction,
-     otherRestriction.?) <> ((UserProfile.apply _).tupled, UserProfile.unapply)
+     otherRestriction.?,
+     isDeleted) <> ((UserProfile.apply _).tupled, UserProfile.unapply)
 }
 
 object UserProfileTable {
@@ -62,7 +67,7 @@ object UserProfileTable {
 
   def removeByUserUuid(userUuid: UUID)(
       implicit connection: DBConnection): Future[Int] = {
-    val query = userProfileTable.filter(x => x.userUuid === userUuid).delete
+    val query = userProfileTable.filter(_.userUuid === userUuid).map(_.isDeleted).update(true)
     connection.db.run(query)
   }
 

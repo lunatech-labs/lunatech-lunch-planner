@@ -37,7 +37,7 @@ class ReportService @Inject()(
 
     val attendees: Future[Seq[MenuPerDayReportByDateAndLocation]] =
       menuPerDayService
-        .getAllOrderedByDateFilterDateRange(new Date(sDate.getMillis),
+        .getAllOrderedByDateFilterDateRangeWithDeleted(new Date(sDate.getMillis),
                                             new Date(eDate.getMillis))
         .flatMap { menuPerDay =>
           Future.traverse(menuPerDay) { mpd: MenuPerDay =>

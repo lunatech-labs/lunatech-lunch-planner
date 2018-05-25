@@ -23,7 +23,7 @@ class DishControllerSpec extends ControllerSpec {
 
   private val config = Configuration(ConfigFactory.load())
 
-  private val developer = User(UUID.randomUUID(), "Developer", "developer@lunatech.com")
+  private val developer = User(UUID.randomUUID(), "Developer", "developer@lunatech.nl")
 
   private val userService = mock[UserService]
   private val dishService = mock[DishService]
@@ -35,7 +35,7 @@ class DishControllerSpec extends ControllerSpec {
 
   private val dishTable = TableQuery[DishTable]
 
-  when(userService.getByEmailAddress("developer@lunatech.com")).thenReturn(Future.successful(Some(developer)))
+  when(userService.getByEmailAddress("developer@lunatech.nl")).thenReturn(Future.successful(Some(developer)))
   when(dishService.getAll).thenReturn(Future.successful(Seq(dish1, dish2, dish3, dish4, dish5)))
 
   private val controller = new DishController(
@@ -49,7 +49,7 @@ class DishControllerSpec extends ControllerSpec {
   "Dish controller" should {
 
     "display list of dishes" in {
-      val request = FakeRequest().withSession("email" -> "developer@lunatech.com")
+      val request = FakeRequest().withSession("email" -> "developer@lunatech.nl")
       val result = call(controller.getAllDishes, request)
 
       status(result) mustBe 200

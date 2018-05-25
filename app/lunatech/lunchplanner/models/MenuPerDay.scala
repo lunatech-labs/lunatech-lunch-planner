@@ -7,7 +7,8 @@ final case class MenuPerDay(
     uuid: UUID = UUID.randomUUID(),
     menuUuid: UUID,
     date: Date,
-    location: String
+    location: String,
+    isDeleted: Boolean = false
 )
 
 final case class MenuWithNamePerDay(

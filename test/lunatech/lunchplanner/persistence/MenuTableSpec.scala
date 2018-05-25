@@ -8,7 +8,7 @@ import shapeless.contrib.scalacheck._
 
 import scala.concurrent.Await
 
-object MenuTableSpec extends Properties("MenuTable") with PropertyTestingConfig {
+object MenuTableSpec extends Properties(name = "MenuTable") with PropertyTestingConfig {
 
   import lunatech.lunchplanner.data.TableDataGenerator._
 
@@ -20,16 +20,6 @@ object MenuTableSpec extends Properties("MenuTable") with PropertyTestingConfig 
     cleanMenuTable
 
     result == menu
-  }
-
-  property("query for existing menus successfully") = forAll { menu: Menu =>
-    addMenuToDB(menu)
-
-    val result = Await.result(MenuTable.exists(menu.uuid), defaultTimeout)
-
-    cleanMenuTable
-
-    result
   }
 
   property("query for menus by uuid") = forAll { menu: Menu =>
@@ -56,14 +46,16 @@ object MenuTableSpec extends Properties("MenuTable") with PropertyTestingConfig 
   property("remove an existing menu by uuid") = forAll { menu: Menu =>
     addMenuToDB(menu)
 
-    val result = Await.result(MenuTable.remove(menu.uuid), defaultTimeout)
-    result == 1
+    val result = Await.result(MenuTable.removeByUuid(menu.uuid), defaultTimeout)
+    val getByUuid = Await.result(MenuTable.getByUUID(menu.uuid), defaultTimeout).get
+
+    result == 1 && getByUuid.isDeleted
   }
 
   property("not fail when trying to remove a menu that does not exist") = forAll { menu: Menu =>
     // skip adding menu to DB
 
-    val result = Await.result(MenuTable.remove(menu.uuid), defaultTimeout)
+    val result = Await.result(MenuTable.removeByUuid(menu.uuid), defaultTimeout)
     result == 0
   }
 
@@ -81,7 +73,5 @@ object MenuTableSpec extends Properties("MenuTable") with PropertyTestingConfig 
     updatedMenu.name == "updated name"
   }
 
-  private def addMenuToDB(menu: Menu) = {
-    Await.result(MenuTable.add(menu), defaultTimeout)
-  }
+  private def addMenuToDB(menu: Menu): Menu = Await.result(MenuTable.add(menu), defaultTimeout)
 }

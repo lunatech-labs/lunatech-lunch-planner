@@ -4,5 +4,6 @@ import java.util.UUID
 
 final case class Menu(
     uuid: UUID = UUID.randomUUID(),
-    name: String
+    name: String,
+    isDeleted: Boolean = false
 )

@@ -8,7 +8,7 @@ import org.scalacheck.Prop._
 import scala.concurrent.Await
 import shapeless.contrib.scalacheck._
 
-object MenuDishTableSpec extends Properties("MenuDish") with PropertyTestingConfig {
+object MenuDishTableSpec extends Properties(name = "MenuDish") with PropertyTestingConfig {
 
   import lunatech.lunchplanner.data.TableDataGenerator._
 
@@ -20,16 +20,6 @@ object MenuDishTableSpec extends Properties("MenuDish") with PropertyTestingConf
     cleanMenuDishTable
 
     result == menuDishToAdd
-  }
-
-  property("query for existing menus dishes successfully") = forAll { (dish: Dish, menu: Menu, menuDish: MenuDish) =>
-    val menuDishAdded = addMenuAndDishAndMenuDishToDB(dish, menu, menuDish)
-
-    val result = Await.result(MenuDishTable.exists(menuDishAdded.uuid), defaultTimeout)
-
-    cleanMenuDishTable
-
-    result
   }
 
   property("query for menus dishes by uuid") = forAll { (dish: Dish, menu: Menu, menuDish: MenuDish) =>
@@ -80,7 +70,9 @@ object MenuDishTableSpec extends Properties("MenuDish") with PropertyTestingConf
       val menuDishAdded = addMenuAndDishAndMenuDishToDB(dish, menu, menuDish)
 
       val result = Await.result(MenuDishTable.removeByUuid(menuDishAdded.uuid), defaultTimeout)
-      result == 1
+      val getByUuid = Await.result(MenuDishTable.getByUuid(menuDishAdded.uuid), defaultTimeout).get
+
+      result == 1 && getByUuid.isDeleted
   }
 
   property("not fail when trying to remove a menu that does not exist") = forAll { menuDish: MenuDish =>
@@ -95,6 +87,7 @@ object MenuDishTableSpec extends Properties("MenuDish") with PropertyTestingConf
       addMenuAndDishAndMenuDishToDB(dish, menu, menuDish)
 
       val result = Await.result(MenuDishTable.removeByMenuUuid(menu.uuid), defaultTimeout)
+
       result == 1
   }
 
@@ -106,7 +99,7 @@ object MenuDishTableSpec extends Properties("MenuDish") with PropertyTestingConf
       result == 1
   }
 
-  private def addMenuAndDishToDB(dish: Dish, menu: Menu) = {
+  private def addMenuAndDishToDB(dish: Dish, menu: Menu): Menu = {
     Await.result(DishTable.add(dish), defaultTimeout)
     Await.result(MenuTable.add(menu), defaultTimeout)
   }

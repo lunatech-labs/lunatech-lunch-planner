@@ -13,7 +13,8 @@ import slick.lifted.{ForeignKeyQuery, ProvenShape, TableQuery}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class MenuPerDayTable(tag: Tag) extends Table[MenuPerDay](tag, "MenuPerDay") {
+class MenuPerDayTable(tag: Tag)
+    extends Table[MenuPerDay](tag, _tableName = "MenuPerDay") {
   private val menuTable = TableQuery[MenuTable]
   private val dishTable = TableQuery[DishTable]
 
@@ -25,11 +26,15 @@ class MenuPerDayTable(tag: Tag) extends Table[MenuPerDay](tag, "MenuPerDay") {
 
   def location: Rep[String] = column[String]("location")
 
+  def isDeleted: Rep[Boolean] = column[Boolean]("isDeleted")
+
   def menuPerDayMenuForeignKey: ForeignKeyQuery[MenuTable, Menu] =
-    foreignKey("menuPerDayMenu_fkey_", menuUuid, menuTable)(_.uuid)
+    foreignKey(name = "menuPerDayMenu_fkey_",
+               sourceColumns = menuUuid,
+               targetTableQuery = menuTable)(_.uuid)
 
   def * : ProvenShape[MenuPerDay] =
-    (uuid, menuUuid, date, location) <> ((MenuPerDay.apply _).tupled, MenuPerDay.unapply)
+    (uuid, menuUuid, date, location, isDeleted) <> ((MenuPerDay.apply _).tupled, MenuPerDay.unapply)
 }
 
 object MenuPerDayTable {
@@ -41,47 +46,43 @@ object MenuPerDayTable {
     connection.db.run(query)
   }
 
-  def exists(uuid: UUID)(implicit connection: DBConnection): Future[Boolean] = {
-    connection.db.run(menuPerDayTable.filter(_.uuid === uuid).exists.result)
-  }
-
   def getByUuid(uuid: UUID)(
       implicit connection: DBConnection): Future[Option[MenuPerDay]] = {
-    exists(uuid).flatMap {
-      case true =>
-        val query = menuPerDayTable.filter(x => x.uuid === uuid)
-        connection.db.run(query.result.headOption)
-      case false => Future(None)
-    }
+    val query = menuPerDayTable.filter(x => x.uuid === uuid)
+    connection.db.run(query.result.headOption)
   }
 
   def getByMenuUuid(menuUuid: UUID)(
       implicit connection: DBConnection): Future[Seq[MenuPerDay]] = {
-    val query = menuPerDayTable.filter(_.menuUuid === menuUuid)
+    val query = menuPerDayTable.filter(mpd =>
+      mpd.menuUuid === menuUuid && mpd.isDeleted === false)
     connection.db.run(query.result)
   }
 
   def getByDate(date: Date)(
       implicit connection: DBConnection): Future[Seq[MenuPerDay]] = {
-    val query = menuPerDayTable.filter(_.date === date)
+    val query = menuPerDayTable.filter(mpd =>
+      mpd.date === date && mpd.isDeleted === false)
     connection.db.run(query.result)
   }
 
   def getAll(implicit connection: DBConnection): Future[Seq[MenuPerDay]] = {
-    connection.db.run(menuPerDayTable.result)
+    connection.db.run(menuPerDayTable.filter(_.isDeleted === false).result)
   }
 
   def getAllOrderedByDateAscending(
       implicit connection: DBConnection): Future[Seq[MenuPerDay]] = {
-    val query = menuPerDayTable.sortBy(menu => menu.date)
+    val query =
+      menuPerDayTable.filter(_.isDeleted === false).sortBy(menu => menu.date)
     connection.db.run(query.result)
   }
 
   def getAllFutureAndOrderedByDateAscending(
       implicit connection: DBConnection): Future[Seq[MenuPerDay]] = {
     val query = menuPerDayTable
-      .filter(menu => menu.date >= new Date(DateTime.now.getMillis))
-      .sortBy(menu => menu.date)
+      .filter(mpd =>
+        mpd.isDeleted === false && mpd.date >= new Date(DateTime.now.getMillis))
+      .sortBy(mpd => mpd.date)
     connection.db.run(query.result)
   }
 
@@ -89,20 +90,34 @@ object MenuPerDayTable {
                                                   dateEnd: Date)(
       implicit connection: DBConnection): Future[Seq[MenuPerDay]] = {
     val query = menuPerDayTable
-      .filter(menu => menu.date >= dateStart && menu.date <= dateEnd)
-      .sortBy(menu => menu.date)
+      .filter(mpd => mpd.isDeleted === false && mpd.date >= dateStart && mpd.date <= dateEnd)
+      .sortBy(mpd => mpd.date)
+    connection.db.run(query.result)
+  }
+
+  // Method to be used on reports, does not filter out deleted data
+  def getAllFilteredDateRangeOrderedDateAscendingWithDeleted(dateStart: Date,
+    dateEnd: Date)(
+    implicit connection: DBConnection): Future[Seq[MenuPerDay]] = {
+    val query = menuPerDayTable
+      .filter(mpd => mpd.date >= dateStart && mpd.date <= dateEnd)
+      .sortBy(mpd => mpd.date)
     connection.db.run(query.result)
   }
 
   def removeByUuid(uuid: UUID)(
       implicit connection: DBConnection): Future[Int] = {
-    val query = menuPerDayTable.filter(x => x.uuid === uuid).delete
+    val query =
+      menuPerDayTable.filter(_.uuid === uuid).map(_.isDeleted).update(true)
     connection.db.run(query)
   }
 
   def removeByMenuUuid(menuUuid: UUID)(
       implicit connection: DBConnection): Future[Int] = {
-    val query = menuPerDayTable.filter(x => x.menuUuid === menuUuid).delete
+    val query = menuPerDayTable
+      .filter(_.menuUuid === menuUuid)
+      .map(_.isDeleted)
+      .update(true)
     connection.db.run(query)
   }
 
@@ -118,13 +133,14 @@ object MenuPerDayTable {
       r => MenuPerDay(UUID.fromString(r.<<), UUID.fromString(r.<<), r.<<, r.<<))
     val query =
       sql"""SELECT mpd."uuid", mpd."menuUuid", mpd."date", mpd."location", m."name"
-           FROM "MenuPerDay" mpd JOIN "Menu" m ON mpd."menuUuid"=m."uuid"
+           FROM "MenuPerDay" mpd JOIN "Menu" m ON mpd."menuUuid"=m."uuid" AND m."isDeleted" = FALSE
            WHERE mpd."date" = (SELECT current_date - cast(extract(dow FROM current_date) AS int) + 5)"""
         .as[(MenuPerDay, String)]
 
     connection.db.run(query)
   }
 
+  // Method used on reports, data not filtered by `isDeleted`
   def getAllAvailableDatesWithinRange(dateStart: Date, dateEnd: Date)(
       implicit connection: DBConnection): Future[Seq[Date]] = {
     implicit val result: GetResult[Date] = GetResult(r => r.nextDate)

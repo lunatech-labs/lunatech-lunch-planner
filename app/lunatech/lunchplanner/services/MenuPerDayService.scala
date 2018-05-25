@@ -28,6 +28,12 @@ class MenuPerDayService @Inject()(menuService: MenuService)(
     MenuPerDayTable.getAllFilteredDateRangeOrderedDateAscending(dateStart,
                                                                 dateEnd)
 
+  def getAllOrderedByDateFilterDateRangeWithDeleted(
+    dateStart: Date,
+    dateEnd: Date): Future[Seq[MenuPerDay]] =
+    MenuPerDayTable.getAllFilteredDateRangeOrderedDateAscendingWithDeleted(dateStart,
+      dateEnd)
+
   def getMenuPerDayByUuid(uuid: UUID): Future[Option[MenuPerDay]] =
     MenuPerDayTable.getByUuid(uuid)
 

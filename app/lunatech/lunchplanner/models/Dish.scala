@@ -17,7 +17,8 @@ final case class Dish(
     hasChicken: Boolean = false,
     isGlutenFree: Boolean = false,
     hasLactose: Boolean = false,
-    remarks: Option[String] = None
+    remarks: Option[String] = None,
+    isDeleted: Boolean = false
 )
 
 final case class DishIsSelected(
