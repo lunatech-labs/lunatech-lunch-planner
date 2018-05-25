@@ -77,7 +77,7 @@ class MenuPerDayPerPersonService @Inject()(
               }
           }
       }
-    }
+    }.map(_.sortBy(_.location))
   }
 
   def getByUserUuidAndMenuPerDayUuid(
