@@ -1,11 +1,11 @@
 package lunatech.lunchplanner.services
 
 import javax.inject.Inject
-
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.{User, UserProfile}
 import lunatech.lunchplanner.persistence.{UserProfileTable, UserTable}
 import play.api.Configuration
+import scalaz.\/
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -15,6 +15,14 @@ class UserService @Inject()(configuration: Configuration)(
 
   def getByEmailAddress(emailAddress: String): Future[Option[User]] =
     UserTable.getByEmailAddress(emailAddress)
+
+  def getByEmailAddressT(emailAddress: String): Future[\/[String, User]] = {
+    for {
+      user <- UserTable.getByEmailAddress(emailAddress)
+    } yield {
+      \/.fromEither(Either.cond(user.isDefined, user.get, s"No user found for $emailAddress"))
+    }
+  }
 
   def isAdminUser(emailAddress: String): Boolean =
     configuration.get[Seq[String]]("administrators").contains(emailAddress)
