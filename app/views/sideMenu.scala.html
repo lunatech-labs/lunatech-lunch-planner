@@ -8,20 +8,20 @@
         <li>
             <a id="planned" href="@lunatech.lunchplanner.controllers.routes.Application.index">Planned meals</a>
         </li>
-        @if(currentUser.isAdmin) {
-            <li>
-                <a id="dishes" href="@lunatech.lunchplanner.controllers.routes.DishController.getAllDishes">Dishes</a>
-            </li>
-            <li>
-                <a id="menus" href="@lunatech.lunchplanner.controllers.routes.MenuController.getAllMenus">Menus</a>
-            </li>
-            <li>
-                <a id="schedule" href="@lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay()">Schedules</a>
-            </li>
+    @if(currentUser.isAdmin) {
+        <li>
+            <a id="dishes" href="@lunatech.lunchplanner.controllers.routes.DishController.getAllDishes">Dishes</a>
+        </li>
+        <li>
+            <a id="menus" href="@lunatech.lunchplanner.controllers.routes.MenuController.getAllMenus">Menus</a>
+        </li>
+        <li>
+            <a id="schedule" href="@lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay()">Schedules</a>
+        </li>
+    }
         <li>
             <a href="@lunatech.lunchplanner.controllers.routes.ReportController.getReport()">Monthly Report</a>
         </li>
-        }
         <li><br></li>
         <div class="sidebar-heading" style="padding-left: 20px;">Logged in as @currentUser.name</div>
         <li>
