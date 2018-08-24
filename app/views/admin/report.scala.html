@@ -2,7 +2,7 @@
 @import lunatech.lunchplanner.models.{Report, ReportByDateAndLocation, User, ReportDate}
 @import org.joda.time.DateTime
 
-@(admin: User, reportForm: Form[ReportDate], report: ReportByDateAndLocation, reportNotAttending: Report, reportDate: ReportDate)(implicit messages: MessagesProvider)
+@(user: User, reportForm: Form[ReportDate], report: ReportByDateAndLocation, reportNotAttending: Report, reportDate: ReportDate)(implicit messages: MessagesProvider)
 
 @months = @{
     Seq(1 -> "January",
@@ -22,7 +22,7 @@
     (2017 to DateTime.now.getYear).map(year => year)
 }
 
-@main("Monthly Report", admin) {
+@main("Monthly Report", user) {
     <h1>Reports</h1>
 
     <form action="/report/filter" method="GET" class="form-inline" id="reportDateForm">
@@ -43,8 +43,10 @@
 
     <div class="col col-lg-12" style="padding-left: 0">
     @b3.form(lunatech.lunchplanner.controllers.routes.ReportController.export) {
-        @b3.submit('class -> "btn btn-primary") {
-            Export
+        @if(user.isAdmin) {
+            @b3.submit('class -> "btn btn-primary") {
+                Export
+            }
         }
             <div class="row text-success">
                 <h4>Attendees</h4>
@@ -69,8 +71,8 @@
                             </tbody>
                             <tfoot>
                                 <td align="right">Total: @users.length</td>
-                            </tfoot>
-                        </table>
+                    </tfoot>
+                    </table>
                     </div>
                 }
             </div>
