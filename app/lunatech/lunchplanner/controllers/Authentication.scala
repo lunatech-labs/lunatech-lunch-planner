@@ -40,12 +40,13 @@ class Authentication @Inject()(userService: UserService,
     val response = auth.authenticateToken(code, idToken, accessToken)
 
     response.flatMap {
-      case Left(parameters) =>
+      case Left(authResult) =>
+        val userEmail = authResult.email
         userService
-          .addUserIfNew(emailAddress = parameters.head._2)
+          .addUserIfNew(emailAddress = userEmail)
           .map(_ =>
             Redirect(routes.Application.index())
-              .withSession(parameters.toArray: _*))
+              .withSession("email" -> userEmail))
       case Right(message) =>
         Future.successful(
           Redirect(routes.Authentication.login()).withNewSession
