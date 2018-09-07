@@ -42,7 +42,7 @@ class ReportController @Inject()(userService: UserService,
 
     for {
       currentUser <- userService.getByEmailAddress(request.email)
-      totalAttendees <- reportService.getReportByLocationAndDate(reportMonth, reportYear)
+      sortedReport <- reportService.getSortedReport(reportMonth, reportYear)
       totalNotAttending <- reportService.getReportForNotAttending(reportMonth, reportYear)
       isAdmin = if (currentUser.isDefined) userService.isAdminUser(currentUser.get.emailAddress) else false
     } yield
@@ -50,7 +50,7 @@ class ReportController @Inject()(userService: UserService,
         views.html.admin.report(
           getCurrentUser(currentUser, isAdmin = isAdmin, request.email),
           ReportForm.reportForm,
-          totalAttendees,
+          sortedReport,
           totalNotAttending,
           ReportDate(reportMonth, reportYear)
         )

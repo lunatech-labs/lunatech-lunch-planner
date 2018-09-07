@@ -26,6 +26,20 @@ class ReportService @Inject()(menuPerDayPerPersonService: MenuPerDayPerPersonSer
     override def compare(x: Date, y: Date): Int = x compareTo y
   }
 
+  def getSortedReport(month: Int, year: Int): Future[List[(Date, ReportByDateAndLocation)]] = {
+    getReportByLocationAndDate(month, year).map(repList => {
+      repList.usersPerDateAndLocation
+        .groupBy { case ((date, _), _) => date }
+        .map(item => {
+          (item._1, ReportByDateAndLocation(item._2))
+        })
+        .toList
+        .sortWith((rep1, rep2) => {
+          rep1._1.after(rep2._1)
+        })
+    })
+  }
+
   def getReportByLocationAndDate(month: Int, year: Int): Future[ReportByDateAndLocation] = {
     val baseDate = DateTime.now.withMonthOfYear(month).withYear(year)
     val sDate = baseDate.withDayOfMonth(1)
