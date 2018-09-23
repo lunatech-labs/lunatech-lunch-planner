@@ -186,7 +186,7 @@ class SlackService @Inject()(
           style = "danger",
           value = if (menuWithMenuNameList.length == 1) { s"${menuWithMenuNameList.head._1.uuid}~" } else { menuWithMenuNameList.map(_._1.uuid).mkString("~") }
       )
-      yesActions :+ noAction
+      if (yesActions.nonEmpty) yesActions :+ noAction else Seq.empty
     }
 
     for {
@@ -195,7 +195,7 @@ class SlackService @Inject()(
       val actions = toAttachmentsActions(menuWithMenuNameList)
       val menuAndLocations = menuWithMenuNameList.map{ case (menuPerDay, menuName) => s"$menuName in ${menuPerDay.location}"}.mkString(" and ")
       val message = getString("slack.bot.attachment.text").format(menuAndLocations)
-      Seq(Attachments(message, "callback_id", actions))
+      if (actions.nonEmpty) Seq(Attachments(message, "callback_id", actions)) else Seq.empty
     }
   }
 
