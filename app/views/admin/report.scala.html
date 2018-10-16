@@ -1,8 +1,11 @@
 @import b3.vertical.fieldConstructor
 @import lunatech.lunchplanner.models.{Report, ReportByDateAndLocation, User, ReportDate}
 @import org.joda.time.DateTime
+@import java.sql.Date
 
-@(user: User, reportForm: Form[ReportDate], report: ReportByDateAndLocation, reportNotAttending: Report, reportDate: ReportDate)(implicit messages: MessagesProvider)
+@(user: User, reportForm: Form[ReportDate],
+        report: List[(Date, ReportByDateAndLocation)],
+        reportNotAttending: Report, reportDate: ReportDate)(implicit messages: MessagesProvider)
 
 @months = @{
     Seq(1 -> "January",
@@ -52,11 +55,11 @@
                 <h4>Attendees</h4>
             </div>
 
-        @report.usersPerDateAndLocation.groupBy{ case ((date, _), _) => @date }.map { case (date, usersPerDateAndLocation) =>
+        @report.map { case (date, reportByDateAndLocation) =>
             <div class="row text-success">
                 <h4>@date</h4>
 
-                @usersPerDateAndLocation.map { case ((_, location), users) =>
+                @reportByDateAndLocation.usersPerDateAndLocation.map { case ((_, location), users) =>
                     <div class="col col-xs-4" style="padding-left: 0">
                         <table class="table">
                             <thead>
