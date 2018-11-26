@@ -54,7 +54,7 @@ class ReportService @Inject()(menuPerDayPerPersonService: MenuPerDayPerPersonSer
     }
 
     for {
-      menuPerDayList <- menuPerDayService.getAllOrderedByDateFilterDateRangeWithDeleted(new Date(sDate.getMillis), new Date(eDate.getMillis))
+      menuPerDayList <- menuPerDayService.getAllOrderedByDateFilterDateRange(new Date(sDate.getMillis), new Date(eDate.getMillis))
       attendeesPerSchedule <- Future.traverse(menuPerDayList)(mpd => menuPerDayPerPersonService.getListOfPeopleByMenuPerDayByLocationAndDateForReport(mpd))
       scheduleWithAttendees = attendeesPerSchedule.flatten[MenuPerDayReportByDateAndLocation]
     } yield ReportByDateAndLocation(usersPerDateAndLocation = groupAndSort(scheduleWithAttendees))
