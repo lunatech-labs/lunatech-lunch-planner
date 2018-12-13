@@ -55,6 +55,7 @@ object ControllersData {
   val user2 = User(name = "user 2", emailAddress = "user2@lunatech.nl")
   val user3 = User(name = "user 3", emailAddress = "user3@lunatech.nl")
   val user4 = User(name = "user 4", emailAddress = "user4@lunatech.nl")
+  val user5 = User(name = "user 5", emailAddress = "user5@lunatech.nl")
 
   val userProfile1 = UserProfile(vegetarian = true)
   val userProfile2 = UserProfile(glutenRestriction = true)

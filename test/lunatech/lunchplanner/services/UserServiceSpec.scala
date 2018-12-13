@@ -68,7 +68,7 @@ class UserServiceSpec extends BehaviorTestingConfig {
     }
 
     "add new users when user does not exists" in {
-      val result = Await.result(userService.addUserIfNew(user4.emailAddress), defaultTimeout)
+      val result = Await.result(userService.addUserIfNew(user5.emailAddress), defaultTimeout)
 
       result mustBe true
     }
