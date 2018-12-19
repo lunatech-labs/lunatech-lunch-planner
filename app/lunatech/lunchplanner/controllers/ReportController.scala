@@ -87,7 +87,7 @@ class ReportController @Inject()(userService: UserService,
       month = Month.values(reportMonth - 1).month
       content = StreamConverters.fromInputStream(() => inputStream, ChunkSize)
     } yield Result(
-      header = ResponseHeader(Http.Status.OK, Map(Http.HeaderNames.CONTENT_DISPOSITION -> s"attachment; filename='$month $reportYear report.xls'")),
+      header = ResponseHeader(Http.Status.OK, Map(Http.HeaderNames.CONTENT_DISPOSITION -> s"attachment; filename=$month $reportYear report.xls")),
       body = HttpEntity.Streamed(content, None, Some("application/vnd.ms-excel"))
     )
   }
