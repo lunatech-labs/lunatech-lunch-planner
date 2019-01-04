@@ -29,9 +29,10 @@ class MenuPerDayService @Inject()(menuService: MenuService)(
                                                                 dateEnd)
 
   def getAllOrderedByDateFilterDateRangeWithDeleted(
-    dateStart: Date,
-    dateEnd: Date): Future[Seq[MenuPerDay]] =
-    MenuPerDayTable.getAllFilteredDateRangeOrderedDateAscendingWithDeleted(dateStart,
+      dateStart: Date,
+      dateEnd: Date): Future[Seq[MenuPerDay]] =
+    MenuPerDayTable.getAllFilteredDateRangeOrderedDateAscendingWithDeleted(
+      dateStart,
       dateEnd)
 
   def getMenuPerDayByUuid(uuid: UUID): Future[Option[MenuPerDay]] =
@@ -44,8 +45,8 @@ class MenuPerDayService @Inject()(menuService: MenuService)(
     MenuPerDayTable.getMenuForUpcomingSchedule
   }
 
-  def insertOrUpdate(uuid: UUID, menuPerDay: MenuPerDay): Future[Boolean] = {
-    MenuPerDayTable.insertOrUpdate(menuPerDay.copy(uuid))
+  def update(uuid: UUID, menuPerDay: MenuPerDay): Future[Boolean] = {
+    MenuPerDayTable.update(menuPerDay.copy(uuid))
   }
 
   def deleteByMenuUuid(menuUuid: UUID): Future[Int] =

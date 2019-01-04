@@ -1,17 +1,24 @@
 package lunatech.lunchplanner.controllers
 
-import java.time.{ Instant, LocalDate }
+import java.time.{Instant, LocalDate}
 import java.util.UUID
 
 import javax.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.{ Menu, MenuDish }
+import lunatech.lunchplanner.models.{Menu, MenuDish}
 import lunatech.lunchplanner.models._
-import lunatech.lunchplanner.services.{ DishService, MenuDishService, MenuPerDayPerPersonService, MenuPerDayService, MenuService, UserService }
-import lunatech.lunchplanner.viewModels.{ ListMenusForm, MenuForm }
+import lunatech.lunchplanner.services.{
+  DishService,
+  MenuDishService,
+  MenuPerDayPerPersonService,
+  MenuPerDayService,
+  MenuService,
+  UserService
+}
+import lunatech.lunchplanner.viewModels.{ListMenusForm, MenuForm}
 import play.api.i18n.I18nSupport
-import play.api.mvc.{ BaseController, ControllerComponents }
-import play.api.{ Configuration, Environment }
+import play.api.mvc.{BaseController, ControllerComponents}
+import play.api.{Configuration, Environment}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -175,7 +182,7 @@ class MenuController @Inject()(
   private def updateMenuDishes(menuUuid: UUID, menuData: MenuForm) = {
     // update menu name
     val menu = Menu(name = menuData.menuName.normalize)
-    menuService.insertOrUpdate(menuUuid, menu)
+    menuService.update(menuUuid, menu)
 
     // remove all previous menu dishes and add them again
     menuDishService.deleteByMenuUuid(menuUuid)
@@ -196,10 +203,9 @@ class MenuController @Inject()(
         val currentDate = LocalDate.now
 
         // do not delete past menus
-        if(menuDate.isAfter(currentDate)) {
+        if (menuDate.isAfter(currentDate)) {
           menuPerDayPerPersonService.deleteByMenuPerPersonUuid(mpd.uuid)
-        }
-        else {
+        } else {
           Future.successful(0)
         }
       })

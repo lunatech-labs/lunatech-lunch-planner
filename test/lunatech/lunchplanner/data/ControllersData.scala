@@ -1,6 +1,6 @@
 package lunatech.lunchplanner.data
 
-import java.util.{ Date, UUID }
+import java.util.UUID
 
 import lunatech.lunchplanner.models.{ Dish, Menu, MenuWithDishes, MenuWithNamePerDay, User, UserProfile }
 import play.api.libs.json.{ JsValue, Json }
@@ -42,8 +42,8 @@ object ControllersData {
   val dish5 = Dish(UUID.randomUUID(), "Gamberoni all aglio", "King prawns panfried in garlic, olive oil, chilli & tomato", isVegetarian = false, hasSeaFood = true, hasPork = false, hasBeef = false, hasChicken = false, isGlutenFree = false, hasLactose = false, None)
 
 
-  val menu1 = Menu(UUID.randomUUID(), "Menu 1")
-  val menu2 = Menu(UUID.randomUUID(), "Menu 2")
+  val menu1 = Menu(name ="Menu 1")
+  val menu2 = Menu(name ="Menu 2")
 
   val menuDish1 = MenuWithDishes(UUID.randomUUID(), menu1.name, Seq(dish2, dish3))
   val menuDish2 = MenuWithDishes(UUID.randomUUID(), menu2.name, Seq(dish1, dish5, dish4))

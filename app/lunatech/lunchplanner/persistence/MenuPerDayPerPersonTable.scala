@@ -14,6 +14,7 @@ import slick.jdbc.PostgresProfile.api._
 import slick.jdbc.GetResult
 import slick.lifted.{ForeignKeyQuery, ProvenShape, TableQuery}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class MenuPerDayPerPersonTable(tag: Tag)
@@ -50,19 +51,20 @@ object MenuPerDayPerPersonTable {
 
   def add(menuPerDayPerPerson: MenuPerDayPerPerson)(
       implicit connection: DBConnection): Future[MenuPerDayPerPerson] = {
-    val query = menuPerDayPerPersonTable returning menuPerDayPerPersonTable += menuPerDayPerPerson
-    connection.db.run(query)
+    val query = menuPerDayPerPersonTable += menuPerDayPerPerson
+    connection.db.run(query).map(_ => menuPerDayPerPerson)
   }
 
   def getByUuid(uuid: UUID)(implicit connection: DBConnection)
     : Future[Option[MenuPerDayPerPerson]] = {
-    val query = menuPerDayPerPersonTable.filter(x => x.uuid === uuid)
+    val query = menuPerDayPerPersonTable.filter(_.uuid === uuid)
     connection.db.run(query.result.headOption)
   }
 
   def getByMenuPerDayUuid(menuPerDayUuid: UUID)(
       implicit connection: DBConnection): Future[Seq[MenuPerDayPerPerson]] = {
-    val query = menuPerDayPerPersonTable.filter(mpdpp => mpdpp.menuPerDayUuid === menuPerDayUuid)
+    val query = menuPerDayPerPersonTable.filter(mpdpp =>
+      mpdpp.menuPerDayUuid === menuPerDayUuid)
     connection.db.run(query.result)
   }
 
@@ -75,15 +77,19 @@ object MenuPerDayPerPersonTable {
     connection.db.run(query.result)
   }
 
-  def getAttendeesByMenuPerDayUuid(menuPerDayUuid: UUID)(implicit connection: DBConnection): Future[Seq[(User, UserProfile)]] = {
+  def getAttendeesByMenuPerDayUuid(menuPerDayUuid: UUID)(
+      implicit connection: DBConnection): Future[Seq[(User, UserProfile)]] = {
     val query = {
       for {
-        mpdpp <- menuPerDayPerPersonTable.filter(mpdppt => mpdppt.menuPerDayUuid === menuPerDayUuid && mpdppt.isAttending)
+        mpdpp <- menuPerDayPerPersonTable.filter(mpdppt =>
+          mpdppt.menuPerDayUuid === menuPerDayUuid && mpdppt.isAttending)
         user <- UserTable.userTable if mpdpp.userUuid === user.uuid
-        userProfile <- UserProfileTable.userProfileTable if user.uuid === userProfile.userUuid
+        userProfile <- UserProfileTable.userProfileTable
+        if user.uuid === userProfile.userUuid
       } yield (user, userProfile)
-    }.distinctOn { case (user, _) =>
-      user.name
+    }.distinctOn {
+      case (user, _) =>
+        user.name
     }
 
     connection.db.run(query.result)
@@ -98,11 +104,13 @@ object MenuPerDayPerPersonTable {
              emailAddress = r.<<,
              isAdmin = r.<<))
 
-    val query = sql"""SELECT DISTINCT ON (u."uuid") u.*
+    val query = sql"""SELECT u.*
                             FROM "MenuPerDayPerPerson" mpdpp
                             JOIN "MenuPerDay" mpd ON mpdpp."menuPerDayUuid" = mpd."uuid"
                             JOIN "User" u ON mpdpp."userUuid" = u."uuid"
-                            WHERE mpdpp."isAttending" = FALSE AND mpd."date" = '#$date'"""
+                            WHERE mpdpp."isAttending" = FALSE AND mpd."date" = '#$date'
+                            GROUP BY u."uuid"
+                            ORDER BY u."uuid""""
       .as[User]
 
     connection.db.run(query)
@@ -147,18 +155,21 @@ object MenuPerDayPerPersonTable {
     connection.db.run(menuPerDayPerPersonTable.result)
   }
 
-  def removeByUuid(uuid: UUID)(implicit connection: DBConnection): Future[Int] = {
+  def removeByUuid(uuid: UUID)(
+      implicit connection: DBConnection): Future[Int] = {
     val query = menuPerDayPerPersonTable.filter(_.uuid === uuid).delete
     connection.db.run(query)
   }
 
   def removeByMenuPerDayUuid(menuPerDayUuid: UUID)(
-    implicit connection: DBConnection): Future[Int] = {
-    val query = menuPerDayPerPersonTable.filter(_.menuPerDayUuid === menuPerDayUuid).delete
+      implicit connection: DBConnection): Future[Int] = {
+    val query = menuPerDayPerPersonTable
+      .filter(_.menuPerDayUuid === menuPerDayUuid)
+      .delete
     connection.db.run(query)
   }
 
-    /**
+  /**
     * Get attendees for upcoming Friday lunch. The '5' refers to Friday.
     */
   def getAttendeesEmailAddressesForUpcomingLunch(

@@ -7,6 +7,7 @@ import lunatech.lunchplanner.models.{Dish, Menu, MenuDish}
 import slick.jdbc.PostgresProfile.api._
 import slick.lifted.{ForeignKeyQuery, ProvenShape, TableQuery}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class MenuDishTable(tag: Tag)
@@ -40,13 +41,13 @@ object MenuDishTable {
 
   def add(menuDish: MenuDish)(
       implicit connection: DBConnection): Future[MenuDish] = {
-    val query = menuDishTable returning menuDishTable += menuDish
-    connection.db.run(query)
+    val query = menuDishTable += menuDish
+    connection.db.run(query).map(_ => menuDish)
   }
 
   def getByUuid(uuid: UUID)(
       implicit connection: DBConnection): Future[Option[MenuDish]] = {
-    val query = menuDishTable.filter(menu => menu.uuid === uuid)
+    val query = menuDishTable.filter(_.uuid === uuid)
     connection.db.run(query.result.headOption)
   }
 

@@ -30,7 +30,8 @@ class UserProfileTable(tag: Tag)
 
   def lactoseRestriction: Rep[Boolean] = column[Boolean]("lactoseRestriction")
 
-  def otherRestriction: Rep[String] = column[String]("otherRestriction")
+  def otherRestriction: Rep[Option[String]] =
+    column[Option[String]]("otherRestriction")
 
   def isDeleted: Rep[Boolean] = column[Boolean]("isDeleted")
 
@@ -48,7 +49,7 @@ class UserProfileTable(tag: Tag)
      chickenRestriction,
      glutenRestriction,
      lactoseRestriction,
-     otherRestriction.?,
+     otherRestriction,
      isDeleted) <> ((UserProfile.apply _).tupled, UserProfile.unapply)
 }
 
@@ -56,9 +57,15 @@ object UserProfileTable {
   val userProfileTable: TableQuery[UserProfileTable] =
     TableQuery[UserProfileTable]
 
+  def add(userProfile: UserProfile)(
+      implicit connection: DBConnection): Future[UserProfile] = {
+    val query = userProfileTable += userProfile
+    connection.db.run(query).map(_ => userProfile)
+  }
+
   def getByUserUUID(userUuid: UUID)(
       implicit connection: DBConnection): Future[Option[UserProfile]] = {
-    val query = userProfileTable.filter(x => x.userUuid === userUuid)
+    val query = userProfileTable.filter(_.userUuid === userUuid)
     connection.db.run(query.result.headOption)
   }
 
@@ -67,13 +74,38 @@ object UserProfileTable {
 
   def removeByUserUuid(userUuid: UUID)(
       implicit connection: DBConnection): Future[Int] = {
-    val query = userProfileTable.filter(_.userUuid === userUuid).map(_.isDeleted).update(true)
+    val query = userProfileTable
+      .filter(_.userUuid === userUuid)
+      .map(_.isDeleted)
+      .update(true)
     connection.db.run(query)
   }
 
-  def insertOrUpdate(userProfile: UserProfile)(
+  def update(userProfile: UserProfile)(
       implicit connection: DBConnection): Future[Boolean] = {
-    val query = userProfileTable.insertOrUpdate(userProfile)
+    val query = userProfileTable
+      .filter(_.userUuid === userProfile.userUuid)
+      .map(
+        up =>
+          (up.vegetarian,
+           up.seaFoodRestriction,
+           up.porkRestriction,
+           up.beefRestriction,
+           up.chickenRestriction,
+           up.glutenRestriction,
+           up.lactoseRestriction,
+           up.otherRestriction,
+           up.isDeleted))
+      .update(
+        (userProfile.vegetarian,
+         userProfile.seaFoodRestriction,
+         userProfile.porkRestriction,
+         userProfile.beefRestriction,
+         userProfile.chickenRestriction,
+         userProfile.glutenRestriction,
+         userProfile.lactoseRestriction,
+         userProfile.otherRestriction,
+         userProfile.isDeleted))
     connection.db.run(query).map(_ == 1)
   }
 

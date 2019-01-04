@@ -12,63 +12,78 @@ object MenuTableSpec extends Properties(name = "MenuTable") with PropertyTesting
 
   import lunatech.lunchplanner.data.TableDataGenerator._
 
-  override def afterAll(): Unit = dbConnection.db.close()
-
   property("add a new menu") = forAll { menu: Menu =>
+    createTestSchema()
+    
     val result = addMenuToDB(menu)
 
-    cleanMenuTable
+    dropTestSchema()
 
     result == menu
   }
 
   property("query for menus by uuid") = forAll { menu: Menu =>
+    createTestSchema()
+    
     addMenuToDB(menu)
 
     val result = Await.result(MenuTable.getByUUID(menu.uuid), defaultTimeout).get
 
-    cleanMenuTable
+    dropTestSchema()
 
     result == menu
   }
 
   property("query for menus by uuid") = forAll { (menu1: Menu, menu2: Menu) =>
+    createTestSchema()
+    
     addMenuToDB(menu1)
     addMenuToDB(menu2)
 
     val result = Await.result(MenuTable.getAll, defaultTimeout)
 
-    cleanMenuTable
+    dropTestSchema()
 
     result == Seq(menu1, menu2)
   }
 
   property("remove an existing menu by uuid") = forAll { menu: Menu =>
+    createTestSchema()
+    
     addMenuToDB(menu)
 
     val result = Await.result(MenuTable.removeByUuid(menu.uuid), defaultTimeout)
     val getByUuid = Await.result(MenuTable.getByUUID(menu.uuid), defaultTimeout).get
 
+    dropTestSchema()
+
     result == 1 && getByUuid.isDeleted
   }
 
   property("not fail when trying to remove a menu that does not exist") = forAll { menu: Menu =>
+    createTestSchema()
+    
     // skip adding menu to DB
 
     val result = Await.result(MenuTable.removeByUuid(menu.uuid), defaultTimeout)
+
+    dropTestSchema()
+
     result == 0
   }
 
   property("update an existing menu by uuid") = forAll { menu: Menu =>
+    createTestSchema()
+    
     addMenuToDB(menu)
 
     val menuUpdated = menu.copy(name = "updated name")
-    val result = Await.result(MenuTable.insertOrUpdate(menuUpdated), defaultTimeout)
+    val result = Await.result(MenuTable.update(menuUpdated), defaultTimeout)
     assert(result)
 
     val updatedMenu = Await.result(MenuTable.getByUUID(menu.uuid), defaultTimeout).get
 
-    cleanMenuTable
+    dropTestSchema()
 
     updatedMenu.name == "updated name"
   }

@@ -34,7 +34,7 @@ class DishService @Inject()(implicit val connection: DBConnection) {
 
   def getByUuid(uuid: UUID): Future[Option[Dish]] = DishTable.getByUuid(uuid)
 
-  def insertOrUpdate(uuid: UUID, dishData: Dish): Future[Dish] = {
+  def update(uuid: UUID, dishData: Dish): Future[Dish] = {
     getByUuid(uuid)
       .flatMap {
         case Some(dish) =>
@@ -51,7 +51,7 @@ class DishService @Inject()(implicit val connection: DBConnection) {
             remarks = dishData.remarks
           )
           DishTable
-            .insertOrUpdate(updatedDish)
+            .update(updatedDish)
             .flatMap {
               case true  => Future.successful(updatedDish)
               case false => add(dishData)

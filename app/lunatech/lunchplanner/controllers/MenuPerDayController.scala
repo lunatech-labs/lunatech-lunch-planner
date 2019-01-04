@@ -251,7 +251,7 @@ class MenuPerDayController @Inject()(
           },
           menuPerDayData => {
             menuPerDayService
-              .insertOrUpdate(uuid, getNewMenuPerDay(menuPerDayData))
+              .update(uuid, getNewMenuPerDay(menuPerDayData))
               .map(_ =>
                 Redirect(
                   lunatech.lunchplanner.controllers.routes.MenuPerDayController

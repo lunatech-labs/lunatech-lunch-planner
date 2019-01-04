@@ -26,8 +26,8 @@ class MenuService @Inject()(implicit val connection: DBConnection) {
 
   def getByUuid(uuid: UUID): Future[Option[Menu]] = MenuTable.getByUUID(uuid)
 
-  def insertOrUpdate(menuUuid: UUID, menu: Menu): Future[Boolean] = {
-    MenuTable.insertOrUpdate(menu.copy(uuid = menuUuid))
+  def update(menuUuid: UUID, menu: Menu): Future[Boolean] = {
+    MenuTable.update(menu.copy(uuid = menuUuid))
   }
 
   def delete(uuid: UUID): Future[Int] = MenuTable.removeByUuid(uuid)

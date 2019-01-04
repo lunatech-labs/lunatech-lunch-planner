@@ -20,7 +20,9 @@ class UserService @Inject()(configuration: Configuration)(
     for {
       user <- UserTable.getByEmailAddress(emailAddress)
     } yield {
-      \/.fromEither(Either.cond(user.isDefined, user.get, s"No user found for $emailAddress"))
+      \/.fromEither(
+        Either
+          .cond(user.isDefined, user.get, s"No user found for $emailAddress"))
     }
   }
 
@@ -38,7 +40,7 @@ class UserService @Inject()(configuration: Configuration)(
           UserTable
             .add(newUser)
             .map(user => {
-              UserProfileTable.insertOrUpdate(UserProfile(newUser.uuid))
+              UserProfileTable.add(UserProfile(newUser.uuid))
               true
             })
         } else {

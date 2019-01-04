@@ -1,6 +1,5 @@
 package lunatech.lunchplanner.common
 
-import org.scalatest.BeforeAndAfterAll
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -13,7 +12,6 @@ trait ControllerSpec
   extends PlaySpec
     with Results
     with MockitoSugar
-    with BeforeAndAfterAll
     with GuiceOneAppPerSuite
     with Writeables {
 

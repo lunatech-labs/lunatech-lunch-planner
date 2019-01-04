@@ -25,13 +25,13 @@ object MenuTable {
   val menuTable: TableQuery[MenuTable] = TableQuery[MenuTable]
 
   def add(menu: Menu)(implicit connection: DBConnection): Future[Menu] = {
-    val query = menuTable returning menuTable += menu
-    connection.db.run(query)
+    val query = menuTable += menu
+    connection.db.run(query).map(_ => menu)
   }
 
   def getByUUID(uuid: UUID)(
       implicit connection: DBConnection): Future[Option[Menu]] = {
-    val query = menuTable.filter(x => x.uuid === uuid)
+    val query = menuTable.filter(_.uuid === uuid)
     connection.db.run(query.result.headOption)
   }
 
@@ -51,9 +51,11 @@ object MenuTable {
     connection.db.run(query)
   }
 
-  def insertOrUpdate(menu: Menu)(
-      implicit connection: DBConnection): Future[Boolean] = {
-    val query = menuTable.insertOrUpdate(menu)
+  def update(menu: Menu)(implicit connection: DBConnection): Future[Boolean] = {
+    val query = menuTable
+      .filter(_.uuid === menu.uuid)
+      .map(m => (m.name, m.isDeleted))
+      .update((menu.name, menu.isDeleted))
     connection.db.run(query).map(_ == 1)
   }
 }

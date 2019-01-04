@@ -42,7 +42,12 @@ class SlackService @Inject()(
       response <- doPost(getString("slack.api.usersList.url"), requestBody)
     } yield {
       val members = SlackForm.jsonToMemberObject(response.json)
-      members.filter(member => member.profile.email.isDefined && emails.contains(member.profile.email.get)).map(_.id)
+      members
+        .filter(
+          member =>
+            member.profile.email.isDefined && emails.contains(
+              member.profile.email.get))
+        .map(_.id)
     }
   }
 
@@ -54,7 +59,8 @@ class SlackService @Inject()(
     Future.sequence {
       val responses = userIds.map { userId =>
         val requestBody = Map("token" -> Seq(token), "users" -> Seq(userId))
-        val response = doPost(getString("slack.api.conversations.open"), requestBody)
+        val response =
+          doPost(getString("slack.api.conversations.open"), requestBody)
         response.map(r => (r.json \ "channel" \ "id").as[String])
       }
       responses
@@ -67,14 +73,17 @@ class SlackService @Inject()(
   def postMessage(channelIds: Seq[String]): Future[String] = {
     val text = getString("slack.bot.message.text")
 
-    def sendMessage(attachments: Seq[Attachments]): String => Future[JsValue] = { channelId =>
-      val requestBody =
-        Map("token" -> Seq(token),
-          "channel" -> Seq(channelId),
-          "text" -> Seq(text),
-          "attachments" -> Seq(SlackForm.jsonToString(attachments)))
-      val response = doPost(getString("slack.api.postMessage.url"), requestBody)
-      response.map(r => r.json)
+    def sendMessage(
+        attachments: Seq[Attachments]): String => Future[JsValue] = {
+      channelId =>
+        val requestBody =
+          Map("token" -> Seq(token),
+              "channel" -> Seq(channelId),
+              "text" -> Seq(text),
+              "attachments" -> Seq(SlackForm.jsonToString(attachments)))
+        val response =
+          doPost(getString("slack.api.postMessage.url"), requestBody)
+        response.map(r => r.json)
     }
 
     def result(attachments: Seq[Attachments]): Future[String] = {
@@ -83,7 +92,8 @@ class SlackService @Inject()(
           responses <- Future.traverse(channelIds)(sendMessage(attachments))
         } yield s"Message sent to ${responses.length} people!"
       } else {
-        Future.successful("No message sent because there's no upcoming lunch this coming Friday")
+        Future.successful(
+          "No message sent because there's no upcoming lunch this coming Friday")
       }
     }
 
@@ -107,12 +117,20 @@ class SlackService @Inject()(
       value = slackResponse.action.head.value
     } yield {
       result match {
-        case -\/(error) => s"Error: $error. Please inform the admins about this."
+        case -\/(error) =>
+          s"Error: $error. Please inform the admins about this."
         case \/-(isAttending) =>
           if (isAttending) {
-            val uuidAndMenuName = menuForUpcomingSchedule.map { case (menuPerDay, menuName) => menuPerDay.uuid -> menuName }
-            val response = uuidAndMenuName.filter{ case (uuid, _) => uuid == UUID.fromString(value) }.head._2
-            configuration.get[String]("slack.bot.response.text").format(response)
+            val uuidAndMenuName = menuForUpcomingSchedule.map {
+              case (menuPerDay, menuName) => menuPerDay.uuid -> menuName
+            }
+            val response = uuidAndMenuName
+              .filter { case (uuid, _) => uuid == UUID.fromString(value) }
+              .head
+              ._2
+            configuration
+              .get[String]("slack.bot.response.text")
+              .format(response)
           } else {
             configuration.get[String]("slack.bot.response.notAttending.text")
           }
@@ -123,8 +141,11 @@ class SlackService @Inject()(
   /**
     * A "~" in value means that the user picked "Not Attending". Sample value is menuUuid1~menuUuid2 which will be added separately to the DB
     */
-  private def addResponseToDb(user: \/[String, User], slackResponse: SlackResponse): EitherT[Future, String, Boolean] = {
-    def addToDb(actions: Seq[ResponseAction], user: User): Future[\/[String, Boolean]] = {
+  private def addResponseToDb(
+      user: \/[String, User],
+      slackResponse: SlackResponse): EitherT[Future, String, Boolean] = {
+    def addToDb(actions: Seq[ResponseAction],
+                user: User): Future[\/[String, Boolean]] = {
       val results = for {
         action <- actions
       } yield {
@@ -137,21 +158,25 @@ class SlackService @Inject()(
 
       Future.sequence(results).map {
         case r: Seq[Boolean] => \/-(r.forall(a => a))
-        case _ => -\/(s"Error in addResponseToDb.")
+        case _               => -\/(s"Error in addResponseToDb.")
       }
     }
 
-    def addMenuPerDayPerPerson(value: String, userUuid: UUID, menuUuids: Seq[String]): Future[Equals] = {
+    def addMenuPerDayPerPerson(value: String,
+                               userUuid: UUID,
+                               menuUuids: Seq[String]): Future[Equals] = {
       if (value.contains("~")) {
-        Future.traverse(menuUuids){ menuUuid =>
-          menuPerDayPerPersonService.add(MenuPerDayPerPerson(menuPerDayUuid = UUID.fromString(menuUuid),
-                                                             userUuid = userUuid,
-                                                             isAttending = false))
+        Future.traverse(menuUuids) { menuUuid =>
+          menuPerDayPerPersonService.add(
+            MenuPerDayPerPerson(menuPerDayUuid = UUID.fromString(menuUuid),
+                                userUuid = userUuid,
+                                isAttending = false))
         }
       } else {
-        menuPerDayPerPersonService.add(MenuPerDayPerPerson(menuPerDayUuid = UUID.fromString(value),
-                                                           userUuid = userUuid,
-                                                           isAttending = true))
+        menuPerDayPerPersonService.add(
+          MenuPerDayPerPerson(menuPerDayUuid = UUID.fromString(value),
+                              userUuid = userUuid,
+                              isAttending = true))
       }
     }
 
@@ -161,7 +186,8 @@ class SlackService @Inject()(
     } yield result
   }
 
-  private def getEmailAddressBySlackUserId(slackUserId: String): Future[String] = {
+  private def getEmailAddressBySlackUserId(
+      slackUserId: String): Future[String] = {
     val requestBody = Map("token" -> Seq(token), "user" -> Seq(slackUserId))
     for {
       response <- doPost(getString("slack.api.usersInfo.url"), requestBody)
@@ -175,16 +201,21 @@ class SlackService @Inject()(
   }
 
   private def getAttachments: Future[Seq[Attachments]] = {
-    def toAttachmentsActions(menuWithMenuNameList: Seq[(MenuPerDay, String)]): Seq[AttachmentsActions] = {
-      val yesActions = menuWithMenuNameList.map { case (menuPerDay, menuName) =>
-        val text = getString("slack.bot.button.yes.text").format(menuName, menuPerDay.location)
-        val value = menuPerDay.uuid.toString
-        AttachmentsActions(text = text, value = value)
+    def toAttachmentsActions(menuWithMenuNameList: Seq[(MenuPerDay, String)])
+      : Seq[AttachmentsActions] = {
+      val yesActions = menuWithMenuNameList.map {
+        case (menuPerDay, menuName) =>
+          val text = getString("slack.bot.button.yes.text")
+            .format(menuName, menuPerDay.location)
+          val value = menuPerDay.uuid.toString
+          AttachmentsActions(text = text, value = value)
       }
       val noAction = AttachmentsActions(
-          text = getString("slack.bot.button.no.text"),
-          style = "danger",
-          value = if (menuWithMenuNameList.length == 1) { s"${menuWithMenuNameList.head._1.uuid}~" } else { menuWithMenuNameList.map(_._1.uuid).mkString("~") }
+        text = getString("slack.bot.button.no.text"),
+        style = "danger",
+        value = if (menuWithMenuNameList.length == 1) {
+          s"${menuWithMenuNameList.head._1.uuid}~"
+        } else { menuWithMenuNameList.map(_._1.uuid).mkString("~") }
       )
       if (yesActions.nonEmpty) yesActions :+ noAction else Seq.empty
     }
@@ -193,9 +224,15 @@ class SlackService @Inject()(
       menuWithMenuNameList <- menuPerDayService.getMenuForUpcomingSchedule
     } yield {
       val actions = toAttachmentsActions(menuWithMenuNameList)
-      val menuAndLocations = menuWithMenuNameList.map{ case (menuPerDay, menuName) => s"$menuName in ${menuPerDay.location}"}.mkString(" and ")
-      val message = getString("slack.bot.attachment.text").format(menuAndLocations)
-      if (actions.nonEmpty) Seq(Attachments(message, "callback_id", actions)) else Seq.empty
+      val menuAndLocations = menuWithMenuNameList
+        .map {
+          case (menuPerDay, menuName) => s"$menuName in ${menuPerDay.location}"
+        }
+        .mkString(" and ")
+      val message =
+        getString("slack.bot.attachment.text").format(menuAndLocations)
+      if (actions.nonEmpty) Seq(Attachments(message, "callback_id", actions))
+      else Seq.empty
     }
   }
 

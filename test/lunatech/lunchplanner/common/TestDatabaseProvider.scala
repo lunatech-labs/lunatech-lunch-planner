@@ -1,6 +1,6 @@
 package lunatech.lunchplanner.common
 
-import lunatech.lunchplanner.persistence.{ DishTable, MenuDishTable, MenuPerDayPerPersonTable, MenuPerDayTable, MenuTable, UserProfileTable, UserTable }
+import lunatech.lunchplanner.persistence._
 import slick.jdbc.PostgresProfile.api._
 import slick.lifted.TableQuery
 

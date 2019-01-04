@@ -1,8 +1,8 @@
 package lunatech.lunchplanner.controllers
 
 import java.util.UUID
-import javax.inject.Inject
 
+import javax.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.Dish
 import lunatech.lunchplanner.models._
@@ -105,7 +105,7 @@ class DishController @Inject()(
           },
           dishForm => {
             dishService
-              .insertOrUpdate(uuid, getDish(dishForm))
+              .update(uuid, getDish(dishForm))
               .map(_ =>
                 Redirect(lunatech.lunchplanner.controllers.routes.DishController
                   .getAllDishes())
