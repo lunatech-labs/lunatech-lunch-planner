@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/lunatech-labs/lunatech-lunch-planner.svg?branch=master)](https://travis-ci.org/lunatech-labs/lunatech-lunch-planner)
+
 This is the source code for the Lunatech Lunch Planner application
 =====================================
 
