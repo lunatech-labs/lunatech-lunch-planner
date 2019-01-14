@@ -42,13 +42,13 @@ object MenuPerDayTable {
 
   def add(menuPerDay: MenuPerDay)(
       implicit connection: DBConnection): Future[MenuPerDay] = {
-    val query = menuPerDayTable returning menuPerDayTable += menuPerDay
-    connection.db.run(query)
+    val query = menuPerDayTable += menuPerDay
+    connection.db.run(query).map(_ => menuPerDay)
   }
 
   def getByUuid(uuid: UUID)(
       implicit connection: DBConnection): Future[Option[MenuPerDay]] = {
-    val query = menuPerDayTable.filter(x => x.uuid === uuid)
+    val query = menuPerDayTable.filter(_.uuid === uuid)
     connection.db.run(query.result.headOption)
   }
 
@@ -90,15 +90,16 @@ object MenuPerDayTable {
                                                   dateEnd: Date)(
       implicit connection: DBConnection): Future[Seq[MenuPerDay]] = {
     val query = menuPerDayTable
-      .filter(mpd => mpd.isDeleted === false && mpd.date >= dateStart && mpd.date <= dateEnd)
+      .filter(mpd =>
+        mpd.isDeleted === false && mpd.date >= dateStart && mpd.date <= dateEnd)
       .sortBy(mpd => mpd.date)
     connection.db.run(query.result)
   }
 
   // Method to be used on reports, does not filter out deleted data
   def getAllFilteredDateRangeOrderedDateAscendingWithDeleted(dateStart: Date,
-    dateEnd: Date)(
-    implicit connection: DBConnection): Future[Seq[MenuPerDay]] = {
+                                                             dateEnd: Date)(
+      implicit connection: DBConnection): Future[Seq[MenuPerDay]] = {
     val query = menuPerDayTable
       .filter(mpd => mpd.date >= dateStart && mpd.date <= dateEnd)
       .sortBy(mpd => mpd.date)
@@ -121,9 +122,12 @@ object MenuPerDayTable {
     connection.db.run(query)
   }
 
-  def insertOrUpdate(menuPerDay: MenuPerDay)(
+  def update(menuPerDay: MenuPerDay)(
       implicit connection: DBConnection): Future[Boolean] = {
-    val query = menuPerDayTable.insertOrUpdate(menuPerDay)
+    val query = menuPerDayTable
+      .filter(_.uuid === menuPerDay.uuid)
+      .map(m => (m.date, m.location, m.isDeleted))
+      .update((menuPerDay.date, menuPerDay.location, menuPerDay.isDeleted))
     connection.db.run(query).map(_ == 1)
   }
 

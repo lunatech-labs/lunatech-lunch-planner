@@ -2,15 +2,13 @@ name := """lunatech-lunch-planner"""
 
 version := "1.0-SNAPSHOT"
 
-dockerImageCreationTask := (publishLocal in Docker).value
-
 scalaVersion := "2.12.4"
 
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala)
-  .enablePlugins(DockerComposePlugin)
   .settings(
     javaOptions in Test += "-Dconfig.file=conf/application-test.conf",
+    testOptions in Test += Tests.Argument(TestFrameworks.ScalaCheck,  "-verbosity", "1"),
     parallelExecution in Test := false,
     fork in Test := true
   )
@@ -23,7 +21,8 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-slick" % "3.0.3",
   "com.typesafe.play" %% "play-slick-evolutions" % "3.0.3",
   "com.typesafe.slick" %% "slick-hikaricp" % "3.2.3",
-  "org.postgresql" % "postgresql" % "9.3-1102-jdbc41",
+
+  "org.postgresql" % "postgresql" % "42.2.5",
   "com.google.api-client" % "google-api-client" % "1.22.0",
   "com.google.http-client" % "google-http-client-jackson" % "1.22.0",
   "com.lunatech" %% "play-googleopenconnect" % "2.3",
@@ -33,9 +32,10 @@ libraryDependencies ++= Seq(
   "com.enragedginger" %% "akka-quartz-scheduler" % "1.6.0-akka-2.4.x",
   "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test,
   "org.mockito" % "mockito-all" % "1.10.19" % Test,
-  "org.scalacheck" %% "scalacheck" % "1.13.5" % Test,
+  "org.scalacheck" %% "scalacheck" % "1.14.0" % Test,
   "org.typelevel" %% "shapeless-scalacheck" % "0.6.1" % Test,
-  "wolfendale" %% "scalacheck-gen-regexp" % "0.1.0" % Test
+  "wolfendale" %% "scalacheck-gen-regexp" % "0.1.0" % Test,
+  "com.h2database" % "h2" % "1.4.197" % Test
 )
 
 resolvers ++= Seq(

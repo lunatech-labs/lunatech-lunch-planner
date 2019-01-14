@@ -14,8 +14,11 @@ import scala.concurrent.Future
 class UserProfileService @Inject()(configuration: Configuration)(
     implicit val connection: DBConnection) {
 
-  def insertOrUpdate(userProfile: UserProfile): Future[Boolean] =
-    UserProfileTable.insertOrUpdate(userProfile)
+  def add(userProfile: UserProfile): Future[UserProfile] =
+    UserProfileTable.add(userProfile)
+
+  def update(userProfile: UserProfile): Future[Boolean] =
+    UserProfileTable.update(userProfile)
 
   def getUserProfileByUserUuid(userUuid: UUID): Future[Option[UserProfile]] =
     UserProfileTable.getByUserUUID(userUuid)

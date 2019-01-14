@@ -12,47 +12,56 @@ object UserProfileTableSpec extends Properties(name = "UserProfile") with Proper
 
   import lunatech.lunchplanner.data.TableDataGenerator._
 
-  override def afterAll(): Unit = dbConnection.db.close()
-
   property("add a new user profile") = forAll { (user: User, userProfile: UserProfile) =>
+    createTestSchema()
+
     val result = addUserAndProfileToDB(user, userProfile)
 
-    cleanUserAndProfileTable
+    dropTestSchema()
 
     result
   }
 
   property("get user profile by user uuid") = forAll { (user: User, userProfile: UserProfile) =>
+    createTestSchema()
+
     addUserAndProfileToDB(user, userProfile)
 
     val result = Await.result(UserProfileTable.getByUserUUID(user.uuid), defaultTimeout).get
 
-    cleanUserAndProfileTable
+    dropTestSchema()
 
     result == userProfile.copy(userUuid = user.uuid)
   }
 
   property("get all user profiles") = forAll { (user: User, userProfile: UserProfile) =>
+    createTestSchema()
+
     addUserAndProfileToDB(user, userProfile)
 
     val result = Await.result(UserProfileTable.getAll, defaultTimeout)
 
-    cleanUserAndProfileTable
+    dropTestSchema()
 
     result == Seq(userProfile.copy(userUuid = user.uuid))
   }
 
   property("remove user profile") = forAll { (user: User, userProfile: UserProfile) =>
+    createTestSchema()
+
     addUserAndProfileToDB(user, userProfile)
 
     val result = Await.result(UserProfileTable.removeByUserUuid(user.uuid), defaultTimeout)
     val getByUuid = Await.result(UserProfileTable.getByUserUUID(user.uuid), defaultTimeout).get
+
+    dropTestSchema()
 
     result == 1 && getByUuid.isDeleted
   }
 
   property("get summary of diet restrictions by menuPerDay") = forAll {
     (user: User, userProfile: UserProfile, menu: Menu, menuPerDay: MenuPerDay, menuPerDayPerPerson: MenuPerDayPerPerson) =>
+      createTestSchema()
 
       addUserAndProfileToDB(user, userProfile)
       Await.result(MenuTable.add(menu), defaultTimeout)
@@ -61,7 +70,7 @@ object UserProfileTableSpec extends Properties(name = "UserProfile") with Proper
 
       val result = Await.result(UserProfileTable.getRestrictionsByMenuPerDay(menuPerDay.uuid), defaultTimeout).head
 
-      cleanDatabase
+      dropTestSchema()
 
       result._1 == booleanToInt(userProfile.vegetarian) &&
       result._2 == booleanToInt(userProfile.seaFoodRestriction) &&
@@ -75,7 +84,13 @@ object UserProfileTableSpec extends Properties(name = "UserProfile") with Proper
   private def booleanToInt(boolean: Boolean): Int = if (boolean) 1 else 0
 
   private def addUserAndProfileToDB(user: User, userProfile: UserProfile): Boolean = {
-    Await.result(UserTable.add(user), defaultTimeout)
-    Await.result(UserProfileTable.insertOrUpdate(userProfile.copy(userUuid = user.uuid)), defaultTimeout)
+    import scala.concurrent.ExecutionContext.Implicits.global
+
+    val query = for {
+      _ <- UserTable.add(user)
+      isInserted <- UserProfileTable.add(userProfile.copy(userUuid = user.uuid)).map(_ => true)
+    } yield isInserted
+
+    Await.result(query, defaultTimeout)
   }
 }

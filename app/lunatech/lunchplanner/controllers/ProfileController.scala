@@ -81,7 +81,7 @@ class ProfileController @Inject()(
       userOption <- userService.getByEmailAddress(username)
       result <- userOption
         .map { user =>
-          userProfileService.insertOrUpdate(getUserProfile(user.uuid, profile))
+          userProfileService.update(getUserProfile(user.uuid, profile))
         }
         .getOrElse(Future.successful(false))
     } yield result

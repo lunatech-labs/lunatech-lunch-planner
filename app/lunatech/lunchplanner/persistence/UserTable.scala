@@ -7,6 +7,7 @@ import lunatech.lunchplanner.models.User
 import slick.jdbc.PostgresProfile.api._
 import slick.lifted.{ProvenShape, TableQuery}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class UserTable(tag: Tag) extends Table[User](tag, _tableName = "User") {
@@ -28,8 +29,8 @@ object UserTable {
   val userTable: TableQuery[UserTable] = TableQuery[UserTable]
 
   def add(user: User)(implicit connection: DBConnection): Future[User] = {
-    val query = userTable returning userTable += user
-    connection.db.run(query)
+    val query = userTable += user
+    connection.db.run(query).map(_ => user)
   }
 
   def existsByEmail(emailAddress: String)(
@@ -43,13 +44,13 @@ object UserTable {
 
   def getByUUID(uuid: UUID)(
       implicit connection: DBConnection): Future[Option[User]] = {
-    val query = userTable.filter(user => user.uuid === uuid)
+    val query = userTable.filter(_.uuid === uuid)
     connection.db.run(query.result.headOption)
   }
 
   def getByEmailAddress(emailAddress: String)(
       implicit connection: DBConnection): Future[Option[User]] = {
-    val query = userTable.filter(user => user.emailAddress === emailAddress)
+    val query = userTable.filter(_.emailAddress === emailAddress)
     connection.db.run(query.result.headOption)
   }
 

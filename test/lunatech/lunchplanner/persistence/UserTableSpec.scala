@@ -8,78 +8,90 @@ import org.scalacheck.Prop._
 import scala.concurrent.Await
 import shapeless.contrib.scalacheck._
 
-object UserTableSpec extends Properties(name = "UserProfile") with PropertyTestingConfig {
+object UserTableSpec extends Properties(name = "User") with PropertyTestingConfig {
 
   import lunatech.lunchplanner.data.TableDataGenerator._
 
-  override def afterAll(): Unit = dbConnection.db.close()
-
   property("add a new user") = forAll { user: User =>
+    createTestSchema()
+    
     val result = addUserToDB(user)
 
-    cleanUserAndProfileTable
+    dropTestSchema()
 
     result == user
   }
 
   property("query for users by UUID successfully") = forAll { user: User =>
+    createTestSchema()
+    
     addUserToDB(user)
 
     val result = Await.result(UserTable.getByUUID(user.uuid), defaultTimeout).get
 
-    cleanUserAndProfileTable
+    dropTestSchema()
 
     result == user
   }
 
   property("query for users by email address") = forAll { user: User =>
+    createTestSchema()
+    
     addUserToDB(user)
 
     val result = Await.result(UserTable.getByEmailAddress(user.emailAddress), defaultTimeout).get
 
-    cleanUserAndProfileTable
+    dropTestSchema()
 
     result == user
   }
 
   property("check if a user exist by email address") = forAll { user: User =>
+    createTestSchema()
+    
     addUserToDB(user)
 
     val result = Await.result(UserTable.existsByEmail(user.emailAddress), defaultTimeout)
 
-    cleanUserAndProfileTable
+    dropTestSchema()
 
     result
   }
 
   property("query for all users") = forAll { (user1: User, user2: User) =>
+    createTestSchema()
+    
     addUserToDB(user1)
     addUserToDB(user2)
 
     val result = Await.result(UserTable.getAll, defaultTimeout)
 
-    cleanUserAndProfileTable
+    dropTestSchema()
 
     result == Seq(user1, user2)
   }
 
   property("delete an existing user by uuid") = forAll { user: User =>
+    createTestSchema()
+    
     addUserToDB(user)
 
     val deletedResult = Await.result(UserTable.removeByUuid(user.uuid), defaultTimeout)
     val getByUUIDUser = Await.result(UserTable.getByUUID(user.uuid), defaultTimeout).get
 
-    cleanUserAndProfileTable
+    dropTestSchema()
 
     deletedResult == 1 && getByUUIDUser.isDeleted
   }
 
   property("delete a non existing user by uuid") = forAll { user: User =>
+    createTestSchema()
+    
     //skip adding user to DB
 
     val deletedResult = Await.result(UserTable.removeByUuid(user.uuid), defaultTimeout)
 
-    cleanUserAndProfileTable
+    dropTestSchema()
 
     deletedResult == 0
   }

@@ -37,14 +37,19 @@ class ReportController @Inject()(userService: UserService,
   val year = "year"
 
   def getReport: EssentialAction = userAction.async { implicit request =>
-    val reportMonth = request.session.get(month).map(_.toInt).getOrElse(getDefaultDate.month)
-    val reportYear = request.session.get(year).map(_.toInt).getOrElse(getDefaultDate.year)
+    val reportMonth =
+      request.session.get(month).map(_.toInt).getOrElse(getDefaultDate.month)
+    val reportYear =
+      request.session.get(year).map(_.toInt).getOrElse(getDefaultDate.year)
 
     for {
       currentUser <- userService.getByEmailAddress(request.email)
       sortedReport <- reportService.getSortedReport(reportMonth, reportYear)
-      totalNotAttending <- reportService.getReportForNotAttending(reportMonth, reportYear)
-      isAdmin = if (currentUser.isDefined) userService.isAdminUser(currentUser.get.emailAddress) else false
+      totalNotAttending <- reportService.getReportForNotAttending(reportMonth,
+                                                                  reportYear)
+      isAdmin = if (currentUser.isDefined)
+        userService.isAdminUser(currentUser.get.emailAddress)
+      else false
     } yield
       Ok(
         views.html.admin.report(
@@ -59,11 +64,13 @@ class ReportController @Inject()(userService: UserService,
 
   def filterAttendees: EssentialAction = userAction.async { implicit request =>
     def hasErrors: Form[ReportDate] => Future[Result] = { _ =>
-      Future(Redirect(lunatech.lunchplanner.controllers.routes.ReportController.getReport()))
+      Future(Redirect(
+        lunatech.lunchplanner.controllers.routes.ReportController.getReport()))
     }
 
     def success: ReportDate => Future[Result] = { selectedReportDate =>
-      val session = request.session + (month -> Integer.toString(selectedReportDate.month)) +
+      val session = request.session + (month -> Integer.toString(
+        selectedReportDate.month)) +
         (year -> Integer.toString(selectedReportDate.year))
       Future {
         Redirect(
@@ -77,20 +84,31 @@ class ReportController @Inject()(userService: UserService,
 
   def export: EssentialAction = adminAction.async { implicit request =>
     val ChunkSize = 1024
-    val reportMonth = request.session.get(month).map(_.toInt).getOrElse(getDefaultDate.month)
-    val reportYear = request.session.get(year).map(_.toInt).getOrElse(getDefaultDate.year)
+    val reportMonth =
+      request.session.get(month).map(_.toInt).getOrElse(getDefaultDate.month)
+    val reportYear =
+      request.session.get(year).map(_.toInt).getOrElse(getDefaultDate.year)
 
     for {
-      totalAttendees <- reportService.getReportByLocationAndDate(reportMonth, reportYear)
-      totalNotAttending <- reportService.getReportForNotAttending(reportMonth, reportYear)
-      inputStream = new ByteArrayInputStream(reportService.exportToExcel(totalAttendees, totalNotAttending))
+      totalAttendees <- reportService.getReportByLocationAndDate(reportMonth,
+                                                                 reportYear)
+      totalNotAttending <- reportService.getReportForNotAttending(reportMonth,
+                                                                  reportYear)
+      inputStream = new ByteArrayInputStream(
+        reportService.exportToExcel(totalAttendees, totalNotAttending))
       month = Month.values(reportMonth - 1).month
       content = StreamConverters.fromInputStream(() => inputStream, ChunkSize)
-    } yield Result(
-      header = ResponseHeader(Http.Status.OK, Map(Http.HeaderNames.CONTENT_DISPOSITION -> s"attachment; filename=$month $reportYear report.xls")),
-      body = HttpEntity.Streamed(content, None, Some("application/vnd.ms-excel"))
-    )
+    } yield
+      Result(
+        header = ResponseHeader(
+          Http.Status.OK,
+          Map(
+            Http.HeaderNames.CONTENT_DISPOSITION -> s"attachment; filename='$month $reportYear report.xls'")),
+        body =
+          HttpEntity.Streamed(content, None, Some("application/vnd.ms-excel"))
+      )
   }
 
-  private def getDefaultDate: ReportDate = ReportDate(month = DateTime.now.getMonthOfYear, year = DateTime.now.getYear)
+  private def getDefaultDate: ReportDate =
+    ReportDate(month = DateTime.now.getMonthOfYear, year = DateTime.now.getYear)
 }

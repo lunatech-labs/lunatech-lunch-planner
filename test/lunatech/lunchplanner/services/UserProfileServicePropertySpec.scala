@@ -14,49 +14,54 @@ object UserProfileServicePropertySpec extends Properties("UserService") with Pro
 
   import lunatech.lunchplanner.data.TableDataGenerator._
 
-  override def afterAll(): Unit = dbConnection.db.close()
-
   private val configuration = mock[Configuration]
   private val userProfileService = new UserProfileService(configuration)
 
   property("insert new user profile") = forAll { (user: User, userProfile: UserProfile) =>
-    addUserToDB(user)
-    val result = Await.result(userProfileService.insertOrUpdate(userProfile.copy(userUuid = user.uuid)), defaultTimeout)
+    createTestSchema()
+    
+    addUserAndProfileToDB(user, userProfile)
 
-    val newProfile = Await.result(UserProfileTable.getByUserUUID(user.uuid), defaultTimeout).get
+    val result = Await.result(UserProfileTable.getByUserUUID(user.uuid), defaultTimeout).get
 
-    cleanUserAndProfileTable
+    dropTestSchema()
 
-    result && newProfile == userProfile.copy(userUuid = user.uuid)
+    result == userProfile.copy(userUuid = user.uuid)
   }
 
   property("update an existent user profile") = forAll { (user: User, userProfile1: UserProfile, userProfile2: UserProfile) =>
+    createTestSchema()
+    
     addUserAndProfileToDB(user, userProfile1)
 
-    val result = Await.result(userProfileService.insertOrUpdate(userProfile2.copy(userUuid = user.uuid)), defaultTimeout)
+    val result = Await.result(userProfileService.update(userProfile2.copy(userUuid = user.uuid)), defaultTimeout)
     val updatedProfile = Await.result(UserProfileTable.getByUserUUID(user.uuid), defaultTimeout).get
 
-    cleanUserAndProfileTable
+    dropTestSchema()
 
     result && updatedProfile == userProfile2.copy(userUuid = user.uuid)
   }
 
   property("return user profile given user uuid") = forAll { (user: User, userProfile: UserProfile) =>
+    createTestSchema()
+    
     addUserAndProfileToDB(user, userProfile)
 
     val result = Await.result(userProfileService.getUserProfileByUserUuid(user.uuid), defaultTimeout).get
 
-    cleanUserAndProfileTable
+    dropTestSchema()
 
     result == userProfile.copy(userUuid = user.uuid)
   }
 
-  private def addUserToDB(user: User) = {
-    Await.result(UserTable.add(user), defaultTimeout)
-  }
+  private def addUserAndProfileToDB(user: User, userProfile: UserProfile): Unit = {
+    import scala.concurrent.ExecutionContext.Implicits.global
 
-  private def addUserAndProfileToDB(user: User, userProfile: UserProfile) = {
-    Await.result(UserTable.add(user), defaultTimeout)
-    Await.result(UserProfileTable.insertOrUpdate(userProfile.copy(userUuid = user.uuid)), defaultTimeout)
+    val query = for {
+      _ <- UserTable.add(user)
+      _ <- userProfileService.add(userProfile.copy(userUuid = user.uuid))
+    } yield ()
+
+    Await.result(query, defaultTimeout)
   }
 }

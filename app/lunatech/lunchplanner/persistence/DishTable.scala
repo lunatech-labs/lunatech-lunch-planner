@@ -31,7 +31,7 @@ class DishTable(tag: Tag) extends Table[Dish](tag, _tableName = "Dish") {
 
   def hasLactose: Rep[Boolean] = column[Boolean]("hasLactose")
 
-  def remarks: Rep[String] = column[String]("remarks")
+  def remarks: Rep[Option[String]] = column[Option[String]]("remarks")
 
   def isDeleted: Rep[Boolean] = column[Boolean]("isDeleted")
 
@@ -46,7 +46,7 @@ class DishTable(tag: Tag) extends Table[Dish](tag, _tableName = "Dish") {
      hasChicken,
      isGlutenFree,
      hasLactose,
-     remarks.?,
+     remarks,
      isDeleted) <> ((Dish.apply _).tupled, Dish.unapply)
 }
 
@@ -54,13 +54,13 @@ object DishTable {
   val dishTable: TableQuery[DishTable] = TableQuery[DishTable]
 
   def add(dish: Dish)(implicit connection: DBConnection): Future[Dish] = {
-    val query = dishTable returning dishTable += dish
-    connection.db.run(query)
+    val query = dishTable += dish
+    connection.db.run(query).map(_ => dish)
   }
 
   def getByUuid(uuid: UUID)(
       implicit connection: DBConnection): Future[Option[Dish]] = {
-    val query = dishTable.filter(dish => dish.uuid === uuid)
+    val query = dishTable.filter(_.uuid === uuid)
     connection.db.run(query.result.headOption)
   }
 
@@ -74,9 +74,34 @@ object DishTable {
     connection.db.run(query)
   }
 
-  def insertOrUpdate(dish: Dish)(
-      implicit connection: DBConnection): Future[Boolean] = {
-    val query = dishTable.insertOrUpdate(dish)
+  def update(dish: Dish)(implicit connection: DBConnection): Future[Boolean] = {
+    val query = dishTable
+      .filter(_.uuid === dish.uuid)
+      .map(
+        d =>
+          (d.name,
+           d.description,
+           d.isVegetarian,
+           d.hasSeaFood,
+           d.hasPork,
+           d.hasBeef,
+           d.hasChicken,
+           d.isGlutenFree,
+           d.hasLactose,
+           d.remarks,
+           d.isDeleted))
+      .update(
+        (dish.name,
+         dish.description,
+         dish.isVegetarian,
+         dish.hasSeaFood,
+         dish.hasPork,
+         dish.hasBeef,
+         dish.hasChicken,
+         dish.isGlutenFree,
+         dish.hasLactose,
+         dish.remarks,
+         dish.isDeleted))
     connection.db.run(query).map(_ == 1)
   }
 }

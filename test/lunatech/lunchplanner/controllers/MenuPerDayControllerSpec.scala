@@ -23,8 +23,6 @@ class MenuPerDayControllerSpec extends ControllerSpec {
 
   implicit lazy private val materializer: Materializer = app.materializer
 
-  private val config = Configuration(ConfigFactory.load())
-
   private val developer = User(UUID.randomUUID(), "Developer", "developer@lunatech.nl", isAdmin = true)
 
   private val userService = mock[UserService]
@@ -35,7 +33,7 @@ class MenuPerDayControllerSpec extends ControllerSpec {
   private val menuPerDayPerPersonService = mock[MenuPerDayPerPersonService]
   private val environment = mock[Environment]
   private val controllerComponents = app.injector.instanceOf[ControllerComponents]
-  private val configuration = app.injector.instanceOf[Configuration]
+  private val configuration = Configuration(ConfigFactory.load("application-test.conf"))
   private val connection = mock[DBConnection]
 
   val dishTable = TableQuery[DishTable]
@@ -69,20 +67,17 @@ class MenuPerDayControllerSpec extends ControllerSpec {
     }
 
     "not accept location not in scope" in {
-      val result = route(app, FakeRequest(POST, "/menuPerDay/add")
+      val request = FakeRequest()
         .withSession("email" -> "developer@lunatech.nl")
         .withFormUrlEncodedBody("date" -> "23-04-2017",
           "menuUuid" -> uuid,
-          "location" -> "The Hague"))
+          "location" -> "The Hague")
 
-      result match {
-        case Some(r) =>
-          status(r) mustBe 400
-          contentAsString(r).contains("The Hague is not a valid office location") mustBe true
-        case _ => fail("Invalid locations were accepted! This should not happen!")
-      }
+      val result = call(controller.createNewMenuPerDay, request)
+
+
+      status(result) mustBe 400
+      contentAsString(result).contains("The Hague is not a valid office location") mustBe true
     }
   }
-
-
 }
