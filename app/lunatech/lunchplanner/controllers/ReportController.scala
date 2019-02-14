@@ -37,19 +37,16 @@ class ReportController @Inject()(userService: UserService,
   val year = "year"
 
   def getReport: EssentialAction = userAction.async { implicit request =>
-    val reportMonth =
-      request.session.get(month).map(_.toInt).getOrElse(getDefaultDate.month)
-    val reportYear =
-      request.session.get(year).map(_.toInt).getOrElse(getDefaultDate.year)
+    val reportMonth = getMonth(request.session)
+    val reportYear = getYear(request.session)
 
     for {
       currentUser <- userService.getByEmailAddress(request.email)
       sortedReport <- reportService.getSortedReport(reportMonth, reportYear)
       totalNotAttending <- reportService.getReportForNotAttending(reportMonth,
                                                                   reportYear)
-      isAdmin = if (currentUser.isDefined)
-        userService.isAdminUser(currentUser.get.emailAddress)
-      else false
+      isAdmin = currentUser.exists(user =>
+        userService.isAdminUser(user.emailAddress))
     } yield
       Ok(
         views.html.admin.report(
@@ -68,26 +65,24 @@ class ReportController @Inject()(userService: UserService,
         lunatech.lunchplanner.controllers.routes.ReportController.getReport()))
     }
 
-    def success: ReportDate => Future[Result] = { selectedReportDate =>
-      val session = request.session + (month -> Integer.toString(
-        selectedReportDate.month)) +
-        (year -> Integer.toString(selectedReportDate.year))
-      Future {
-        Redirect(
-          lunatech.lunchplanner.controllers.routes.ReportController.getReport())
-          .withSession(session)
-      }
+    def success: ReportDate => Future[Result] = {
+      selectedReportDate: ReportDate =>
+        val session = updateSession(request.session, selectedReportDate)
+        Future {
+          Redirect(
+            lunatech.lunchplanner.controllers.routes.ReportController
+              .getReport())
+            .withSession(session)
+        }
     }
 
     ReportForm.reportForm.bindFromRequest.fold(hasErrors, success)
   }
 
   def export: EssentialAction = adminAction.async { implicit request =>
-    val ChunkSize = 1024
-    val reportMonth =
-      request.session.get(month).map(_.toInt).getOrElse(getDefaultDate.month)
-    val reportYear =
-      request.session.get(year).map(_.toInt).getOrElse(getDefaultDate.year)
+    val chunkSize = 1024
+    val reportMonth = getMonth(request.session)
+    val reportYear = getYear(request.session)
 
     for {
       totalAttendees <- reportService.getReportByLocationAndDate(reportMonth,
@@ -97,7 +92,7 @@ class ReportController @Inject()(userService: UserService,
       inputStream = new ByteArrayInputStream(
         reportService.exportToExcel(totalAttendees, totalNotAttending))
       month = Month.values(reportMonth - 1).month
-      content = StreamConverters.fromInputStream(() => inputStream, ChunkSize)
+      content = StreamConverters.fromInputStream(() => inputStream, chunkSize)
     } yield
       Result(
         header = ResponseHeader(
@@ -111,4 +106,14 @@ class ReportController @Inject()(userService: UserService,
 
   private def getDefaultDate: ReportDate =
     ReportDate(month = DateTime.now.getMonthOfYear, year = DateTime.now.getYear)
+
+  private def getMonth(session: Session): Int =
+    session.get(month).map(_.toInt).getOrElse(getDefaultDate.month)
+
+  private def getYear(session: Session): Int =
+    session.get(year).map(_.toInt).getOrElse(getDefaultDate.year)
+
+  private def updateSession(session: Session, reportDate: ReportDate): Session =
+    session + (month -> Integer.toString(reportDate.month)) + (year -> Integer
+      .toString(reportDate.year))
 }
