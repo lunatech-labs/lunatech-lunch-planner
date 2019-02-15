@@ -26,7 +26,7 @@ docker run -it --rm -m 1024m -p 5432:5432 lunatech-lunch-planner
 sbt run
 ```
 
-Open the browser and you are all set:
+Make sure the docker image withe the DB is running. Open the browser and you are all set:
 ```
 localhost:9000
 ```
