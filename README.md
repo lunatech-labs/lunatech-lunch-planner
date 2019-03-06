@@ -20,6 +20,30 @@ docker build -t lunatech-lunch-planner .
 docker run -it --rm -m 1024m -p 5432:5432 lunatech-lunch-planner
 ```
 
+##### Create configuration override
+
+Create a `conf/override.conf` file with the following fields:
+ 
+```
+PLAY_SECRET = xxx
+
+POSTGRESQL_ADDON_HOST = localhost
+POSTGRESQL_ADDON_PORT = 5432
+POSTGRESQL_ADDON_DB = lunch-planner
+POSTGRESQL_ADDON_USER = postgres
+POSTGRESQL_ADDON_PASSWORD = password
+
+GOOGLE_CLIENTID = xxx
+GOOGLE_SECRET = xxx
+
+SLACK_API_TOKEN = xxx
+SLACK_HOST_NAME = xxx
+
+administrators = ["developer@lunatech.nl"]
+``` 
+
+Ensure that your database credentials are correct. 
+
 ##### Start the app:
 
 ```
