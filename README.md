@@ -38,6 +38,8 @@ GOOGLE_SECRET = xxx
 
 SLACK_API_TOKEN = xxx
 SLACK_HOST_NAME = xxx
+
+administrators = ["developer@lunatech.nl"]
 ``` 
 
 Ensure that your database credentials are correct. 
