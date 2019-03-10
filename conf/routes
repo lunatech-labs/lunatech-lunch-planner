@@ -6,7 +6,7 @@ GET         /                                  lunatech.lunchplanner.controllers
 
 # redirect to google authentication
 GET         /login                             lunatech.lunchplanner.controllers.Authentication.login
-GET         /authenticate                      lunatech.lunchplanner.controllers.Authentication.authenticate(code: String, id_token: String, access_token: String)
+GET         /authenticate                      lunatech.lunchplanner.controllers.Authentication.authenticate(code: String)
 GET         /logout                            lunatech.lunchplanner.controllers.Authentication.logout
 
 GET         /profile                           lunatech.lunchplanner.controllers.ProfileController.getProfile

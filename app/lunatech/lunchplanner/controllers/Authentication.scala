@@ -34,24 +34,22 @@ class Authentication @Inject()(userService: UserService,
     }
   }
 
-  def authenticate(code: String,
-                   idToken: String,
-                   accessToken: String): Action[AnyContent] = Action.async {
-    val response = auth.authenticateToken(code, idToken, accessToken)
-
-    response.flatMap {
-      case Left(authResult) =>
-        val userEmail = authResult.email
-        userService
-          .addUserIfNew(emailAddress = userEmail)
-          .map(_ =>
-            Redirect(routes.Application.index())
-              .withSession("email" -> userEmail))
-      case Right(message) =>
-        Future.successful(
-          Redirect(routes.Authentication.login()).withNewSession
-            .flashing("error" -> message.toString()))
-    }
+  def authenticate(code: String): Action[AnyContent] = Action.async {
+    auth
+      .authenticateToken(code)
+      .flatMap {
+        case Left(authResult) =>
+          val userEmail = authResult.email
+          userService
+            .addUserIfNew(emailAddress = userEmail)
+            .map(_ =>
+              Redirect(routes.Application.index())
+                .withSession("email" -> userEmail))
+        case Right(message) =>
+          Future.successful(
+            Redirect(routes.Authentication.login()).withNewSession
+              .flashing("error" -> message.toString()))
+      }
   }
 
   def logout: EssentialAction = Action {
