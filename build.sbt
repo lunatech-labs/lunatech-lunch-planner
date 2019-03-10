@@ -25,7 +25,7 @@ libraryDependencies ++= Seq(
   "org.postgresql" % "postgresql" % "42.2.5",
   "com.google.api-client" % "google-api-client" % "1.22.0",
   "com.google.http-client" % "google-http-client-jackson" % "1.22.0",
-  "com.lunatech" %% "play-googleopenconnect" % "2.3.1",
+  "com.lunatech" %% "play-googleopenconnect" % "2.4.0",
   "com.adrianhurt" %% "play-bootstrap" % "1.2-P26-B3",
   "org.scalaz" %% "scalaz-core" % "7.2.10",
   "org.apache.poi" % "poi-ooxml" % "3.16",

@@ -1,0 +1,26 @@
+div#Header {
+    background: #FFF;
+}
+
+#Tabs a:link,
+#Tabs a:visited {
+    border: 1px solid #EEE;
+    color: #fff;
+    background-color: rgb(26,152,206);
+    border-bottom: 1px solid rgb(17,121,161);
+}
+
+#Tabs a:hover {
+    color: #fff;
+    background: #1D64AD;
+    border-bottom: 1px solid #1D64AD;
+}
+
+#Tabs ul a:link.current, #Tabs ul a:visited.current {
+    color: #000;
+}
+
+#Tabs li.logout a:link,
+#Tabs li.logout a:visited {
+    color: #8099b3;
+}
