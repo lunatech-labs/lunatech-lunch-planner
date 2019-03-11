@@ -61,6 +61,7 @@ private class LunchBotActor(
     menuPerDayPerPersonService: MenuPerDayPerPersonService,
     slackService: SlackService)
     extends Actor {
+  private val logger = Logger(this.getClass)
 
   override def receive: Receive = {
     case StartBot => act
@@ -74,7 +75,7 @@ private class LunchBotActor(
     val response = postMessages(channelIds)
     response onComplete {
       case Success(r) =>
-        Logger.info(r)
+        logger.info(r)
       case Failure(t) => throw t
     }
   }
