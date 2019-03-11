@@ -23,8 +23,6 @@ libraryDependencies ++= Seq(
   "com.typesafe.slick" %% "slick-hikaricp" % "3.2.3",
 
   "org.postgresql" % "postgresql" % "42.2.5",
-  "com.google.api-client" % "google-api-client" % "1.22.0",
-  "com.google.http-client" % "google-http-client-jackson" % "1.22.0",
   "com.lunatech" %% "play-googleopenconnect" % "2.4.0",
   "com.adrianhurt" %% "play-bootstrap" % "1.2-P26-B3",
   "org.scalaz" %% "scalaz-core" % "7.2.10",
@@ -40,7 +38,6 @@ libraryDependencies ++= Seq(
 
 resolvers ++= Seq(
   "Lunatech Artifactory" at "https://artifactory.lunatech.com/artifactory/releases-public",
-  "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/",
   Resolver.bintrayRepo("wolfendale", "maven")
 )
 
