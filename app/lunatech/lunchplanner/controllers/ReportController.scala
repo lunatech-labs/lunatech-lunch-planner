@@ -98,7 +98,7 @@ class ReportController @Inject()(userService: UserService,
         header = ResponseHeader(
           Http.Status.OK,
           Map(
-            Http.HeaderNames.CONTENT_DISPOSITION -> s"attachment; filename='$month $reportYear report.xls'")),
+            Http.HeaderNames.CONTENT_DISPOSITION -> s"""attachment; filename="$month $reportYear report.xls"""")),
         body =
           HttpEntity.Streamed(content, None, Some("application/vnd.ms-excel"))
       )
