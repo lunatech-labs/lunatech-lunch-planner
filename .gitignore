@@ -7,4 +7,5 @@ target
 /.settings
 /RUNNING_PID
 /conf/override.conf
+/conf/override_prod.conf
 /data_scripts
