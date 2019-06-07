@@ -90,10 +90,10 @@ class SlackService @Inject()(
       if (attachments.nonEmpty) {
         for {
           responses <- Future.traverse(channelIds)(sendMessage(attachments))
-        } yield s"Message sent to ${responses.length} people!"
+        } yield s"SlackBot message sent to ${responses.length} people!"
       } else {
         Future.successful(
-          "No message sent because there's no upcoming lunch this coming Friday")
+          "No message sent by SlackBot because there's no upcoming lunch this coming Friday.")
       }
     }
 
