@@ -28,6 +28,9 @@ libraryDependencies ++= Seq(
   "org.scalaz" %% "scalaz-core" % "7.2.10",
   "org.apache.poi" % "poi-ooxml" % "3.16",
   "com.enragedginger" %% "akka-quartz-scheduler" % "1.6.0-akka-2.4.x",
+  "com.typesafe.play" %% "play-mailer" % "6.0.1",
+  "com.typesafe.play" %% "play-mailer-guice" % "6.0.1",
+
   "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test,
   "org.mockito" % "mockito-all" % "1.10.19" % Test,
   "org.scalacheck" %% "scalacheck" % "1.14.0" % Test,

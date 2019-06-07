@@ -136,26 +136,31 @@ class ReportService @Inject()(
       reportByDateAndLocations.flatMap { case ((_, _), users) => users }.size
     }
 
-    report.usersPerDateAndLocation
-      .groupBy { case ((date, _), _) => date }
-      .foreach {
-        case (date, reportByDateAndLocations) =>
-          val sheet = workbook.createSheet(date.toString)
-          initializeSheet(sheet = sheet,
-                          date = date.toString,
-                          totalUsers = getTotalUsers(reportByDateAndLocations),
-                          cellStyle = cellStyle)
+    if (report.usersPerDateAndLocation.isEmpty) {
+      workbook.createSheet("No attendants")
+    } else {
+      report.usersPerDateAndLocation
+        .groupBy { case ((date, _), _) => date }
+        .foreach {
+          case (date, reportByDateAndLocations) =>
+            val sheet = workbook.createSheet(date.toString)
+            initializeSheet(
+              sheet = sheet,
+              date = date.toString,
+              totalUsers = getTotalUsers(reportByDateAndLocations),
+              cellStyle = cellStyle)
 
-          reportByDateAndLocations.zipWithIndex.foreach {
-            case (((_, location), users), index) =>
-              val row = Option(sheet.getRow(StartingRow)) match {
-                case Some(r) => r
-                case None    => sheet.createRow(StartingRow)
-              }
-              writeSecondRow(row, s"$location:", cellStyle, index)
-              writeUserData(sheet, users, index)
-          }
-      }
+            reportByDateAndLocations.zipWithIndex.foreach {
+              case (((_, location), users), index) =>
+                val row = Option(sheet.getRow(StartingRow)) match {
+                  case Some(r) => r
+                  case None    => sheet.createRow(StartingRow)
+                }
+                writeSecondRow(row, s"$location:", cellStyle, index)
+                writeUserData(sheet, users, index)
+            }
+        }
+    }
   }
 
   private def writeReportForNotAttending(workbook: XSSFWorkbook,
