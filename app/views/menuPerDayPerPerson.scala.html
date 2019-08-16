@@ -55,7 +55,7 @@
                         <td rowspan="@schedulesByDate._2.length">
                             <label class="font-normal label-date">@schedulesByDate._1</label>
                         </td>
-                    @schedulesByDate._2.zipWithIndex.map { scheduleDetails =>
+                    @schedulesByDate._2.sortBy(_.location).zipWithIndex.map { scheduleDetails =>
                         @if(scheduleDetails._2 != 0) {
                         <tr>
                         }
