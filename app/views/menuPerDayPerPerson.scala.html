@@ -26,11 +26,11 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Response<br/>
+                            <th>Choose location<br/>
                                 <select class="select" id="set-all">
                                     <option></option>
-                                    <option>Attend all:Rotterdam</option>
-                                    <option>Attend all:Amsterdam</option>
+                                    <option>Attend all @@ Rotterdam</option>
+                                    <option>Attend all @@ Amsterdam</option>
                                     <option>Not Attending</option>
                                 </select>
                             </th>
@@ -47,7 +47,7 @@
                             <select name="menuPerDayUuids[]" class="select select-@schedulesByDate._1">
                                 <option class="select-empty"></option>
                                 @schedulesByDate._2.map { s =>
-                                    <option class="location-@s.location" value="@s.menuPerDayUuid" @if(s.isAttending == Some(true)) { selected } > @s.menuName:@s.location</option>
+                                    <option class="location-@s.location" value="@s.menuPerDayUuid" @if(s.isAttending == Some(true)) { selected } > @s.menuName @@ @s.location</option>
                                 }
                                 <option class="select-not-attending" value="@schedulesByDate._2.map(_.menuPerDayUuid).mkString("~")" @if(schedulesByDate._2.map(_.isAttending).contains(Some(false))) { selected }>Not Attending</option>
                             </select>
