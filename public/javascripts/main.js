@@ -1,12 +1,16 @@
 $(function () {
     $('select#set-all').change(function () {
         var value = $(this).val();
+        if (value === "") {
+            $('.select-empty').prop("selected", true);
+        }
+
         if (value === "Not Attending") {
             $('.select-not-attending').prop("selected", true);
         }
 
         if (value.endsWith("Rotterdam") || value.endsWith("Amsterdam")) {
-            var location = value.split(":")[1];
+            var location = value.split("@ ")[1];
             var option = $('.location-' + location);
             option.prop("selected", true);
         }

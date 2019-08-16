@@ -32,12 +32,12 @@
       <label class="font-normal">** Please use this space for real diet restrictions and not diet preferences **</label><br>
       @b3.checkbox( profileForm("vegetarian"), '_text -> "Vegetarian", 'checked-> userProfile.vegetarian)
       @b3.checkbox( profileForm("seaFoodRestriction"), '_text -> "Sea food allergic", 'checked-> userProfile.seaFoodRestriction)
-      @b3.checkbox( profileForm("porkRestriction"), '_text -> "Don't eat Pork", 'checked-> userProfile.porkRestriction)
-      @b3.checkbox( profileForm("beefRestriction"), '_text -> "Don't eat Beef", 'checked-> userProfile.beefRestriction)
-      @b3.checkbox( profileForm("chickenRestriction"), '_text -> "Don't eat Chicken", 'checked-> userProfile.chickenRestriction)
-      @b3.checkbox( profileForm("glutenRestriction"), '_text -> "Gluten allergic", 'checked-> userProfile.glutenRestriction)
-      @b3.checkbox( profileForm("lactoseRestriction"), '_text -> "Lactose allergic", 'checked-> userProfile.lactoseRestriction)
-      @b3.text( profileForm("otherRestriction"), '_label -> "Any other important food allergy", 'placeholder -> "Optional", 'value -> userProfile.otherRestriction.getOrElse(""))
+      @b3.checkbox( profileForm("porkRestriction"), '_text -> "Don't eat pork", 'checked-> userProfile.porkRestriction)
+      @b3.checkbox( profileForm("beefRestriction"), '_text -> "Don't eat beef", 'checked-> userProfile.beefRestriction)
+      @b3.checkbox( profileForm("chickenRestriction"), '_text -> "Don't eat chicken", 'checked-> userProfile.chickenRestriction)
+      @b3.checkbox( profileForm("glutenRestriction"), '_text -> "Gluten intolerant", 'checked-> userProfile.glutenRestriction)
+      @b3.checkbox( profileForm("lactoseRestriction"), '_text -> "Lactose intolerant", 'checked-> userProfile.lactoseRestriction)
+      @b3.text( profileForm("otherRestriction"), '_label -> "Any other important food allergies:", 'placeholder -> "Optional", 'value -> userProfile.otherRestriction.getOrElse(""))
 
       @b3.submit('class -> "btn btn-primary"){ <span class="glyphicon glyphicon-ok"></span> Save }
     </div>
