@@ -6,13 +6,12 @@ import java.util.UUID
 import javax.inject.Inject
 import lunatech.lunchplanner.models.{MenuPerDay, MenuPerDayPerPerson, User}
 import lunatech.lunchplanner.viewModels._
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import play.api.http.ContentTypes
 import play.api.libs.json.JsValue
 import play.api.libs.ws.WSClient
 import play.mvc.Http.HeaderNames
-import scalaz.EitherT.eitherT
-import scalaz.{-\/, EitherT, Monad, \/, \/-}
+import scalaz.Monad
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -103,88 +102,108 @@ class SlackService @Inject()(
     } yield response
   }
 
-  /**
-    * Will handle the request from the Slack Bot.
+  /***
+    * Compute the response for the use on Slack
     */
-  def processSlackRequest(json: JsValue): Future[String] = {
-    val slackResponse = SlackForm.jsonToSlackResponseObject(json)
+  def processSlackResponse(response: SlackResponse): Future[String] = {
+    val isAttending =
+      response.action.forall(action => isUserAttending(action.value))
 
-    for {
-      email <- getEmailAddressBySlackUserId(slackResponse.user.id)
-      user <- userService.getByEmailAddressT(email)
-      menuForUpcomingSchedule <- menuPerDayService.getMenuForUpcomingSchedule
-      result <- addResponseToDb(user, slackResponse).run
-      value = slackResponse.action.head.value
-    } yield {
-      result match {
-        case -\/(error) =>
-          s"Error: $error. Please inform the admins about this."
-        case \/-(isAttending) =>
-          if (isAttending) {
-            val uuidAndMenuName = menuForUpcomingSchedule.map {
+    if (isAttending) {
+      menuPerDayService.getMenuForUpcomingSchedule.map {
+        menusForUpcomingSchedule =>
+          val uuidAndMenuName: Seq[(UUID, String)] =
+            menusForUpcomingSchedule.map {
               case (menuPerDay, menuName) => menuPerDay.uuid -> menuName
             }
-            val response = uuidAndMenuName
-              .filter { case (uuid, _) => uuid == UUID.fromString(value) }
-              .head
-              ._2
-            configuration
-              .get[String]("slack.bot.response.text")
-              .format(response)
-          } else {
-            configuration.get[String]("slack.bot.response.notAttending.text")
-          }
+          val menuName =
+            getSelectedMenuName(uuidAndMenuName, getMenuUuid(response))
+
+          configuration
+            .get[String]("slack.bot.response.text")
+            .format(menuName)
       }
+    } else {
+      Future.successful(
+        configuration.get[String]("slack.bot.response.notAttending.text"))
     }
   }
 
+  private def getMenuUuid(response: SlackResponse): String =
+    response.action.headOption
+      .map(_.value)
+      .fold {
+        Logger.error(s"Empty slack response ${response}")
+        ""
+      }(identity)
+
+  private def getSelectedMenuName(uuidAndMenuName: Seq[(UUID, String)],
+                                  menuUuid: String) =
+    uuidAndMenuName
+      .find { case (uuid, _) => uuid == UUID.fromString(menuUuid) }
+      .map(_._2)
+      .fold {
+        Logger.error(
+          s"Error computing response for slack action with menu uuid $menuUuid")
+        ""
+      }(identity)
+
   /**
-    * A "~" in value means that the user picked "Not Attending". Sample value is menuUuid1~menuUuid2 which will be added separately to the DB
+    * Will save to the DB the user response to the Slack Bot.
     */
+  def processSlackRequest(
+      response: SlackResponse): Future[Seq[MenuPerDayPerPerson]] = {
+    for {
+      email <- getEmailAddressBySlackUserId(response.user.id)
+      user <- userService.getByEmailAddress(email)
+      added <- addResponseToDb(user, response)
+    } yield added
+  }
+
   private def addResponseToDb(
-      user: \/[String, User],
-      slackResponse: SlackResponse): EitherT[Future, String, Boolean] = {
+      user: Option[User],
+      slackResponse: SlackResponse): Future[Seq[MenuPerDayPerPerson]] = {
+
     def addToDb(actions: Seq[ResponseAction],
-                user: User): Future[\/[String, Boolean]] = {
-      val results = for {
-        action <- actions
-      } yield {
-        val value = action.value
-        for {
-          menuUuids <- Future.successful(value.split("~").toList)
-          _ <- addMenuPerDayPerPerson(value, user.uuid, menuUuids)
-        } yield !value.contains("~")
-      }
+                user: User): Future[Seq[MenuPerDayPerPerson]] =
+      Future
+        .sequence(actions.map(action =>
+          addMenuPerDayPerPerson(action.value, user.uuid)))
+        .map(_.flatten)
 
-      Future.sequence(results).map {
-        case r: Seq[Boolean] => \/-(r.forall(a => a))
-        case _               => -\/(s"Error in addResponseToDb.")
-      }
-    }
-
-    def addMenuPerDayPerPerson(value: String,
-                               userUuid: UUID,
-                               menuUuids: Seq[String]): Future[Equals] = {
-      if (value.contains("~")) {
+    def addMenuPerDayPerPerson(
+        value: String,
+        userUuid: UUID): Future[Seq[MenuPerDayPerPerson]] = {
+      if (isUserAttending(value)) {
+        menuPerDayPerPersonService
+          .add(
+            MenuPerDayPerPerson(menuPerDayUuid = UUID.fromString(value),
+                                userUuid = userUuid,
+                                isAttending = true))
+          .map(Seq(_))
+      } else {
+        val menuUuids = getListMenuUuids(value)
         Future.traverse(menuUuids) { menuUuid =>
           menuPerDayPerPersonService.add(
             MenuPerDayPerPerson(menuPerDayUuid = UUID.fromString(menuUuid),
                                 userUuid = userUuid,
                                 isAttending = false))
         }
-      } else {
-        menuPerDayPerPersonService.add(
-          MenuPerDayPerPerson(menuPerDayUuid = UUID.fromString(value),
-                              userUuid = userUuid,
-                              isAttending = true))
       }
     }
 
-    for {
-      u <- eitherT(Future.successful(user))
-      result <- eitherT(addToDb(slackResponse.action, u))
-    } yield result
+    user
+      .map(addToDb(slackResponse.action, _))
+      .getOrElse(Future.failed(new RuntimeException(
+        s"Unexpected error when processing slack response to user $user.")))
   }
+
+  // A "~" in value means that the user picked "Not Attending".
+  // Sample value is menuUuid1~menuUuid2 which will be added separately to the DB
+  private def isUserAttending(response: String): Boolean =
+    !response.contains("~")
+  private def getListMenuUuids(listMenus: String): Seq[String] =
+    listMenus.split("~").toList
 
   private def getEmailAddressBySlackUserId(
       slackUserId: String): Future[String] = {
