@@ -4,8 +4,7 @@ import javax.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.{User, UserProfile}
 import lunatech.lunchplanner.persistence.{UserProfileTable, UserTable}
-import play.api.Configuration
-import scalaz.\/
+import play.api.{Configuration, Logger}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -13,16 +12,10 @@ import scala.concurrent.Future
 class UserService @Inject()(configuration: Configuration)(
     implicit val connection: DBConnection) {
 
-  def getByEmailAddress(emailAddress: String): Future[Option[User]] =
-    UserTable.getByEmailAddress(emailAddress)
-
-  def getByEmailAddressT(emailAddress: String): Future[\/[String, User]] = {
-    for {
-      user <- UserTable.getByEmailAddress(emailAddress)
-    } yield {
-      \/.fromEither(
-        Either
-          .cond(user.isDefined, user.get, s"No user found for $emailAddress"))
+  def getByEmailAddress(emailAddress: String): Future[Option[User]] = {
+    UserTable.getByEmailAddress(emailAddress).map { user =>
+      if (user.isEmpty) Logger.error(s"No user found for $emailAddress.")
+      user
     }
   }
 
@@ -58,7 +51,8 @@ class UserService @Inject()(configuration: Configuration)(
   private[services] def getUserNameFromEmail(emailAddress: String) =
     emailAddress
       .split("@")
-      .head
+      .headOption
+      .getOrElse("")
       .split("\\.")
       .map(w => w.head.toUpper + w.tail)
       .mkString(" ")

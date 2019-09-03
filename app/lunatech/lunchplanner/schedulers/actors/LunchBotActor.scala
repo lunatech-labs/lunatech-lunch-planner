@@ -21,19 +21,20 @@ class LunchBotActor(ws: WSClient,
     extends Actor {
 
   override def receive: Receive = {
-    case StartBot => act
+    case StartBot => act()
   }
 
-  def act: Unit = {
+  def act(): Unit = {
     val allEmails = userService.getAllEmailAddresses
-    val filtered = getEmailAddressesOfUsersWhoHaveNoDecision(allEmails)
-    val userIds = getSlackUserIdsByUserEmails(filtered)
-    val channelIds = openConversation(userIds)
+    val emailsNoDecision = getEmailAddressesOfUsersWhoHaveNoDecision(allEmails)
+    val slackUserIds = getSlackUserIdsByUserEmails(emailsNoDecision)
+    val channelIds = openConversation(slackUserIds)
     val response = postMessages(channelIds)
     response onComplete {
-      case Success(r) =>
-        Logger.info(r)
-      case Failure(t) => throw t
+      case Success(res) =>
+        Logger.info(res)
+      case Failure(exception) =>
+        Logger.error(exception.getMessage, exception)
     }
   }
 
