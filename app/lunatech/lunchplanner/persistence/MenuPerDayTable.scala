@@ -126,8 +126,12 @@ object MenuPerDayTable {
       implicit connection: DBConnection): Future[Boolean] = {
     val query = menuPerDayTable
       .filter(_.uuid === menuPerDay.uuid)
-      .map(m => (m.date, m.location, m.isDeleted))
-      .update((menuPerDay.date, menuPerDay.location, menuPerDay.isDeleted))
+      .map(m => (m.menuUuid, m.date, m.location, m.isDeleted))
+      .update(
+        (menuPerDay.menuUuid,
+         menuPerDay.date,
+         menuPerDay.location,
+         menuPerDay.isDeleted))
     connection.db.run(query).map(_ == 1)
   }
 
