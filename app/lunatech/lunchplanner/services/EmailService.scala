@@ -29,7 +29,8 @@ class EmailService @Inject()(mailerClient: MailerClient) {
       )
 
     val result = mailerClient.send(message)
-    Logger.info(result)
+    Logger.info(
+      s"Monthly report sent to [${emailConfiguration.to.mkString(", ")}]")
     result
   }
 }

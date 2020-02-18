@@ -15,6 +15,9 @@ import play.api.inject.ApplicationLifecycle
 
 import scala.concurrent.Future
 
+/**
+  * The scheduler for the Monthly report
+  */
 class MonthlyReportScheduler @Inject()(service: MonthlyReportService,
                                        conf: Configuration,
                                        lifecycle: ApplicationLifecycle) {
