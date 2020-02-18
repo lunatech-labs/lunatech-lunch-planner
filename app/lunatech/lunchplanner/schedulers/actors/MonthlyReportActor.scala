@@ -7,7 +7,7 @@ import play.api.Logger
 class MonthlyReportActor(service: MonthlyReportService) extends Actor {
   override def receive: Receive = {
     case SendLastMonthlyReport =>
-      Logger.info("Triggering monthly report automatic")
+      Logger.info("Triggering monthly report automatically.")
       service.sendMonthlyReport()
   }
 }

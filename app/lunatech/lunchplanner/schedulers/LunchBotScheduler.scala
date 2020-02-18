@@ -18,7 +18,7 @@ import play.api.Configuration
 import scala.concurrent.Future
 
 /**
-  * The scheduler for the LunchBot. It will execute at 10 AM every Tuesday.
+  * The scheduler for the LunchBot
   */
 class LunchBotScheduler @Inject()(
     userService: UserService,
@@ -28,21 +28,25 @@ class LunchBotScheduler @Inject()(
     client: WSClient,
     conf: Configuration) {
 
-  val system = ActorSystem("LunchBotActorSystem")
-  var scheduler = QuartzSchedulerExtension(system)
+  private val system = ActorSystem("LunchBotActorSystem")
+  private var scheduler = QuartzSchedulerExtension(system)
 
-  val scheduleName = "EveryTuesday"
+  private val slackHost = conf.get[String]("slack.bot.host")
+  private val cronExpression = conf.get[String]("slack.bot.cron")
+  private val scheduleName = "LunchBot"
+  private val scheduleDescription = "Slack bot"
+
   val lunchBotActor = system.actorOf(
     Props.create(classOf[LunchBotActor],
                  client,
-                 conf.get[String]("slack.bot.host"),
+                 slackHost,
                  userService,
                  menuPerDayPerPersonService,
                  slackService))
 
   scheduler.createSchedule(scheduleName,
-                           None,
-                           conf.get[String]("slack.bot.cron"),
+                           Some(scheduleDescription),
+                           cronExpression,
                            None,
                            TimeZone.getDefault)
 
