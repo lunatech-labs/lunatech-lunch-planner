@@ -35,13 +35,12 @@ libraryDependencies ++= Seq(
   "org.mockito" % "mockito-all" % "1.10.19" % Test,
   "org.scalacheck" %% "scalacheck" % "1.14.0" % Test,
   "org.typelevel" %% "shapeless-scalacheck" % "0.6.1" % Test,
-  "wolfendale" %% "scalacheck-gen-regexp" % "0.1.0" % Test,
+  "io.github.wolfendale" %% "scalacheck-gen-regexp" % "0.1.3" % Test,
   "com.h2database" % "h2" % "1.4.197" % Test
 )
 
 resolvers ++= Seq(
-  "Lunatech Artifactory" at "https://artifactory.lunatech.com/artifactory/releases-public",
-  Resolver.bintrayRepo("wolfendale", "maven")
+  "Lunatech Artifactory" at "https://artifactory.lunatech.com/artifactory/releases-public"
 )
 
 addCommandAlias("validate", ";scalafmt;coverage;test;dependencyCheck")
