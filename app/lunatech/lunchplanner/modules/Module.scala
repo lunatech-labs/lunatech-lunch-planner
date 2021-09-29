@@ -7,7 +7,7 @@ import lunatech.lunchplanner.schedulers.{
 }
 
 class Module extends AbstractModule {
-  protected def configure(): Unit = {
+  protected override def configure(): Unit = {
     bind(classOf[LunchBotScheduler]).asEagerSingleton()
     bind(classOf[MonthlyReportScheduler]).asEagerSingleton()
   }

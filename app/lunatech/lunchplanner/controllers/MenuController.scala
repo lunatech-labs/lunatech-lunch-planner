@@ -66,8 +66,8 @@ class MenuController @Inject()(
         menuData => {
           addNewMenuDishes(menuData).map(
             _ =>
-              Redirect(lunatech.lunchplanner.controllers.routes.MenuController
-                .getAllMenus())
+              Redirect(
+                lunatech.lunchplanner.controllers.routes.MenuController.getAllMenus)
                 .flashing("success" -> "New menu created!"))
         }
       )
@@ -114,8 +114,8 @@ class MenuController @Inject()(
         menuData => {
           updateMenuDishes(menuUuid, menuData).map(
             _ =>
-              Redirect(lunatech.lunchplanner.controllers.routes.MenuController
-                .getAllMenus())
+              Redirect(
+                lunatech.lunchplanner.controllers.routes.MenuController.getAllMenus)
                 .flashing("success" -> "Menu updated!"))
         }
       )
@@ -138,8 +138,8 @@ class MenuController @Inject()(
         _ => {
           deleteMenuDish(menuUuid).map(
             _ =>
-              Redirect(lunatech.lunchplanner.controllers.routes.MenuController
-                .getAllMenus())
+              Redirect(
+                lunatech.lunchplanner.controllers.routes.MenuController.getAllMenus)
                 .flashing("success" -> "Menu deleted!"))
         }
       )
@@ -162,8 +162,8 @@ class MenuController @Inject()(
         menusData =>
           deleteMenuDishes(menusData).map(
             _ =>
-              Redirect(lunatech.lunchplanner.controllers.routes.MenuController
-                .getAllMenus())
+              Redirect(
+                lunatech.lunchplanner.controllers.routes.MenuController.getAllMenus)
                 .flashing("success" -> "Menu(s) deleted!"))
       )
   }

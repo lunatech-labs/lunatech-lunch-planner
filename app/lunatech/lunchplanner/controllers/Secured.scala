@@ -11,11 +11,11 @@ trait Secured extends GoogleSecured {
   val controllerComponents: ControllerComponents
 
   override def onUnauthorized[A](request: Request[A]): Result =
-    Results.Redirect(routes.Authentication.login())
+    Results.Redirect(routes.Authentication.login)
 
   override def onForbidden[A](request: Request[A]): Result =
     Results
-      .Redirect(routes.Application.index())
+      .Redirect(routes.Application.index)
       .flashing("error" -> "You are not an admin!")
 
   def getCurrentUser(optionUser: Option[User],

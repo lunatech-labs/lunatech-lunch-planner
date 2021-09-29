@@ -65,8 +65,7 @@ class ProfileController @Inject()(
         profileForm =>
           updateUserProfile(profileForm, request.email).map { result =>
             Redirect(
-              lunatech.lunchplanner.controllers.routes.ProfileController
-                .getProfile())
+              lunatech.lunchplanner.controllers.routes.ProfileController.getProfile)
               .flashing(result match {
                 case (true)  => "success" -> "Profile saved!"
                 case (false) => "error" -> "Error when saving profile!"

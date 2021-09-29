@@ -61,8 +61,9 @@ class ReportController @Inject()(userService: UserService,
 
   def filterAttendees: EssentialAction = userAction.async { implicit request =>
     def hasErrors: Form[ReportDate] => Future[Result] = { _ =>
-      Future(Redirect(
-        lunatech.lunchplanner.controllers.routes.ReportController.getReport()))
+      Future(
+        Redirect(
+          lunatech.lunchplanner.controllers.routes.ReportController.getReport))
     }
 
     def success: ReportDate => Future[Result] = {
@@ -70,8 +71,7 @@ class ReportController @Inject()(userService: UserService,
         val session = updateSession(request.session, selectedReportDate)
         Future {
           Redirect(
-            lunatech.lunchplanner.controllers.routes.ReportController
-              .getReport())
+            lunatech.lunchplanner.controllers.routes.ReportController.getReport)
             .withSession(session)
         }
     }

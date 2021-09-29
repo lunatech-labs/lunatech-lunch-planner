@@ -70,10 +70,8 @@ class MenuPerDayController @Inject()(
       FilterMenusPerDayForm.filterMenusPerDayForm.bindFromRequest
         .fold(
           _ => {
-            Future.successful(
-              Redirect(
-                lunatech.lunchplanner.controllers.routes.MenuPerDayController
-                  .getAllMenusPerDay()))
+            Future.successful(Redirect(
+              lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay))
           },
           filterDataForm => {
             val start = new SimpleDateFormat("yyyy-MM-dd")
@@ -84,8 +82,7 @@ class MenuPerDayController @Inject()(
 
             Future.successful(
               Redirect(
-                lunatech.lunchplanner.controllers.routes.MenuPerDayController
-                  .getAllMenusPerDay())
+                lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay)
                 .withSession(session))
           }
         )
@@ -114,8 +111,7 @@ class MenuPerDayController @Inject()(
               .add(getNewMenuPerDay(menuPerDayForm))
               .map(_ =>
                 Redirect(
-                  lunatech.lunchplanner.controllers.routes.MenuPerDayController
-                    .getAllMenusPerDay())
+                  lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay)
                   .flashing("success" -> "New schedule created!"))
           }
         )
@@ -160,8 +156,7 @@ class MenuPerDayController @Inject()(
             deleteSeveral(menusPerDayData).map(
               _ =>
                 Redirect(
-                  lunatech.lunchplanner.controllers.routes.MenuPerDayController
-                    .getAllMenusPerDay())
+                  lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay)
                   .flashing("success" -> "Schedule(s) deleted!"))
         )
   }
@@ -217,8 +212,7 @@ class MenuPerDayController @Inject()(
             delete(uuid).map(
               _ =>
                 Redirect(
-                  lunatech.lunchplanner.controllers.routes.MenuPerDayController
-                    .getAllMenusPerDay())
+                  lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay)
                   .flashing("success" -> "Schedule deleted!"))
           }
         )
@@ -254,8 +248,7 @@ class MenuPerDayController @Inject()(
               .update(uuid, getNewMenuPerDay(menuPerDayData))
               .map(_ =>
                 Redirect(
-                  lunatech.lunchplanner.controllers.routes.MenuPerDayController
-                    .getAllMenusPerDay())
+                  lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay)
                   .flashing("success" -> "Schedule updated!"))
           }
         )

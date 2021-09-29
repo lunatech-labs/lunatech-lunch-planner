@@ -61,7 +61,7 @@ class MenuPerDayPerPersonController @Inject()(
                                         request.email).uuid,
                          formData).map { _ =>
                 Redirect(
-                  lunatech.lunchplanner.controllers.routes.Application.index())
+                  lunatech.lunchplanner.controllers.routes.Application.index)
                   .flashing("success" -> "Meals updated!")
               }
             }
