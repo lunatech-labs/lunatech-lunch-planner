@@ -44,7 +44,7 @@ trait DBConnectionProvider extends InMemoryDatabase with HasDatabaseConfigProvid
     MenuPerDayTable.menuPerDayTable.schema ++
     MenuPerDayPerPersonTable.menuPerDayPerPersonTable.schema
 
-  private val duration: Duration = 3 second
+  private val duration: Duration = 3.seconds
 
   def createTestSchema(): Unit = Await.result(jdbc.run(createSchema.create), duration)
 

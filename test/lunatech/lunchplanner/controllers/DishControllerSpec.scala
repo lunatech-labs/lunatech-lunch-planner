@@ -8,6 +8,7 @@ import lunatech.lunchplanner.data.ControllersData._
 import lunatech.lunchplanner.models.User
 import lunatech.lunchplanner.services.{ DishService, MenuDishService, UserService }
 import org.scalamock.scalatest.MockFactory
+import play.api.db.slick.DatabaseConfigProvider
 import play.api.mvc.ControllerComponents
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{ call, status, _ }
@@ -26,10 +27,9 @@ class DishControllerSpec extends ControllerSpec with MockFactory {
   private val environment = mock[Environment]
   private val controllerComponents = app.injector.instanceOf[ControllerComponents]
   private val configuration = Configuration(ConfigFactory.load("application-test.conf"))
-  private val connection = mock[DBConnection]
 
-  (userService.getByEmailAddress _).when("developer@lunatech.nl").returns(Future.successful(Some(developer)))
-  (dishService.getAll _).when().returns(Future.successful(Seq(dish1, dish2, dish3, dish4, dish5)))
+  (userService.getByEmailAddress _).expects("developer@lunatech.nl").returns(Future.successful(Some(developer)))
+  (dishService.getAll _).expects().returns(Future.successful(Seq(dish1, dish2, dish3, dish4, dish5)))
 
   private val controller = new DishController(
     userService,
@@ -37,7 +37,7 @@ class DishControllerSpec extends ControllerSpec with MockFactory {
     menuDishService,
     controllerComponents,
     environment,
-    configuration)(connection)
+    configuration)
 
   "Dish controller" should {
 

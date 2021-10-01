@@ -26,36 +26,32 @@ class MenuPerDayControllerSpec extends ControllerSpec with MockFactory {
   private val userService = mock[UserService]
   private val userProfileService = mock[UserProfileService]
   private val menuService = mock[MenuService]
-  private val menuDishService = mock[MenuDishService]
   private val menuPerDayService = mock[MenuPerDayService]
   private val menuPerDayPerPersonService = mock[MenuPerDayPerPersonService]
   private val environment = mock[Environment]
   private val controllerComponents = app.injector.instanceOf[ControllerComponents]
   private val configuration = Configuration(ConfigFactory.load("application-test.conf"))
-  private val connection = mock[DBConnection]
 
   val dishTable = TableQuery[DishTable]
 
   val uuid = UUID.randomUUID.toString
 
-  (userService.getByEmailAddress _).when("developer@lunatech.nl").returns(Future.successful(Some(developer)))
-  (menuPerDayPerPersonService.getAllMenuWithNamePerDayFilterDateRange _).when(*, *)
-    .returns(Future.successful(Seq(schedule1, schedule2)))
-  (menuService.getAllMenusUuidAndNames _) .when().returns(Future.successful(Seq(uuid -> "MyMenu")))
-
   val controller = new MenuPerDayController(
     userService,
     userProfileService,
     menuService,
-    menuDishService,
     menuPerDayService,
     menuPerDayPerPersonService,
     controllerComponents,
     environment,
-    configuration)(connection)
+    configuration)
 
   "Menu per day controller" should {
     "display list of menus per day (schedules)" in {
+      (userService.getByEmailAddress _).expects("developer@lunatech.nl").returns(Future.successful(Some(developer)))
+      (menuPerDayPerPersonService.getAllMenuWithNamePerDayFilterDateRange _).expects(*, *)
+        .returns(Future.successful(Seq(schedule1, schedule2)))
+
       val request = FakeRequest().withSession("email" -> "developer@lunatech.nl")
       val result = call(controller.getAllMenusPerDay, request)
 
@@ -65,6 +61,9 @@ class MenuPerDayControllerSpec extends ControllerSpec with MockFactory {
     }
 
     "not accept location not in scope" in {
+      (userService.getByEmailAddress _).expects("developer@lunatech.nl").returns(Future.successful(Some(developer)))
+      (menuService.getAllMenusUuidAndNames _).expects().returns(Future.successful(Seq(uuid -> "MyMenu")))
+
       val request = FakeRequest()
         .withSession("email" -> "developer@lunatech.nl")
         .withFormUrlEncodedBody("date" -> "23-04-2017",

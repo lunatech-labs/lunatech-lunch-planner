@@ -31,10 +31,9 @@ class MenuControllerSpec extends ControllerSpec with MockFactory {
   private val environment = mock[Environment]
   private val controllerComponents = app.injector.instanceOf[ControllerComponents]
   private val configuration = Configuration(ConfigFactory.load("application-test.conf"))
-  private val connection = mock[DBConnection]
 
-  (userService.getByEmailAddress _).when("developer@lunatech.nl").returns(Future.successful(Some(developer)))
-  (menuDishService.getAllWithListOfDishes _).when().returns(Future.successful(Seq(menuDish1, menuDish2)))
+  (userService.getByEmailAddress _).expects("developer@lunatech.nl").returns(Future.successful(Some(developer)))
+  (menuDishService.getAllWithListOfDishes _).expects().returns(Future.successful(Seq(menuDish1, menuDish2)))
 
   private val controller = new MenuController(
     userService,
@@ -45,7 +44,7 @@ class MenuControllerSpec extends ControllerSpec with MockFactory {
     menuDishService,
     controllerComponents,
     environment,
-    configuration)(connection)
+    configuration)
 
   "Menu controller" should {
 

@@ -16,12 +16,10 @@ import scala.concurrent.Future
 
 class MenuPerDayPerPersonController @Inject()(
     userService: UserService,
-    menuPerDayService: MenuPerDayService,
     menuPerDayPerPersonService: MenuPerDayPerPersonService,
     val controllerComponents: ControllerComponents,
     val environment: Environment,
-    val configuration: Configuration,
-    implicit val connection: DBConnection)
+    val configuration: Configuration)
     extends BaseController
     with Secured
     with I18nSupport {

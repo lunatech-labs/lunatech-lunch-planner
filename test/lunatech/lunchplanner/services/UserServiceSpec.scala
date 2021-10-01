@@ -2,7 +2,7 @@ package lunatech.lunchplanner.services
 
 import lunatech.lunchplanner.common.BehaviorTestingConfig
 import lunatech.lunchplanner.persistence.UserTable
-import play.api.Configuration
+import play.api.{ ConfigLoader, Configuration }
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.BeforeAndAfterEach
 
@@ -18,9 +18,6 @@ class UserServiceSpec extends BehaviorTestingConfig with BeforeAndAfterEach with
 
   override def beforeEach: Unit = {
     createTestSchema()
-
-    (configuration.get[Seq[String]] _).when("administrators").returns(Seq("developer@lunatech.nl", "user1@lunatech.nl"))
-
     Await.result(
       for {
         _ <- UserTable.add(user1)
@@ -44,12 +41,18 @@ class UserServiceSpec extends BehaviorTestingConfig with BeforeAndAfterEach with
     }
 
     "return if user has admin privileges (when true)" in {
+      (configuration.get[Seq[String]] (_:String)(_:ConfigLoader[Seq[String]]))
+        .expects("administrators", *).returns(Seq("developer@lunatech.nl", "user1@lunatech.nl"))
+
       val result = userService.isAdminUser(user1.emailAddress)
 
       result mustBe true
     }
 
     "return if user has admin privileges (when false)" in {
+      (configuration.get[Seq[String]] (_:String)(_:ConfigLoader[Seq[String]]))
+        .expects("administrators", *).returns(Seq("developer@lunatech.nl", "user1@lunatech.nl"))
+
       val result = userService.isAdminUser(user2.emailAddress)
 
       result mustBe false
