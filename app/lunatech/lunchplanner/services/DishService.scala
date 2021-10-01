@@ -1,12 +1,11 @@
 package lunatech.lunchplanner.services
 
-import java.util.UUID
-import javax.inject.Inject
-
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.Dish
 import lunatech.lunchplanner.persistence.DishTable
 
+import java.util.UUID
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

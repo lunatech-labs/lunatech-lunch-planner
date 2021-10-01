@@ -1,13 +1,12 @@
 package lunatech.lunchplanner.services
 
-import java.sql.Date
-import java.util.UUID
-import javax.inject.Inject
-
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.MenuPerDay
 import lunatech.lunchplanner.persistence.MenuPerDayTable
 
+import java.sql.Date
+import java.util.UUID
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class MenuPerDayService @Inject()(menuService: MenuService)(

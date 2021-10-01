@@ -6,7 +6,6 @@ import org.scalacheck._
 import org.scalacheck.Prop._
 
 import scala.concurrent.Await
-import shapeless.contrib.scalacheck._
 
 object UserTableSpec extends Properties(name = "User") with PropertyTestingConfig {
 

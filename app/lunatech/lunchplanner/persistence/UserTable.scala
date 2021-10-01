@@ -1,12 +1,11 @@
 package lunatech.lunchplanner.persistence
 
-import java.util.UUID
-
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.User
 import slick.jdbc.PostgresProfile.api._
-import slick.lifted.{ProvenShape, TableQuery}
+import slick.lifted.{ ProvenShape, TableQuery }
 
+import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

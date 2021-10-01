@@ -1,15 +1,14 @@
 package lunatech.lunchplanner.services
 
-import java.io.ByteArrayOutputStream
-import java.sql.Date
-
-import javax.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models._
 import org.apache.poi.ss.usermodel.CellStyle
-import org.apache.poi.xssf.usermodel.{XSSFRow, XSSFSheet, XSSFWorkbook}
-import org.joda.time.DateTime
+import org.apache.poi.xssf.usermodel.{ XSSFRow, XSSFSheet, XSSFWorkbook }
 
+import java.io.ByteArrayOutputStream
+import java.sql.Date
+import java.time.{ LocalDateTime, ZoneOffset }
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -46,9 +45,9 @@ class ReportService @Inject()(
 
   def getReportByLocationAndDate(month: Int,
                                  year: Int): Future[ReportByDateAndLocation] = {
-    val baseDate = DateTime.now.withMonthOfYear(month).withYear(year)
-    val sDate = baseDate.withDayOfMonth(1)
-    val eDate = sDate.plusMonths(1).minusDays(1)
+    val baseDate = LocalDateTime.now.withMonth(month).withYear(year)
+    val startDate = baseDate.withDayOfMonth(1)
+    val endDate = startDate.plusMonths(1).minusDays(1)
 
     type Location = String
     type Attendees = Seq[String]
@@ -66,10 +65,12 @@ class ReportService @Inject()(
         }
     }
 
+    val sDateMillis = startDate.toInstant(ZoneOffset.UTC).toEpochMilli
+    val eDateMillis = endDate.toInstant(ZoneOffset.UTC).toEpochMilli
     for {
       menuPerDayList <- menuPerDayService.getAllOrderedByDateFilterDateRange(
-        new Date(sDate.getMillis),
-        new Date(eDate.getMillis))
+        new Date(sDateMillis),
+        new Date(eDateMillis))
       attendeesPerSchedule <- Future.traverse(menuPerDayList)(
         mpd =>
           menuPerDayPerPersonService
@@ -82,9 +83,9 @@ class ReportService @Inject()(
   }
 
   def getReportForNotAttending(month: Int, year: Int): Future[Report] = {
-    val baseDate = DateTime.now.withMonthOfYear(month).withYear(year)
-    val sDate = baseDate.withDayOfMonth(1)
-    val eDate = sDate.plusMonths(1).minusDays(1)
+    val baseDate = LocalDateTime.now.withMonth(month).withYear(year)
+    val startDate = baseDate.withDayOfMonth(1)
+    val endDate = startDate.plusMonths(1).minusDays(1)
 
     type DateString = String
     type Names = Seq[String]
@@ -95,10 +96,12 @@ class ReportService @Inject()(
       }
     }
 
+    val startDateMillis = startDate.toInstant(ZoneOffset.UTC).toEpochMilli
+    val endDateMillis = endDate.toInstant(ZoneOffset.UTC).toEpochMilli
     for {
       dates <- menuPerDayService.getAllAvailableDatesWithinRange(
-        new Date(sDate.getMillis),
-        new Date(eDate.getMillis))
+        new Date(startDateMillis),
+        new Date(endDateMillis))
       peopleNotAttending <- Future.traverse(dates)(date =>
         menuPerDayPerPersonService.getNotAttendingByDate(date))
       people = peopleNotAttending.flatten[MenuPerDayReport]

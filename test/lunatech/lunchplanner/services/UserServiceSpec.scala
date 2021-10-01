@@ -3,13 +3,13 @@ package lunatech.lunchplanner.services
 import lunatech.lunchplanner.common.BehaviorTestingConfig
 import lunatech.lunchplanner.persistence.UserTable
 import play.api.Configuration
-import org.mockito.Mockito._
+import org.scalamock.scalatest.MockFactory
 import org.scalatest.BeforeAndAfterEach
 
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class UserServiceSpec extends BehaviorTestingConfig with BeforeAndAfterEach {
+class UserServiceSpec extends BehaviorTestingConfig with BeforeAndAfterEach with MockFactory {
 
   import lunatech.lunchplanner.data.ControllersData._
 
@@ -19,7 +19,7 @@ class UserServiceSpec extends BehaviorTestingConfig with BeforeAndAfterEach {
   override def beforeEach: Unit = {
     createTestSchema()
 
-    when(configuration.get[Seq[String]]("administrators")).thenReturn(Seq("developer@lunatech.nl", "user1@lunatech.nl"))
+    (configuration.get[Seq[String]] _).when("administrators").returns(Seq("developer@lunatech.nl", "user1@lunatech.nl"))
 
     Await.result(
       for {

@@ -1,6 +1,6 @@
 package lunatech.lunchplanner.common
 
-import org.scalatest.mockito.MockitoSugar
+import org.scalamock.scalatest.MockFactory
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.mvc.Results
@@ -11,7 +11,7 @@ import scala.concurrent.duration._
 trait ControllerSpec
   extends PlaySpec
     with Results
-    with MockitoSugar
+    with MockFactory
     with GuiceOneAppPerSuite
     with Writeables {
 

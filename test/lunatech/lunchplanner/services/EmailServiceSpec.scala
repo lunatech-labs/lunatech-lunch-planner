@@ -3,8 +3,6 @@ package lunatech.lunchplanner.services
 import lunatech.lunchplanner.common.BehaviorTestingConfig
 import lunatech.lunchplanner.configuration.MonthlyReportEmailConfiguration
 import org.scalatest.BeforeAndAfterEach
-import org.mockito.Mockito._
-import org.mockito.Matchers.any
 import play.api.libs.mailer.MailerClient
 
 class EmailServiceSpec extends BehaviorTestingConfig with BeforeAndAfterEach {

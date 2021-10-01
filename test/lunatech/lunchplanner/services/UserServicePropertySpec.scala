@@ -3,12 +3,12 @@ package lunatech.lunchplanner.services
 import lunatech.lunchplanner.common.PropertyTestingConfig
 import org.scalacheck.Prop.forAll
 import org.scalacheck.{ Gen, Properties }
-import org.scalatest.mockito.MockitoSugar
 import play.api.Configuration
 import wolfendale.scalacheck.regexp.RegexpGen
 import lunatech.lunchplanner.models._
+import org.scalamock.scalatest.MockFactory
 
-object UserServicePropertySpec extends Properties("UserService") with PropertyTestingConfig with MockitoSugar {
+object UserServicePropertySpec extends Properties("UserService") with PropertyTestingConfig with MockFactory {
   private val configuration = mock[Configuration]
   private val userService = new UserService(configuration)
 

@@ -1,7 +1,7 @@
 @import b3.vertical.fieldConstructor
 @import lunatech.lunchplanner.models.{Report, ReportByDateAndLocation, User, ReportDate}
-@import org.joda.time.DateTime
 @import java.sql.Date
+@import java.time.LocalDateTime
 
 @(user: User, reportForm: Form[ReportDate],
         report: List[(Date, ReportByDateAndLocation)],
@@ -22,7 +22,7 @@
         12 -> "December")
 }
 @years = @{
-    (2017 to DateTime.now.getYear).map(year => year)
+    (2017 to LocalDateTime.now.getYear).map(year => year)
 }
 
 @main("Monthly Report", user) {

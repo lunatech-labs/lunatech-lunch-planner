@@ -1,14 +1,14 @@
 package lunatech.lunchplanner.services
 
 import java.util.UUID
-
 import lunatech.lunchplanner.common.BehaviorTestingConfig
+import org.scalamock.scalatest.MockFactory
 import org.scalatest.BeforeAndAfterEach
 import play.api.Configuration
 
 import scala.concurrent.Await
 
-class UserProfileServiceSpec extends BehaviorTestingConfig with BeforeAndAfterEach {
+class UserProfileServiceSpec extends BehaviorTestingConfig with BeforeAndAfterEach with MockFactory {
   private val configuration = mock[Configuration]
   private val userProfileService = new UserProfileService(configuration)
 

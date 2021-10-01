@@ -5,12 +5,12 @@ import lunatech.lunchplanner.models.{ User, UserProfile }
 import lunatech.lunchplanner.persistence.{ UserProfileTable, UserTable }
 import org.scalacheck.Prop.forAll
 import org.scalacheck.Properties
-import org.scalatest.mockito.MockitoSugar
+import org.scalamock.scalatest.MockFactory
 import play.api.Configuration
 
 import scala.concurrent.Await
 
-object UserProfileServicePropertySpec extends Properties("UserService") with PropertyTestingConfig with MockitoSugar {
+object UserProfileServicePropertySpec extends Properties("UserService") with PropertyTestingConfig with MockFactory {
 
   import lunatech.lunchplanner.data.TableDataGenerator._
 

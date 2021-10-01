@@ -1,13 +1,13 @@
 package lunatech.lunchplanner.viewModels
 
-import java.util.{Date, UUID}
-
 import lunatech.lunchplanner.data.Location
 import play.api.data.Form
-import play.api.data.Forms.{mapping, of, _}
+import play.api.data.Forms._
 import play.api.data.format.Formats._
-import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
-import play.api.libs.json.{Json, OFormat}
+import play.api.data.validation.{ Constraint, Invalid, Valid, ValidationError }
+import play.api.libs.json.{ Json, OFormat }
+
+import java.util.{ Date, UUID }
 
 case class MenuPerDayForm(
     menuUuid: UUID,

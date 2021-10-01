@@ -1,11 +1,11 @@
 package lunatech.lunchplanner.viewModels
 
-import java.util.{Date, UUID}
-
 import play.api.data.Form
-import play.api.data.Forms.{mapping, _}
+import play.api.data.Forms.{ mapping, _ }
 import play.api.data.format.Formats._
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{ Json, OFormat }
+
+import java.util.UUID
 
 case class MenuPerDayPerPersonForm(
     menuPerDayUuids: List[UUID],

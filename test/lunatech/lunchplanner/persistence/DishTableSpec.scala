@@ -9,7 +9,6 @@ import org.scalacheck.Prop._
 
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
-import shapeless.contrib.scalacheck._
 
 object DishTableSpec extends Properties(name = "Dish") with PropertyTestingConfig {
   import lunatech.lunchplanner.data.TableDataGenerator._

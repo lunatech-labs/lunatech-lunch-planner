@@ -1,20 +1,14 @@
 package lunatech.lunchplanner.schedulers
 
-import java.util.TimeZone
-
-import akka.actor.{ActorSystem, Props}
-import javax.inject.Inject
+import akka.actor.{ ActorSystem, Props }
 import com.typesafe.akka.extension.quartz.QuartzSchedulerExtension
-import lunatech.lunchplanner.schedulers.actors.{LunchBotActor, StartBot}
-import lunatech.lunchplanner.services.{
-  MenuPerDayPerPersonService,
-  SlackService,
-  UserService
-}
-import play.api.inject.ApplicationLifecycle
-import play.api.libs.ws.WSClient
+import lunatech.lunchplanner.schedulers.actors.{ LunchBotActor, StartBot }
+import lunatech.lunchplanner.services.{ MenuPerDayPerPersonService, SlackService, UserService }
 import play.api.Configuration
+import play.api.inject.ApplicationLifecycle
 
+import java.util.TimeZone
+import javax.inject.Inject
 import scala.concurrent.Future
 
 /**
@@ -25,21 +19,17 @@ class LunchBotScheduler @Inject()(
     menuPerDayPerPersonService: MenuPerDayPerPersonService,
     slackService: SlackService,
     lifecycle: ApplicationLifecycle,
-    client: WSClient,
     conf: Configuration) {
 
   private val system = ActorSystem("LunchBotActorSystem")
-  private var scheduler = QuartzSchedulerExtension(system)
+  private val scheduler = QuartzSchedulerExtension(system)
 
-  private val slackHost = conf.get[String]("slack.bot.host")
   private val cronExpression = conf.get[String]("slack.bot.cron")
   private val scheduleName = "LunchBot"
   private val scheduleDescription = "Slack bot"
 
   val lunchBotActor = system.actorOf(
     Props.create(classOf[LunchBotActor],
-                 client,
-                 slackHost,
                  userService,
                  menuPerDayPerPersonService,
                  slackService))

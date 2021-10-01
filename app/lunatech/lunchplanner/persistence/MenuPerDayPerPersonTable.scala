@@ -1,19 +1,13 @@
 package lunatech.lunchplanner.persistence
 
+import lunatech.lunchplanner.common.DBConnection
+import lunatech.lunchplanner.models.{ MenuPerDay, MenuPerDayPerPerson, User, UserProfile }
+import slick.jdbc.GetResult
+import slick.jdbc.PostgresProfile.api._
+import slick.lifted.{ ForeignKeyQuery, ProvenShape, TableQuery }
+
 import java.sql.Date
 import java.util.UUID
-
-import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.{
-  MenuPerDay,
-  MenuPerDayPerPerson,
-  User,
-  UserProfile
-}
-import slick.jdbc.PostgresProfile.api._
-import slick.jdbc.GetResult
-import slick.lifted.{ForeignKeyQuery, ProvenShape, TableQuery}
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

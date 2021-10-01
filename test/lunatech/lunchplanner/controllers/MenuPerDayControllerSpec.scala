@@ -1,7 +1,6 @@
 package lunatech.lunchplanner.controllers
 
 import java.util.UUID
-
 import akka.stream.Materializer
 import com.typesafe.config.ConfigFactory
 import lunatech.lunchplanner.common.{ ControllerSpec, DBConnection }
@@ -9,8 +8,7 @@ import lunatech.lunchplanner.data.ControllersData._
 import lunatech.lunchplanner.models.User
 import lunatech.lunchplanner.persistence.DishTable
 import lunatech.lunchplanner.services._
-import org.mockito.Matchers.any
-import org.mockito.Mockito._
+import org.scalamock.scalatest.MockFactory
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{ Configuration, Environment }
@@ -19,7 +17,7 @@ import play.api.mvc.ControllerComponents
 
 import scala.concurrent.Future
 
-class MenuPerDayControllerSpec extends ControllerSpec {
+class MenuPerDayControllerSpec extends ControllerSpec with MockFactory {
 
   implicit lazy private val materializer: Materializer = app.materializer
 
@@ -40,10 +38,10 @@ class MenuPerDayControllerSpec extends ControllerSpec {
 
   val uuid = UUID.randomUUID.toString
 
-  when(userService.getByEmailAddress("developer@lunatech.nl")).thenReturn(Future.successful(Some(developer)))
-  when(menuPerDayPerPersonService.getAllMenuWithNamePerDayFilterDateRange(any[java.sql.Date], any[java.sql.Date]))
-    .thenReturn(Future.successful(Seq(schedule1, schedule2)))
-  when(menuService.getAllMenusUuidAndNames).thenReturn(Future.successful(Seq(uuid -> "MyMenu")))
+  (userService.getByEmailAddress _).when("developer@lunatech.nl").returns(Future.successful(Some(developer)))
+  (menuPerDayPerPersonService.getAllMenuWithNamePerDayFilterDateRange _).when(*, *)
+    .returns(Future.successful(Seq(schedule1, schedule2)))
+  (menuService.getAllMenusUuidAndNames _) .when().returns(Future.successful(Seq(uuid -> "MyMenu")))
 
   val controller = new MenuPerDayController(
     userService,

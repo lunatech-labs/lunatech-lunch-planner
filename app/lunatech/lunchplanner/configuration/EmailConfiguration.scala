@@ -1,7 +1,8 @@
 package lunatech.lunchplanner.configuration
 
-import javax.inject.Inject
 import play.api.Configuration
+
+import javax.inject.Inject
 
 case class MonthlyReportEmailConfiguration(subject: String,
                                            from: String,

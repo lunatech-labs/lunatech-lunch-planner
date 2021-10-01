@@ -39,11 +39,11 @@ class ReportServiceSpec extends BehaviorTestingConfig with BeforeAndAfterEach {
 
       _ <- MenuTable.add(menu1)
       _ <- MenuTable.add(menu2)
-      menuDish1 <- MenuDishTable.add(MenuDish(menuUuid = menu1.uuid, dishUuid = dish1.uuid))
-      menuDish2 <- MenuDishTable.add(MenuDish(menuUuid = menu1.uuid, dishUuid = dish2.uuid))
-      menuDish3 <- MenuDishTable.add(MenuDish(menuUuid = menu2.uuid, dishUuid = dish3.uuid))
-      menuDish4 <- MenuDishTable.add(MenuDish(menuUuid = menu2.uuid, dishUuid = dish4.uuid))
-      menuDish5 <- MenuDishTable.add(MenuDish(menuUuid = menu2.uuid, dishUuid = dish5.uuid))
+      _ <- MenuDishTable.add(MenuDish(menuUuid = menu1.uuid, dishUuid = dish1.uuid))
+      _ <- MenuDishTable.add(MenuDish(menuUuid = menu1.uuid, dishUuid = dish2.uuid))
+      _ <- MenuDishTable.add(MenuDish(menuUuid = menu2.uuid, dishUuid = dish3.uuid))
+      _ <- MenuDishTable.add(MenuDish(menuUuid = menu2.uuid, dishUuid = dish4.uuid))
+      _ <- MenuDishTable.add(MenuDish(menuUuid = menu2.uuid, dishUuid = dish5.uuid))
 
       menuperday1 <- MenuPerDayTable.add(MenuPerDay(menuUuid = menu1.uuid, date = new java.sql.Date(118, 0, 5), location = "Rotterdam"))
       menuperday2 <- MenuPerDayTable.add(MenuPerDay(menuUuid = menu2.uuid, date = new java.sql.Date(118, 0, 5), location = "Amsterdam"))

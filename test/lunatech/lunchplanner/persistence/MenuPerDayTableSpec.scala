@@ -8,7 +8,6 @@ import org.scalacheck.Prop.forAll
 import org.scalacheck.{Gen, Properties}
 
 import scala.concurrent.Await
-import shapeless.contrib.scalacheck._
 
 object MenuPerDayTableSpec
     extends Properties(name = "MenuPerDay")
