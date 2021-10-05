@@ -155,7 +155,7 @@ object MenuPerDayTable {
 
     val query = sql"""SELECT DISTINCT "date"
                             FROM "MenuPerDay"
-                            WHERE "date" >= '#$dateStart' AND "date" <= '#$dateEnd'"""
+                            WHERE "date" >= '#$dateStart' AND "date" <= '#$dateEnd' AND "isDeleted" = FALSE"""
       .as[Date]
     connection.db.run(query)
   }
