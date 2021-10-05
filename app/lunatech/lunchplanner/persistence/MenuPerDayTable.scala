@@ -141,7 +141,7 @@ object MenuPerDayTable {
       r => MenuPerDay(UUID.fromString(r.<<), UUID.fromString(r.<<), r.<<, r.<<))
     val query =
       sql"""SELECT mpd."uuid", mpd."menuUuid", mpd."date", mpd."location", m."name"
-           FROM "MenuPerDay" mpd JOIN "Menu" m ON mpd."menuUuid"=m."uuid" AND m."isDeleted" = FALSE
+           FROM "MenuPerDay" mpd JOIN "Menu" m ON mpd."menuUuid"=m."uuid" AND m."isDeleted" = FALSE AND mpd."isDeleted" = FALSE
            WHERE mpd."date" = (SELECT current_date - cast(extract(dow FROM current_date) AS int) + 5)"""
         .as[(MenuPerDay, String)]
 
@@ -155,7 +155,7 @@ object MenuPerDayTable {
 
     val query = sql"""SELECT DISTINCT "date"
                             FROM "MenuPerDay"
-                            WHERE "date" >= '#$dateStart' AND "date" <= '#$dateEnd' AND "isDeleted" = FALSE"""
+                            WHERE "date" >= '#$dateStart' AND "date" <= '#$dateEnd'"""
       .as[Date]
     connection.db.run(query)
   }
