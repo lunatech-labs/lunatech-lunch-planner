@@ -150,7 +150,7 @@ object MenuPerDayTable {
   // Method used on reports, data not filtered by `isDeleted`
   def getAllAvailableDatesWithinRange(dateStart: Date, dateEnd: Date)(
       implicit connection: DBConnection): Future[Seq[Date]] = {
-    implicit val result: GetResult[Date] = GetResult(r => r.nextDate)
+    implicit val result: GetResult[Date] = GetResult(r => r.nextDate())
 
     val query = sql"""SELECT DISTINCT "date"
                             FROM "MenuPerDay"

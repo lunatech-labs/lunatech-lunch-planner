@@ -43,6 +43,6 @@ class LunchBotScheduler @Inject()(
   scheduler.schedule(scheduleName, lunchBotActor, StartBot)
 
   lifecycle.addStopHook { () =>
-    Future.successful(system.terminate)
+    Future.successful(system.terminate())
   }
 }

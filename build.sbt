@@ -2,7 +2,7 @@ name := """lunatech-lunch-planner"""
 
 version := "1.0-SNAPSHOT"
 
-scalaVersion := "2.12.4"
+scalaVersion := "2.13.6"
 
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala)
@@ -26,9 +26,9 @@ libraryDependencies ++= Seq(
   "com.typesafe.slick" %% "slick-hikaricp" % "3.3.3", // 2020
   "org.postgresql" % "postgresql" % "42.2.24",
 
-  "com.adrianhurt" %% "play-bootstrap" % "1.2-P26-B3", // update
-  "org.scalaz" %% "scalaz-core" % "7.3.5", // update to scala 2.13
-  "org.apache.poi" % "poi-ooxml" % "3.16", // update
+  "com.adrianhurt" %% "play-bootstrap" % "1.6.1-P28-B4",
+  "org.scalaz" %% "scalaz-core" % "7.3.5", // update
+  "org.apache.poi" % "poi-ooxml" % "5.0.0",
   "com.enragedginger" %% "akka-quartz-scheduler" % "1.9.1-akka-2.6.x",
   "com.typesafe.play" %% "play-mailer" % "8.0.1",
   "com.typesafe.play" %% "play-mailer-guice" % "8.0.1",

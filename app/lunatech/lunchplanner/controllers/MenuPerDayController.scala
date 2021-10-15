@@ -61,11 +61,11 @@ class MenuPerDayController @Inject()(
 
   def filterMenusPerDay: EssentialAction = adminAction.async {
     implicit request =>
-      FilterMenusPerDayForm.filterMenusPerDayForm.bindFromRequest
+      FilterMenusPerDayForm.filterMenusPerDayForm.bindFromRequest()
         .fold(
           _ => {
             Future.successful(Redirect(
-              lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay))
+              lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay()))
           },
           filterDataForm => {
             val start = new SimpleDateFormat("yyyy-MM-dd")
@@ -76,7 +76,7 @@ class MenuPerDayController @Inject()(
 
             Future.successful(
               Redirect(
-                lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay)
+                lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay())
                 .withSession(session))
           }
         )
@@ -85,7 +85,7 @@ class MenuPerDayController @Inject()(
   def createNewMenuPerDay: EssentialAction = adminAction.async {
     implicit request =>
       val currentDate = new SimpleDateFormat("dd-MM-yyyy").format(new Date())
-      MenuPerDayForm.menuPerDayForm.bindFromRequest
+      MenuPerDayForm.menuPerDayForm.bindFromRequest()
         .fold(
           formWithErrors => {
             for {
@@ -105,7 +105,7 @@ class MenuPerDayController @Inject()(
               .add(getNewMenuPerDay(menuPerDayForm))
               .map(_ =>
                 Redirect(
-                  lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay)
+                  lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay())
                   .flashing("success" -> "New schedule created!"))
           }
         )
@@ -129,7 +129,7 @@ class MenuPerDayController @Inject()(
 
   def deleteMenusPerDay(): EssentialAction = adminAction.async {
     implicit request =>
-      ListMenusPerDayForm.listMenusPerDayForm.bindFromRequest
+      ListMenusPerDayForm.listMenusPerDayForm.bindFromRequest()
         .fold(
           formWithErrors => {
             for {
@@ -150,7 +150,7 @@ class MenuPerDayController @Inject()(
             deleteSeveral(menusPerDayData).map(
               _ =>
                 Redirect(
-                  lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay)
+                  lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay())
                   .flashing("success" -> "Schedule(s) deleted!"))
         )
   }
@@ -179,7 +179,7 @@ class MenuPerDayController @Inject()(
 
   def deleteMenuPerDay(uuid: UUID): EssentialAction = adminAction.async {
     implicit request =>
-      MenuPerDayForm.menuPerDayForm.bindFromRequest
+      MenuPerDayForm.menuPerDayForm.bindFromRequest()
         .fold(
           formWithErrors => {
             for {
@@ -206,7 +206,7 @@ class MenuPerDayController @Inject()(
             delete(uuid).map(
               _ =>
                 Redirect(
-                  lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay)
+                  lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay())
                   .flashing("success" -> "Schedule deleted!"))
           }
         )
@@ -214,7 +214,7 @@ class MenuPerDayController @Inject()(
 
   def saveMenuPerDayDetails(uuid: UUID): EssentialAction = adminAction.async {
     implicit request =>
-      MenuPerDayForm.menuPerDayForm.bindFromRequest
+      MenuPerDayForm.menuPerDayForm.bindFromRequest()
         .fold(
           formWithErrors => {
             for {
@@ -242,7 +242,7 @@ class MenuPerDayController @Inject()(
               .update(uuid, getNewMenuPerDay(menuPerDayData))
               .map(_ =>
                 Redirect(
-                  lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay)
+                  lunatech.lunchplanner.controllers.routes.MenuPerDayController.getAllMenusPerDay())
                   .flashing("success" -> "Schedule updated!"))
           }
         )

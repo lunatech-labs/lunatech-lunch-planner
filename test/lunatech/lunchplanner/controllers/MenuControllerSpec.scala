@@ -33,7 +33,7 @@ class MenuControllerSpec extends ControllerSpec with MockFactory {
   private val configuration = Configuration(ConfigFactory.load("application-test.conf"))
 
   (userService.getByEmailAddress _).expects("developer@lunatech.nl").returns(Future.successful(Some(developer)))
-  (menuDishService.getAllWithListOfDishes _).expects().returns(Future.successful(Seq(menuDish1, menuDish2)))
+  (() => menuDishService.getAllWithListOfDishes).expects().returns(Future.successful(Seq(menuDish1, menuDish2)))
 
   private val controller = new MenuController(
     userService,

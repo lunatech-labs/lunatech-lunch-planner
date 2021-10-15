@@ -2,40 +2,40 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-GET         /                                  lunatech.lunchplanner.controllers.Application.index
+GET         /                                  lunatech.lunchplanner.controllers.Application.index()
 
 # redirect to google authentication
-GET         /login                             lunatech.lunchplanner.controllers.Authentication.login
+GET         /login                             lunatech.lunchplanner.controllers.Authentication.login()
 GET         /authenticate                      lunatech.lunchplanner.controllers.Authentication.authenticate(code: String)
-GET         /logout                            lunatech.lunchplanner.controllers.Authentication.logout
+GET         /logout                            lunatech.lunchplanner.controllers.Authentication.logout()
 
-GET         /profile                           lunatech.lunchplanner.controllers.ProfileController.getProfile
-POST        /profile                           lunatech.lunchplanner.controllers.ProfileController.saveProfile
+GET         /profile                           lunatech.lunchplanner.controllers.ProfileController.getProfile()
+POST        /profile                           lunatech.lunchplanner.controllers.ProfileController.saveProfile()
 
 # Dish
-GET         /dish/all                          lunatech.lunchplanner.controllers.DishController.getAllDishes
-GET         /dish/new                          lunatech.lunchplanner.controllers.DishController.getNewDish
-POST        /dish/add                          lunatech.lunchplanner.controllers.DishController.createNewDish
-POST        /dish/delete                       lunatech.lunchplanner.controllers.DishController.deleteDishes
+GET         /dish/all                          lunatech.lunchplanner.controllers.DishController.getAllDishes()
+GET         /dish/new                          lunatech.lunchplanner.controllers.DishController.getNewDish()
+POST        /dish/add                          lunatech.lunchplanner.controllers.DishController.createNewDish()
+POST        /dish/delete                       lunatech.lunchplanner.controllers.DishController.deleteDishes()
 POST        /dish/delete/:uuid                 lunatech.lunchplanner.controllers.DishController.deleteDish(uuid: java.util.UUID)
 GET         /dish/:uuid                        lunatech.lunchplanner.controllers.DishController.getDishDetails(uuid: java.util.UUID)
 POST        /dish/:uuid                        lunatech.lunchplanner.controllers.DishController.saveDishDetails(uuid: java.util.UUID)
 
 # Menu
-GET         /menu/all                          lunatech.lunchplanner.controllers.MenuController.getAllMenus
-GET         /menu/new                          lunatech.lunchplanner.controllers.MenuController.getNewMenu
-POST        /menu/add                          lunatech.lunchplanner.controllers.MenuController.createNewMenu
-POST        /menu/delete                       lunatech.lunchplanner.controllers.MenuController.deleteMenus
+GET         /menu/all                          lunatech.lunchplanner.controllers.MenuController.getAllMenus()
+GET         /menu/new                          lunatech.lunchplanner.controllers.MenuController.getNewMenu()
+POST        /menu/add                          lunatech.lunchplanner.controllers.MenuController.createNewMenu()
+POST        /menu/delete                       lunatech.lunchplanner.controllers.MenuController.deleteMenus()
 POST        /menu/delete/:menuUuid             lunatech.lunchplanner.controllers.MenuController.deleteMenu(menuUuid: java.util.UUID)
 GET         /menu/:menuUuid                    lunatech.lunchplanner.controllers.MenuController.getMenuDetails(menuUuid: java.util.UUID)
 POST        /menu/:menuUuid                    lunatech.lunchplanner.controllers.MenuController.saveMenuDetails(menuUuid: java.util.UUID)
 
 # Menu per day
-GET         /menuPerDay/all                    lunatech.lunchplanner.controllers.MenuPerDayController.getAllMenusPerDay
-GET         /menuPerDay/new                    lunatech.lunchplanner.controllers.MenuPerDayController.getNewMenuPerDay
-POST        /menuPerDay/add                    lunatech.lunchplanner.controllers.MenuPerDayController.createNewMenuPerDay
-POST        /menuPerDay/filter                 lunatech.lunchplanner.controllers.MenuPerDayController.filterMenusPerDay
-POST        /menuPerDay/delete                 lunatech.lunchplanner.controllers.MenuPerDayController.deleteMenusPerDay
+GET         /menuPerDay/all                    lunatech.lunchplanner.controllers.MenuPerDayController.getAllMenusPerDay()
+GET         /menuPerDay/new                    lunatech.lunchplanner.controllers.MenuPerDayController.getNewMenuPerDay()
+POST        /menuPerDay/add                    lunatech.lunchplanner.controllers.MenuPerDayController.createNewMenuPerDay()
+POST        /menuPerDay/filter                 lunatech.lunchplanner.controllers.MenuPerDayController.filterMenusPerDay()
+POST        /menuPerDay/delete                 lunatech.lunchplanner.controllers.MenuPerDayController.deleteMenusPerDay()
 POST        /menuPerDay/delete/:uuid           lunatech.lunchplanner.controllers.MenuPerDayController.deleteMenuPerDay(uuid: java.util.UUID)
 GET         /menuPerDay/:uuid                  lunatech.lunchplanner.controllers.MenuPerDayController.getMenuPerDayDetails(uuid: java.util.UUID)
 POST        /menuPerDay/:uuid                  lunatech.lunchplanner.controllers.MenuPerDayController.saveMenuPerDayDetails(uuid: java.util.UUID)

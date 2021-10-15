@@ -16,7 +16,7 @@ class UserServiceSpec extends BehaviorTestingConfig with BeforeAndAfterEach with
   private val configuration = mock[Configuration]
   private val userService = new UserService(configuration)
 
-  override def beforeEach: Unit = {
+  override def beforeEach(): Unit = {
     createTestSchema()
     Await.result(
       for {

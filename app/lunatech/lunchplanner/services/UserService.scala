@@ -54,6 +54,6 @@ class UserService @Inject()(configuration: Configuration)(
       .headOption
       .getOrElse("")
       .split("\\.")
-      .map(w => w.head.toUpper + w.tail)
+      .map(w => w.head.toUpper.toString + w.tail)
       .mkString(" ")
 }

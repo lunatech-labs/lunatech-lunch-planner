@@ -28,7 +28,7 @@ class MenuPerDayPerPersonController @Inject()(
     implicit request =>
       for {
         currentUser <- userService.getByEmailAddress(request.email)
-        result <- MenuPerDayPerPersonForm.menuPerDayPerPersonForm.bindFromRequest
+        result <- MenuPerDayPerPersonForm.menuPerDayPerPersonForm.bindFromRequest()
           .fold(
             formWithErrors =>
               for {
@@ -54,7 +54,7 @@ class MenuPerDayPerPersonController @Inject()(
                                         request.email).uuid,
                          formData).map { _ =>
                 Redirect(
-                  lunatech.lunchplanner.controllers.routes.Application.index)
+                  lunatech.lunchplanner.controllers.routes.Application.index())
                   .flashing("success" -> "Meals updated!")
               }
             }

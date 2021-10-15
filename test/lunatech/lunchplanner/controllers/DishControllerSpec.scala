@@ -29,7 +29,7 @@ class DishControllerSpec extends ControllerSpec with MockFactory {
   private val configuration = Configuration(ConfigFactory.load("application-test.conf"))
 
   (userService.getByEmailAddress _).expects("developer@lunatech.nl").returns(Future.successful(Some(developer)))
-  (dishService.getAll _).expects().returns(Future.successful(Seq(dish1, dish2, dish3, dish4, dish5)))
+  (() => dishService.getAll).expects().returns(Future.successful(Seq(dish1, dish2, dish3, dish4, dish5)))
 
   private val controller = new DishController(
     userService,

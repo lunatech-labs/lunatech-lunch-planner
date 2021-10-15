@@ -41,7 +41,7 @@ class MenuController @Inject()(
   }
 
   def createNewMenu = adminAction.async { implicit request =>
-    MenuForm.menuForm.bindFromRequest
+    MenuForm.menuForm.bindFromRequest()
       .fold(
         formWithErrors => {
           for {
@@ -58,7 +58,7 @@ class MenuController @Inject()(
           addNewMenuDishes(menuData).map(
             _ =>
               Redirect(
-                lunatech.lunchplanner.controllers.routes.MenuController.getAllMenus)
+                lunatech.lunchplanner.controllers.routes.MenuController.getAllMenus())
                 .flashing("success" -> "New menu created!"))
         }
       )
@@ -89,7 +89,7 @@ class MenuController @Inject()(
   }
 
   def saveMenuDetails(menuUuid: UUID) = adminAction.async { implicit request =>
-    MenuForm.menuForm.bindFromRequest
+    MenuForm.menuForm.bindFromRequest()
       .fold(
         formWithErrors => {
           for {
@@ -106,14 +106,14 @@ class MenuController @Inject()(
           updateMenuDishes(menuUuid, menuData).map(
             _ =>
               Redirect(
-                lunatech.lunchplanner.controllers.routes.MenuController.getAllMenus)
+                lunatech.lunchplanner.controllers.routes.MenuController.getAllMenus())
                 .flashing("success" -> "Menu updated!"))
         }
       )
   }
 
   def deleteMenu(menuUuid: UUID) = adminAction.async { implicit request =>
-    MenuForm.menuForm.bindFromRequest
+    MenuForm.menuForm.bindFromRequest()
       .fold(
         formWithErrors => {
           for {
@@ -130,14 +130,14 @@ class MenuController @Inject()(
           deleteMenuDish(menuUuid).map(
             _ =>
               Redirect(
-                lunatech.lunchplanner.controllers.routes.MenuController.getAllMenus)
+                lunatech.lunchplanner.controllers.routes.MenuController.getAllMenus())
                 .flashing("success" -> "Menu deleted!"))
         }
       )
   }
 
   def deleteMenus() = adminAction.async { implicit request =>
-    ListMenusForm.listMenusForm.bindFromRequest
+    ListMenusForm.listMenusForm.bindFromRequest()
       .fold(
         formWithErrors => {
           for {
@@ -154,7 +154,7 @@ class MenuController @Inject()(
           deleteMenuDishes(menusData).map(
             _ =>
               Redirect(
-                lunatech.lunchplanner.controllers.routes.MenuController.getAllMenus)
+                lunatech.lunchplanner.controllers.routes.MenuController.getAllMenus())
                 .flashing("success" -> "Menu(s) deleted!"))
       )
   }

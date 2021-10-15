@@ -74,7 +74,7 @@ class ReportController @Inject()(userService: UserService,
         }
     }
 
-    ReportForm.reportForm.bindFromRequest.fold(hasErrors, success)
+    ReportForm.reportForm.bindFromRequest().fold(hasErrors, success)
   }
 
   def export: EssentialAction = adminAction.async { implicit request =>

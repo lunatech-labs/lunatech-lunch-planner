@@ -34,6 +34,6 @@ class MonthlyReportScheduler @Inject()(service: MonthlyReportService,
   scheduler.schedule(scheduleName, monthlyReportActor, SendLastMonthlyReport)
 
   lifecycle.addStopHook { () =>
-    Future.successful(system.terminate)
+    Future.successful(system.terminate())
   }
 }

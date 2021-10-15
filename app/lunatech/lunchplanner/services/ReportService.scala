@@ -56,6 +56,7 @@ class ReportService @Inject()(
       : Seq[((Date, Location), Attendees)] = {
       scheduleWithAttendees
         .groupBy(schedule => (schedule.date, schedule.location))
+        .view
         .mapValues(_.map(_.attendeeName))
         .toSeq
         .sortBy { case ((date, location), _) => (date, location) }
@@ -91,7 +92,7 @@ class ReportService @Inject()(
     type Names = Seq[String]
     def groupAndSort(
         people: Seq[MenuPerDayReport]): Seq[(DateString, Names)] = {
-      people.groupBy(_.date.toString).mapValues(_.map(_.name)).toSeq.sortBy {
+      people.groupBy(_.date.toString).view.mapValues(_.map(_.name)).toSeq.sortBy {
         case (date, _) => date
       }
     }

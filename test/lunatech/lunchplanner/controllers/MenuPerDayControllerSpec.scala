@@ -62,7 +62,7 @@ class MenuPerDayControllerSpec extends ControllerSpec with MockFactory {
 
     "not accept location not in scope" in {
       (userService.getByEmailAddress _).expects("developer@lunatech.nl").returns(Future.successful(Some(developer)))
-      (menuService.getAllMenusUuidAndNames _).expects().returns(Future.successful(Seq(uuid -> "MyMenu")))
+      (() => menuService.getAllMenusUuidAndNames).expects().returns(Future.successful(Seq(uuid -> "MyMenu")))
 
       val request = FakeRequest()
         .withSession("email" -> "developer@lunatech.nl")

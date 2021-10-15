@@ -1,27 +1,28 @@
-@import b3.vertical.fieldConstructor
 @import lunatech.lunchplanner.models.Dish
 @import lunatech.lunchplanner.models.User
 @import lunatech.lunchplanner.viewModels.MenuForm
 
 @(admin: User, menuForm: Form[MenuForm], listOfDishes: Array[Dish])(implicit messages: MessagesProvider)
+@implicitFieldConstructor = @{ b4.vertical.fieldConstructor() }
+
 @main("New menu", admin) {
     <!-- Nav tabs -->
     <ul class="nav nav-tabs">
-        <li role="presentation"><a href="@lunatech.lunchplanner.controllers.routes.MenuController.getAllMenus">All menus</a></li>
+        <li role="presentation"><a href="@lunatech.lunchplanner.controllers.routes.MenuController.getAllMenus()">All menus</a></li>
         <li role="presentation" class="active"><a data-toggle="tab" href="#newMenu">Create new</a></li>
     </ul>
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="newMenu">
             <br>
-            @helper.form(lunatech.lunchplanner.controllers.routes.MenuController.createNewMenu) {
+            @helper.form(lunatech.lunchplanner.controllers.routes.MenuController.createNewMenu()) {
                 <div class="row">
                     <div class="col col-lg-6">
-                        @b3.text( menuForm("menuName"), '_label -> "Name", 'placeholder -> "Short menu name" )
+                        @b4.text( menuForm("menuName"), Symbol("_label") -> "Name", Symbol("placeholder") -> "Short menu name" )
 
                         @for(index <- listOfDishes.indices) {
-                            @b3.checkbox( menuForm("dishesUuid[" + index + "]"), '_text -> listOfDishes(index).name, 'value -> listOfDishes(index).uuid)
+                            @b4.checkbox( menuForm("dishesUuid[" + index + "]"), Symbol("_text") -> listOfDishes(index).name, Symbol("value") -> listOfDishes(index).uuid)
                         }
-                        @b3.submit('class -> "btn btn-primary"){ <span class="glyphicon glyphicon-plus"></span> Create }
+                        @b4.submit(Symbol("class") -> "btn btn-primary"){ <span class="glyphicon glyphicon-plus"></span> Create }
                     </div>
                 </div>
             }

@@ -1,35 +1,35 @@
-@import b3.vertical.fieldConstructor
 @import lunatech.lunchplanner.models.User
 @import lunatech.lunchplanner.viewModels.DishForm
 
 @(admin: User, dishForm: Form[DishForm])(implicit messages: MessagesProvider)
+@implicitFieldConstructor = @{ b4.vertical.fieldConstructor() }
+
 @main("New dish", admin) {
     <!-- Nav tabs -->
     <ul class="nav nav-tabs">
-        <li role="presentation" ><a href="@lunatech.lunchplanner.controllers.routes.DishController.getAllDishes">All dishes</a></li>
+        <li role="presentation" ><a href="@lunatech.lunchplanner.controllers.routes.DishController.getAllDishes()">All dishes</a></li>
         <li role="presentation" class="active"><a data-toggle="tab" href="#newDish">Create new</a></li>
     </ul>
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="newDish">
             <br>
-            @b3.form(lunatech.lunchplanner.controllers.routes.DishController.createNewDish) {
+            @b4.form(lunatech.lunchplanner.controllers.routes.DishController.createNewDish()) {
                 <div class="row">
                     <div class="col col-lg-6">
-                        @b3.text( dishForm("name"), '_label -> "Name", 'placeholder -> "Short dish name" )
-                        @b3.textarea( dishForm("description"), '_label -> "Description",  'placeholder -> "Dish description", 'rows -> 4)
-                        @b3.text( dishForm("remarks"), '_label -> "Additional remarks", 'placeholder -> "Optional" )
+                        @b4.text( dishForm("name"), Symbol("_label") -> "Name", Symbol("placeholder") -> "Short dish name" )
+                        @b4.textarea( dishForm("description"), Symbol("_label") -> "Description",  Symbol("placeholder") -> "Dish description", Symbol("rows") -> 4)
+                        @b4.text( dishForm("remarks"), Symbol("_label") -> "Additional remarks", Symbol("placeholder") -> "Optional" )
                         <br>
-                        @b3.submit('class -> "btn btn-primary"){ <span class="glyphicon glyphicon-plus"></span> Create }
+                        @b4.submit(Symbol("class") -> "btn btn-primary"){ <span class="glyphicon glyphicon-plus"></span> Create }
                     </div>
                     <div class="col col-lg-6">
-                        <label class="extra-info">Extra info: </label>
-                        @b3.checkbox( dishForm("isVegetarian"), '_text -> "Vegetarian" )
-                        @b3.checkbox( dishForm("hasSeaFood"), '_text -> "Sea food")
-                        @b3.checkbox( dishForm("hasPork"), '_text -> "Pork")
-                        @b3.checkbox( dishForm("hasBeef"), '_text -> "Beef")
-                        @b3.checkbox( dishForm("hasChicken"), '_text -> "Chicken")
-                        @b3.checkbox( dishForm("isGlutenFree"), '_text -> "Gluten free")
-                        @b3.checkbox( dishForm("hasLactose"), '_text -> "Lactose")
+                        @b4.checkbox( dishForm("isVegetarian"), Symbol("_text") -> "Vegetarian" )
+                        @b4.checkbox( dishForm("hasSeaFood"), Symbol("_text") -> "Sea food")
+                        @b4.checkbox( dishForm("hasPork"), Symbol("_text") -> "Pork")
+                        @b4.checkbox( dishForm("hasBeef"), Symbol("_text") -> "Beef")
+                        @b4.checkbox( dishForm("hasChicken"), Symbol("_text") -> "Chicken")
+                        @b4.checkbox( dishForm("isGlutenFree"), Symbol("_text") -> "Gluten free")
+                        @b4.checkbox( dishForm("hasLactose"), Symbol("_text") -> "Lactose")
                     </div>
                 </div>
             }
