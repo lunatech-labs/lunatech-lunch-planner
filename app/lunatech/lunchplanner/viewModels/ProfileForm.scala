@@ -6,6 +6,7 @@ import play.api.libs.json.{ Json, OFormat }
 
 case class ProfileForm(
     vegetarian: Boolean,
+    halal: Boolean,
     seaFoodRestriction: Boolean,
     porkRestriction: Boolean,
     beefRestriction: Boolean,
@@ -21,6 +22,7 @@ object ProfileForm {
   val profileForm = Form(
     mapping(
       "vegetarian" -> boolean,
+      "halal" -> boolean,
       "seaFoodRestriction" -> boolean,
       "porkRestriction" -> boolean,
       "beefRestriction" -> boolean,

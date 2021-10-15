@@ -72,12 +72,13 @@ object UserProfileTableSpec extends Properties(name = "UserProfile") with Proper
       dropTestSchema()
 
       result._1 == booleanToInt(userProfile.vegetarian) &&
-      result._2 == booleanToInt(userProfile.seaFoodRestriction) &&
-      result._3 == booleanToInt(userProfile.porkRestriction) &&
-      result._4 == booleanToInt(userProfile.beefRestriction) &&
-      result._5 == booleanToInt(userProfile.chickenRestriction) &&
-      result._6 == booleanToInt(userProfile.glutenRestriction) &&
-      result._7 == booleanToInt(userProfile.lactoseRestriction)
+      result._2 == booleanToInt(userProfile.halal) &&
+      result._3 == booleanToInt(userProfile.seaFoodRestriction) &&
+      result._4 == booleanToInt(userProfile.porkRestriction) &&
+      result._5 == booleanToInt(userProfile.beefRestriction) &&
+      result._6 == booleanToInt(userProfile.chickenRestriction) &&
+      result._7 == booleanToInt(userProfile.glutenRestriction) &&
+      result._8 == booleanToInt(userProfile.lactoseRestriction)
   }
 
   private def booleanToInt(boolean: Boolean): Int = if (boolean) 1 else 0

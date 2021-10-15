@@ -3,14 +3,13 @@ package lunatech.lunchplanner.services
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.{ MenuPerDayDietRestrictions, UserProfile }
 import lunatech.lunchplanner.persistence.UserProfileTable
-import play.api.Configuration
 
 import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class UserProfileService @Inject()(configuration: Configuration)(
+class UserProfileService @Inject()()(
     implicit val connection: DBConnection) {
 
   def add(userProfile: UserProfile): Future[UserProfile] =
@@ -38,7 +37,8 @@ class UserProfileService @Inject()(configuration: Configuration)(
                                            count._4,
                                            count._5,
                                            count._6,
-                                           count._7))
+                                           count._7,
+                                           count._8))
             .headOption
             .getOrElse(MenuPerDayDietRestrictions(menuPerDayUuid)))
 }

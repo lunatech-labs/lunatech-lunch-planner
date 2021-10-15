@@ -40,6 +40,7 @@
                     <div class="col col-lg-6">
                         <label class="extra-info">Extra info: </label>
                         @b4.checkbox( dishForm("isVegetarian"), Symbol("_text") -> "Vegetarian", Symbol("checked") -> dish.isVegetarian)
+                        @b4.checkbox( dishForm("isHalal"), Symbol("_text") -> "Halal", Symbol("checked") -> dish.isHalal)
                         @b4.checkbox( dishForm("hasSeaFood"), Symbol("_text") -> "Sea food", Symbol("checked") -> dish.hasSeaFood)
                         @b4.checkbox( dishForm("hasPork"), Symbol("_text") -> "Pork", Symbol("checked") -> dish.hasPork)
                         @b4.checkbox( dishForm("hasBeef"), Symbol("_text") -> "Beef", Symbol("checked") -> dish.hasBeef)

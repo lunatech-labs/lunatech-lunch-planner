@@ -17,6 +17,8 @@ class UserProfileTable(tag: Tag)
 
   def vegetarian: Rep[Boolean] = column[Boolean]("vegetarian")
 
+  def halal: Rep[Boolean] = column[Boolean]("halal")
+
   def seaFoodRestriction: Rep[Boolean] = column[Boolean]("seaFoodRestriction")
 
   def porkRestriction: Rep[Boolean] = column[Boolean]("porkRestriction")
@@ -42,6 +44,7 @@ class UserProfileTable(tag: Tag)
   def * : ProvenShape[UserProfile] =
     (userUuid,
      vegetarian,
+     halal,
      seaFoodRestriction,
      porkRestriction,
      beefRestriction,
@@ -110,9 +113,10 @@ object UserProfileTable {
 
   def getRestrictionsByMenuPerDay(menuPerDayUuid: UUID)(
       implicit connection: DBConnection)
-    : Future[Vector[(Int, Int, Int, Int, Int, Int, Int)]] = {
+    : Future[Vector[(Int, Int, Int, Int, Int, Int, Int, Int)]] = {
     val query = sql"""SELECT
          SUM(case when vegetarian then 1 else 0 end) as "vegetarianCount",
+         SUM(case when halal then 1 else 0 end) as "halalCount",
          SUM(case when "seaFoodRestriction" then 1 else 0 end) as "seaFoodCount",
          SUM(case when "porkRestriction" then 1 else 0 end) as "porkCount",
          SUM(case when "beefRestriction" then 1 else 0 end) as "beefCount",
@@ -123,7 +127,7 @@ object UserProfileTable {
          JOIN "UserProfile" up on mpd."userUuid" = up."userUuid"
          WHERE mpd."menuPerDayUuid" = '#$menuPerDayUuid'
          GROUP BY mpd."menuPerDayUuid""""
-      .as[(Int, Int, Int, Int, Int, Int, Int)]
+      .as[(Int, Int, Int, Int, Int, Int, Int, Int)]
 
     connection.db.run(query)
   }

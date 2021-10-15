@@ -14,8 +14,7 @@ object UserProfileServicePropertySpec extends Properties("UserService") with Pro
 
   import lunatech.lunchplanner.data.TableDataGenerator._
 
-  private val configuration = mock[Configuration]
-  private val userProfileService = new UserProfileService(configuration)
+  private val userProfileService = new UserProfileService()
 
   property("insert new user profile") = forAll { (user: User, userProfile: UserProfile) =>
     createTestSchema()
