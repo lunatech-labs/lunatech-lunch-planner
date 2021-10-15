@@ -27,7 +27,7 @@ libraryDependencies ++= Seq(
   "org.postgresql" % "postgresql" % "42.2.24",
 
   "com.adrianhurt" %% "play-bootstrap" % "1.6.1-P28-B4",
-  "org.scalaz" %% "scalaz-core" % "7.3.5", // update
+  "org.scalaz" %% "scalaz-core" % "7.4.0-M8",
   "org.apache.poi" % "poi-ooxml" % "5.0.0",
   "com.enragedginger" %% "akka-quartz-scheduler" % "1.9.1-akka-2.6.x",
   "com.typesafe.play" %% "play-mailer" % "8.0.1",
