@@ -10,6 +10,7 @@ final case class Dish(
     name: String,
     description: String,
     isVegetarian: Boolean = false,
+    isHalal: Boolean = false,
     hasSeaFood: Boolean = false,
     hasPork: Boolean = false,
     hasBeef: Boolean = false,
@@ -32,6 +33,7 @@ object Dish {
   def getDishExtraDetails(dish: Dish): Seq[String] = {
     val list = ListBuffer[String]()
     if (dish.isVegetarian) list += "Vegetarian"
+    if (dish.isHalal) list += "Halal"
     if (dish.isGlutenFree) list += "Gluten Free"
     if (dish.hasChicken) list += "Chicken"
     if (dish.hasSeaFood) list += "Sea Food"

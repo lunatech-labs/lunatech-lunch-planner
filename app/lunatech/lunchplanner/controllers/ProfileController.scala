@@ -90,6 +90,7 @@ class ProfileController @Inject()(
     UserProfile(
       userUuid,
       profile.vegetarian,
+      profile.halal,
       profile.seaFoodRestriction,
       profile.porkRestriction,
       profile.beefRestriction,

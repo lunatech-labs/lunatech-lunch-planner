@@ -18,6 +18,8 @@ class DishTable(tag: Tag) extends Table[Dish](tag, _tableName = "Dish") {
 
   def isVegetarian: Rep[Boolean] = column[Boolean]("isVegetarian")
 
+  def isHalal: Rep[Boolean] = column[Boolean]("isHalal")
+
   def hasSeaFood: Rep[Boolean] = column[Boolean]("hasSeaFood")
 
   def hasPork: Rep[Boolean] = column[Boolean]("hasPork")
@@ -39,6 +41,7 @@ class DishTable(tag: Tag) extends Table[Dish](tag, _tableName = "Dish") {
      name,
      description,
      isVegetarian,
+     isHalal,
      hasSeaFood,
      hasPork,
      hasBeef,
@@ -81,6 +84,7 @@ object DishTable {
           (d.name,
            d.description,
            d.isVegetarian,
+           d.isHalal,
            d.hasSeaFood,
            d.hasPork,
            d.hasBeef,
@@ -93,6 +97,7 @@ object DishTable {
         (dish.name,
          dish.description,
          dish.isVegetarian,
+         dish.isHalal,
          dish.hasSeaFood,
          dish.hasPork,
          dish.hasBeef,

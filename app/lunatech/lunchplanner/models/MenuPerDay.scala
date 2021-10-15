@@ -23,6 +23,7 @@ final case class MenuWithNamePerDay(
 final case class MenuPerDayDietRestrictions(
     menuPerDayUuid: UUID,
     vegetarian: Int = 0,
+    halal: Int = 0,
     seaFoodRestriction: Int = 0,
     porkRestriction: Int = 0,
     beefRestriction: Int = 0,

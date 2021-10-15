@@ -45,6 +45,9 @@
                                 @if(listOfDishes(index).isVegetarian) {
                                     <label class="font-normal">Vegetarian</label> <br>
                                 }
+                                @if(listOfDishes(index).isHalal) {
+                                    <label class="font-normal">Halal</label> <br>
+                                }
                                 @if(listOfDishes(index).hasSeaFood) {
                                     <label class="font-normal">Sea food</label> <br>
                                 }

@@ -1,6 +1,5 @@
 package lunatech.lunchplanner.controllers
 
-import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.{ Dish, _ }
 import lunatech.lunchplanner.services.{ DishService, MenuDishService, UserService }
 import lunatech.lunchplanner.viewModels.{ DishForm, ListDishesForm }
@@ -155,6 +154,7 @@ class DishController @Inject()(
       name = dishForm.name.normalize,
       description = dishForm.description.normalize,
       isVegetarian = dishForm.isVegetarian,
+      isHalal = dishForm.isHalal,
       hasSeaFood = dishForm.hasSeaFood,
       hasPork = dishForm.hasPork,
       hasBeef = dishForm.hasBeef,

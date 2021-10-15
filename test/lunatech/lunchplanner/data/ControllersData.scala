@@ -35,11 +35,11 @@ object ControllersData {
       "hasLactose" -> "false",
       "remarks" -> "")
 
-  val dish1 = Dish(UUID.randomUUID(), "Antipasto misto all italiana", "Selection of Italian cured meats & cheeses with assorted roasted vegetables in extra virgin olive oil", isVegetarian = false, hasSeaFood = false, hasPork = false, hasBeef = true, hasChicken = false, isGlutenFree = false, hasLactose = false, None)
-  val dish2 = Dish(UUID.randomUUID(), "Prosciutto crudo di Parma e melone", "Slices of melon draped with cured Italian ham", isVegetarian = false, hasSeaFood = false, hasPork = false, hasBeef = true, hasChicken = false, isGlutenFree = false, hasLactose = false, None)
-  val dish3 = Dish(UUID.randomUUID(), "Insalata tricolore", "Tomato, mozzarella, avocado & basil", isVegetarian = true, hasSeaFood = false, hasPork = false, hasBeef = false, hasChicken = false, isGlutenFree = false, hasLactose = false, None)
-  val dish4 = Dish(UUID.randomUUID(), "Avocado al forno", "Baked avocado topped with tomato sauce, mozzarella and touch of chilli", isVegetarian = true, hasSeaFood = false, hasPork = false, hasBeef = false, hasChicken = false, isGlutenFree = false, hasLactose = false, None)
-  val dish5 = Dish(UUID.randomUUID(), "Gamberoni all aglio", "King prawns panfried in garlic, olive oil, chilli & tomato", isVegetarian = false, hasSeaFood = true, hasPork = false, hasBeef = false, hasChicken = false, isGlutenFree = false, hasLactose = false, None)
+  val dish1 = Dish(UUID.randomUUID(), "Antipasto misto all italiana", "Selection of Italian cured meats & cheeses with assorted roasted vegetables in extra virgin olive oil", isVegetarian = false, isHalal = false, hasSeaFood = false, hasPork = false, hasBeef = true, hasChicken = false, isGlutenFree = false, hasLactose = false, None)
+  val dish2 = Dish(UUID.randomUUID(), "Prosciutto crudo di Parma e melone", "Slices of melon draped with cured Italian ham", isVegetarian = false, isHalal = false, hasSeaFood = false, hasPork = false, hasBeef = true, hasChicken = false, isGlutenFree = false, hasLactose = false, None)
+  val dish3 = Dish(UUID.randomUUID(), "Insalata tricolore", "Tomato, mozzarella, avocado & basil", isVegetarian = true, isHalal = false, hasSeaFood = false, hasPork = false, hasBeef = false, hasChicken = false, isGlutenFree = false, hasLactose = false, None)
+  val dish4 = Dish(UUID.randomUUID(), "Avocado al forno", "Baked avocado topped with tomato sauce, mozzarella and touch of chilli", isVegetarian = true, isHalal = false, hasSeaFood = false, hasPork = false, hasBeef = false, hasChicken = false, isGlutenFree = false, hasLactose = false, None)
+  val dish5 = Dish(UUID.randomUUID(), "Gamberoni all aglio", "King prawns panfried in garlic, olive oil, chilli & tomato", isVegetarian = false, isHalal = false, hasSeaFood = true, hasPork = false, hasBeef = false, hasChicken = false, isGlutenFree = false, hasLactose = false, None)
 
 
   val menu1 = Menu(name ="Menu 1")

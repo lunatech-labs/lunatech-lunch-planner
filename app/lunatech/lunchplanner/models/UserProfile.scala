@@ -5,6 +5,7 @@ import java.util.UUID
 final case class UserProfile(
     userUuid: UUID = UUID.randomUUID(),
     vegetarian: Boolean = false,
+    halal: Boolean = false,
     seaFoodRestriction: Boolean = false,
     porkRestriction: Boolean = false,
     beefRestriction: Boolean = false,
