@@ -2,8 +2,8 @@ package lunatech.lunchplanner.controllers
 
 import com.lunatech.openconnect.GoogleSecured
 import lunatech.lunchplanner.models.User
-import play.api.mvc.{ControllerComponents, Request, Result, Results}
 import play.api.Configuration
+import play.api.mvc.{ ControllerComponents, Request, Result, Results }
 
 trait Secured extends GoogleSecured {
 

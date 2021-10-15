@@ -1,14 +1,14 @@
 package lunatech.lunchplanner.controllers
 
-import javax.inject.Inject
 import lunatech.lunchplanner.services.SlackService
 import lunatech.lunchplanner.viewModels.SlackForm
 import play.api.Configuration
 import play.api.libs.json.Json
-import play.api.mvc.{BaseController, ControllerComponents, EssentialAction}
+import play.api.mvc.{ BaseController, ControllerComponents, EssentialAction }
 
-import scala.concurrent.Future
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class SlackController @Inject()(val controllerComponents: ControllerComponents,
                                 val slackService: SlackService,

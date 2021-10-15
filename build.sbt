@@ -2,41 +2,45 @@ name := """lunatech-lunch-planner"""
 
 version := "1.0-SNAPSHOT"
 
-scalaVersion := "2.12.4"
+scalaVersion := "2.13.6"
 
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala)
   .settings(
-    javaOptions in Test += "-Dconfig.file=conf/application-test.conf",
-    testOptions in Test += Tests.Argument(TestFrameworks.ScalaCheck,  "-verbosity", "1"),
-    parallelExecution in Test := false,
-    fork in Test := true
+    Test / javaOptions += "-Dconfig.file=conf/application-test.conf",
+    Test / testOptions += Tests.Argument(TestFrameworks.ScalaCheck,  "-verbosity", "1"),
+    Test / parallelExecution := false,
+    Test / fork := true
   )
 
 libraryDependencies ++= Seq(
   ehcache,
   ws,
   evolutions,
-  "com.typesafe.play" %% "play-json" % "2.6.8",
-  "com.typesafe.play" %% "play-slick" % "3.0.3",
-  "com.typesafe.play" %% "play-slick-evolutions" % "3.0.3",
-  "com.typesafe.slick" %% "slick-hikaricp" % "3.2.3",
 
-  "org.postgresql" % "postgresql" % "42.2.5",
-  "com.lunatech" %% "play-googleopenconnect" % "2.4.0",
-  "com.adrianhurt" %% "play-bootstrap" % "1.2-P26-B3",
-  "org.scalaz" %% "scalaz-core" % "7.2.10",
-  "org.apache.poi" % "poi-ooxml" % "3.16",
-  "com.enragedginger" %% "akka-quartz-scheduler" % "1.6.0-akka-2.4.x",
-  "com.typesafe.play" %% "play-mailer" % "6.0.1",
-  "com.typesafe.play" %% "play-mailer-guice" % "6.0.1",
+  "com.lunatech" %% "play-googleopenconnect" % "2.7.0",
 
-  "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test,
-  "org.mockito" % "mockito-all" % "1.10.19" % Test,
-  "org.scalacheck" %% "scalacheck" % "1.14.0" % Test,
-  "org.typelevel" %% "shapeless-scalacheck" % "0.6.1" % Test,
+  "com.typesafe.play" %% "play-json" % "2.9.2",
+  "com.typesafe.play" %% "play-slick" % "5.0.0",  // 2019
+  "com.typesafe.play" %% "play-slick-evolutions" % "5.0.0", // 2019
+  "com.typesafe.slick" %% "slick-hikaricp" % "3.3.3", // 2020
+  "org.postgresql" % "postgresql" % "42.2.24",
+
+  "com.adrianhurt" %% "play-bootstrap" % "1.6.1-P28-B4",
+  "org.scalaz" %% "scalaz-core" % "7.4.0-M8",
+  "org.apache.poi" % "poi-ooxml" % "5.0.0",
+  "com.enragedginger" %% "akka-quartz-scheduler" % "1.9.1-akka-2.6.x",
+  "com.typesafe.play" %% "play-mailer" % "8.0.1",
+  "com.typesafe.play" %% "play-mailer-guice" % "8.0.1",
+
+  "org.scalamock" %% "scalamock" % "5.0.0" % Test,
+
+  "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % Test,
+  "org.scalatestplus" %% "scalacheck-1-15" % "3.2.3.0" % Test,
+  "org.scalacheck" %% "scalacheck" % "1.15.1" % Test,
   "io.github.wolfendale" %% "scalacheck-gen-regexp" % "0.1.3" % Test,
-  "com.h2database" % "h2" % "1.4.197" % Test
+
+  "com.h2database" % "h2" % "1.4.200" % Test
 )
 
 resolvers ++= Seq(

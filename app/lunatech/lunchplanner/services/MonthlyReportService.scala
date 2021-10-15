@@ -1,21 +1,19 @@
 package lunatech.lunchplanner.services
 
-import javax.inject.Inject
 import lunatech.lunchplanner.configuration.EmailConfiguration
-import org.joda.time.DateTime
-import play.api.{Configuration, Logger}
 import play.api.i18n.MessagesApi
-import play.api.libs.ws.WSClient
+import play.api.{ Configuration, Logging }
 
-import scala.concurrent.Future
+import java.time.LocalDateTime
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class MonthlyReportService @Inject()(val configuration: Configuration,
                                      val messagesApi: MessagesApi,
                                      reportService: ReportService,
                                      emailService: EmailService,
-                                     emailConfiguration: EmailConfiguration,
-                                     ws: WSClient) {
+                                     emailConfiguration: EmailConfiguration) extends Logging {
   val oneMonth = 1
   val fileExtension = "xls"
 
@@ -33,7 +31,7 @@ class MonthlyReportService @Inject()(val configuration: Configuration,
     val attachmentName = s"$monthName.$fileExtension"
 
     getLastAvailableReport(month, year).map { reportData =>
-      Logger.info("Monthly report data generated.")
+      logger.info("Monthly report data generated.")
 
       emailService.sendMessageWithAttachment(emailConfWithMonth,
                                              messageBody,
@@ -51,8 +49,8 @@ class MonthlyReportService @Inject()(val configuration: Configuration,
   }
 
   private def getPreviousMonthAndYear: (Int, Int) = {
-    val previousMonth = DateTime.now().minusMonths(oneMonth)
-    (previousMonth.monthOfYear().get, previousMonth.year().get())
+    val previousMonth = LocalDateTime.now().minusMonths(oneMonth)
+    (previousMonth.getMonthValue, previousMonth.getYear)
   }
 
   //noinspection ScalaStyle

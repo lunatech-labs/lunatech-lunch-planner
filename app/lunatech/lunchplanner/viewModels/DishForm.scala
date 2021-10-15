@@ -1,11 +1,11 @@
 package lunatech.lunchplanner.viewModels
 
-import java.util.UUID
-
 import play.api.data.Form
-import play.api.data.Forms.{mapping, optional, text, _}
+import play.api.data.Forms.{ mapping, optional, text, _ }
 import play.api.data.format.Formats._
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{ Json, OFormat }
+
+import java.util.UUID
 
 case class DishForm(
     name: String,

@@ -1,15 +1,14 @@
 package lunatech.lunchplanner.controllers
 
-import java.util.UUID
-import javax.inject.Inject
-
 import lunatech.lunchplanner.models.UserProfile
-import lunatech.lunchplanner.services.{UserProfileService, UserService}
+import lunatech.lunchplanner.services.{ UserProfileService, UserService }
 import lunatech.lunchplanner.viewModels.ProfileForm
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}
-import play.api.{Configuration, Environment}
+import play.api.mvc.{ Action, AnyContent, BaseController, ControllerComponents }
+import play.api.{ Configuration, Environment }
 
+import java.util.UUID
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -42,7 +41,7 @@ class ProfileController @Inject()(
   }
 
   def saveProfile: Action[AnyContent] = userAction.async { implicit request =>
-    ProfileForm.profileForm.bindFromRequest
+    ProfileForm.profileForm.bindFromRequest()
       .fold(
         formWithErrors => {
           for {
@@ -65,8 +64,7 @@ class ProfileController @Inject()(
         profileForm =>
           updateUserProfile(profileForm, request.email).map { result =>
             Redirect(
-              lunatech.lunchplanner.controllers.routes.ProfileController
-                .getProfile())
+              lunatech.lunchplanner.controllers.routes.ProfileController.getProfile())
               .flashing(result match {
                 case (true)  => "success" -> "Profile saved!"
                 case (false) => "error" -> "Error when saving profile!"

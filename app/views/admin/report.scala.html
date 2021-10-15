@@ -1,7 +1,6 @@
-@import b3.vertical.fieldConstructor
 @import lunatech.lunchplanner.models.{Report, ReportByDateAndLocation, User, ReportDate}
-@import org.joda.time.DateTime
 @import java.sql.Date
+@import java.time.LocalDateTime
 
 @(user: User, reportForm: Form[ReportDate],
         report: List[(Date, ReportByDateAndLocation)],
@@ -22,8 +21,9 @@
         12 -> "December")
 }
 @years = @{
-    (2017 to DateTime.now.getYear).map(year => year)
+    (2017 to LocalDateTime.now.getYear).map(year => year)
 }
+@implicitFieldConstructor = @{ b4.vertical.fieldConstructor() }
 
 @main("Monthly Report", user) {
     <h1>Reports</h1>
@@ -45,9 +45,9 @@
     <br>
 
     <div class="col col-lg-12" style="padding-left: 0">
-    @b3.form(lunatech.lunchplanner.controllers.routes.ReportController.export) {
+    @b4.form(lunatech.lunchplanner.controllers.routes.ReportController.export) {
         @if(user.isAdmin) {
-            @b3.submit('class -> "btn btn-primary") {
+            @b4.submit(Symbol("class") -> "btn btn-primary") {
                 Export
             }
         }

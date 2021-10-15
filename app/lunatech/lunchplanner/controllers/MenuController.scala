@@ -1,25 +1,16 @@
 package lunatech.lunchplanner.controllers
 
-import java.time.{Instant, LocalDate}
-import java.util.UUID
-
-import javax.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.{Menu, MenuDish}
 import lunatech.lunchplanner.models._
-import lunatech.lunchplanner.services.{
-  DishService,
-  MenuDishService,
-  MenuPerDayPerPersonService,
-  MenuPerDayService,
-  MenuService,
-  UserService
-}
-import lunatech.lunchplanner.viewModels.{ListMenusForm, MenuForm}
+import lunatech.lunchplanner.services.{ DishService, MenuDishService, MenuPerDayPerPersonService, MenuPerDayService, MenuService, UserService }
+import lunatech.lunchplanner.viewModels.{ ListMenusForm, MenuForm }
 import play.api.i18n.I18nSupport
-import play.api.mvc.{BaseController, ControllerComponents}
-import play.api.{Configuration, Environment}
+import play.api.mvc.{ BaseController, ControllerComponents }
+import play.api.{ Configuration, Environment }
 
+import java.time.LocalDate
+import java.util.UUID
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -32,7 +23,7 @@ class MenuController @Inject()(
     menuDishService: MenuDishService,
     val controllerComponents: ControllerComponents,
     val environment: Environment,
-    val configuration: Configuration)(implicit val connection: DBConnection)
+    val configuration: Configuration)
     extends BaseController
     with Secured
     with I18nSupport {
@@ -50,7 +41,7 @@ class MenuController @Inject()(
   }
 
   def createNewMenu = adminAction.async { implicit request =>
-    MenuForm.menuForm.bindFromRequest
+    MenuForm.menuForm.bindFromRequest()
       .fold(
         formWithErrors => {
           for {
@@ -66,8 +57,8 @@ class MenuController @Inject()(
         menuData => {
           addNewMenuDishes(menuData).map(
             _ =>
-              Redirect(lunatech.lunchplanner.controllers.routes.MenuController
-                .getAllMenus())
+              Redirect(
+                lunatech.lunchplanner.controllers.routes.MenuController.getAllMenus())
                 .flashing("success" -> "New menu created!"))
         }
       )
@@ -98,7 +89,7 @@ class MenuController @Inject()(
   }
 
   def saveMenuDetails(menuUuid: UUID) = adminAction.async { implicit request =>
-    MenuForm.menuForm.bindFromRequest
+    MenuForm.menuForm.bindFromRequest()
       .fold(
         formWithErrors => {
           for {
@@ -114,15 +105,15 @@ class MenuController @Inject()(
         menuData => {
           updateMenuDishes(menuUuid, menuData).map(
             _ =>
-              Redirect(lunatech.lunchplanner.controllers.routes.MenuController
-                .getAllMenus())
+              Redirect(
+                lunatech.lunchplanner.controllers.routes.MenuController.getAllMenus())
                 .flashing("success" -> "Menu updated!"))
         }
       )
   }
 
   def deleteMenu(menuUuid: UUID) = adminAction.async { implicit request =>
-    MenuForm.menuForm.bindFromRequest
+    MenuForm.menuForm.bindFromRequest()
       .fold(
         formWithErrors => {
           for {
@@ -138,15 +129,15 @@ class MenuController @Inject()(
         _ => {
           deleteMenuDish(menuUuid).map(
             _ =>
-              Redirect(lunatech.lunchplanner.controllers.routes.MenuController
-                .getAllMenus())
+              Redirect(
+                lunatech.lunchplanner.controllers.routes.MenuController.getAllMenus())
                 .flashing("success" -> "Menu deleted!"))
         }
       )
   }
 
   def deleteMenus() = adminAction.async { implicit request =>
-    ListMenusForm.listMenusForm.bindFromRequest
+    ListMenusForm.listMenusForm.bindFromRequest()
       .fold(
         formWithErrors => {
           for {
@@ -162,8 +153,8 @@ class MenuController @Inject()(
         menusData =>
           deleteMenuDishes(menusData).map(
             _ =>
-              Redirect(lunatech.lunchplanner.controllers.routes.MenuController
-                .getAllMenus())
+              Redirect(
+                lunatech.lunchplanner.controllers.routes.MenuController.getAllMenus())
                 .flashing("success" -> "Menu(s) deleted!"))
       )
   }

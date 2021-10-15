@@ -1,10 +1,11 @@
-@import b3.vertical.fieldConstructor
 @import lunatech.lunchplanner.models.MenuWithNameWithDishesPerPerson
 @import lunatech.lunchplanner.viewModels.MenuPerDayPerPersonForm
 @import lunatech.lunchplanner.models.User
 @import lunatech.lunchplanner.models.Dish
 
 @(user: User, listOfMenusPerDayPerPerson: Array[MenuWithNameWithDishesPerPerson], form : Form[MenuPerDayPerPersonForm])(implicit messages: MessagesProvider, flash: play.api.mvc.Flash)
+@implicitFieldConstructor = @{ b4.vertical.fieldConstructor() }
+
 @main("Lunatech Lunch Planner", user) {
 
     <h2>Planned meals by Lunatech</h2>
@@ -21,7 +22,7 @@
                 @message
             </div>
         }
-        @helper.form(lunatech.lunchplanner.controllers.routes.MenuPerDayPerPersonController.createNewMenuPerDayPerPerson, 'id -> "formAttendance") {
+        @helper.form(lunatech.lunchplanner.controllers.routes.MenuPerDayPerPersonController.createNewMenuPerDayPerPerson, Symbol("id") -> "formAttendance") {
             <div>
                 <table class="table">
                     <thead>
@@ -47,7 +48,7 @@
                             <select name="menuPerDayUuids[]" class="select select-@schedulesByDate._1">
                                 <option class="select-empty"></option>
                                 @schedulesByDate._2.map { s =>
-                                    <option class="location-@s.location" value="@s.menuPerDayUuid" @if(s.isAttending == Some(true)) { selected } > @s.menuName @@ @s.location</option>
+                                    <option class="location-@s.location" value="@s.menuPerDayUuid" @if(s.isAttending.contains(true)) { selected } > @s.menuName @@ @s.location</option>
                                 }
                                 <option class="select-not-attending" value="@schedulesByDate._2.map(_.menuPerDayUuid).mkString("~")" @if(schedulesByDate._2.map(_.isAttending).contains(Some(false))) { selected }>Not Attending</option>
                             </select>
@@ -85,7 +86,7 @@
                 }
                 </table>
             </div>
-            @b3.submit('class -> "btn btn-primary") {
+            @b4.submit(Symbol("class") -> "btn btn-primary") {
                 <span class="glyphicon glyphicon-ok"></span> Save selected meals
             }
         }

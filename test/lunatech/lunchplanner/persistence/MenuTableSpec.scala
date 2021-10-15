@@ -4,7 +4,6 @@ import lunatech.lunchplanner.common.PropertyTestingConfig
 import lunatech.lunchplanner.models.Menu
 import org.scalacheck._
 import org.scalacheck.Prop._
-import shapeless.contrib.scalacheck._
 
 import scala.concurrent.Await
 

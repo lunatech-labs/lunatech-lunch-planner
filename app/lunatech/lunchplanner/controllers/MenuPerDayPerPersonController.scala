@@ -1,32 +1,25 @@
 package lunatech.lunchplanner.controllers
 
-import java.util.UUID
-import javax.inject.Inject
-
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.MenuPerDayPerPerson
-import lunatech.lunchplanner.services.{
-  MenuPerDayPerPersonService,
-  MenuPerDayService,
-  UserService
-}
+import lunatech.lunchplanner.services.{ MenuPerDayPerPersonService, MenuPerDayService, UserService }
 import lunatech.lunchplanner.viewModels.MenuPerDayPerPersonForm
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Json
-import play.api.mvc.{BaseController, ControllerComponents, EssentialAction}
-import play.api.{Configuration, Environment}
+import play.api.mvc.{ BaseController, ControllerComponents, EssentialAction }
+import play.api.{ Configuration, Environment }
 
+import java.util.UUID
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class MenuPerDayPerPersonController @Inject()(
     userService: UserService,
-    menuPerDayService: MenuPerDayService,
     menuPerDayPerPersonService: MenuPerDayPerPersonService,
     val controllerComponents: ControllerComponents,
     val environment: Environment,
-    val configuration: Configuration,
-    implicit val connection: DBConnection)
+    val configuration: Configuration)
     extends BaseController
     with Secured
     with I18nSupport {
@@ -35,7 +28,7 @@ class MenuPerDayPerPersonController @Inject()(
     implicit request =>
       for {
         currentUser <- userService.getByEmailAddress(request.email)
-        result <- MenuPerDayPerPersonForm.menuPerDayPerPersonForm.bindFromRequest
+        result <- MenuPerDayPerPersonForm.menuPerDayPerPersonForm.bindFromRequest()
           .fold(
             formWithErrors =>
               for {

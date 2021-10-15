@@ -1,9 +1,8 @@
 package lunatech.lunchplanner.models
 
+import play.api.libs.json.{ Json, OFormat }
+
 import java.util.UUID
-
-import play.api.libs.json.{Json, OFormat}
-
 import scala.collection.mutable.ListBuffer
 
 final case class Dish(

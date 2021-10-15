@@ -1,14 +1,15 @@
-@import b3.vertical.fieldConstructor
 @import lunatech.lunchplanner.models.User
 @import lunatech.lunchplanner.models.MenuWithDishes
 @import lunatech.lunchplanner.viewModels.ListMenusForm
 
 @(admin: User, listMenusForm: Form[ListMenusForm], listOfMenus: Array[MenuWithDishes])(implicit messages: MessagesProvider, flash: play.api.mvc.Flash)
+@implicitFieldConstructor = @{ b4.vertical.fieldConstructor() }
+
 @main("Menus", admin) {
 <!-- Nav tabs -->
 <ul class="nav nav-tabs">
     <li role="presentation" class="active"><a data-toggle="tab" href="#list">All menus</a></li>
-    <li role="presentation"><a href="@lunatech.lunchplanner.controllers.routes.MenuController.getNewMenu">Create new</a></li>
+    <li role="presentation"><a href="@lunatech.lunchplanner.controllers.routes.MenuController.getNewMenu()">Create new</a></li>
 </ul>
 <div class="tab-content">
     <div role="tabpanel" class="tab-pane active" id="list">
@@ -20,7 +21,7 @@
                     @message
                 </div>
             }
-            @b3.form(lunatech.lunchplanner.controllers.routes.MenuController.deleteMenus) {
+            @b4.form(lunatech.lunchplanner.controllers.routes.MenuController.deleteMenus()) {
                 <table class="table" >
                     <thead>
                         <tr>
@@ -43,7 +44,7 @@
                         </tr>
                     }
                 </table>
-                @b3.submit('class -> "btn btn-danger js-delete-confirmation"){ <span class="glyphicon glyphicon-remove"></span> Delete selected }
+                @b4.submit(Symbol("class") -> "btn btn-danger js-delete-confirmation"){ <span class="glyphicon glyphicon-remove"></span> Delete selected }
             }
         </div>
     </div>

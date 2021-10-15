@@ -1,15 +1,14 @@
 package lunatech.lunchplanner.persistence
 
-import java.sql.Date
-import java.util.UUID
-
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.{Menu, MenuPerDay}
-import org.joda.time.DateTime
-import slick.jdbc.PostgresProfile.api._
+import lunatech.lunchplanner.models.{ Menu, MenuPerDay }
 import slick.jdbc.GetResult
-import slick.lifted.{ForeignKeyQuery, ProvenShape, TableQuery}
+import slick.jdbc.PostgresProfile.api._
+import slick.lifted.{ ForeignKeyQuery, ProvenShape, TableQuery }
 
+import java.sql.Date
+import java.time.{ LocalDateTime, ZoneOffset }
+import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -81,7 +80,7 @@ object MenuPerDayTable {
       implicit connection: DBConnection): Future[Seq[MenuPerDay]] = {
     val query = menuPerDayTable
       .filter(mpd =>
-        mpd.isDeleted === false && mpd.date >= new Date(DateTime.now.getMillis))
+        mpd.isDeleted === false && mpd.date >= new Date(LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli))
       .sortBy(mpd => mpd.date)
     connection.db.run(query.result)
   }
@@ -151,7 +150,7 @@ object MenuPerDayTable {
   // Method used on reports, data not filtered by `isDeleted`
   def getAllAvailableDatesWithinRange(dateStart: Date, dateEnd: Date)(
       implicit connection: DBConnection): Future[Seq[Date]] = {
-    implicit val result: GetResult[Date] = GetResult(r => r.nextDate)
+    implicit val result: GetResult[Date] = GetResult(r => r.nextDate())
 
     val query = sql"""SELECT DISTINCT "date"
                             FROM "MenuPerDay"

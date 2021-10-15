@@ -6,7 +6,6 @@ import org.scalacheck.Properties
 import org.scalacheck.Prop._
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
-import shapeless.contrib.scalacheck._
 
 object MenuDishTableSpec extends Properties(name = "MenuDish") with PropertyTestingConfig {
 

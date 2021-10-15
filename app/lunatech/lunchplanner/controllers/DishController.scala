@@ -1,21 +1,15 @@
 package lunatech.lunchplanner.controllers
 
-import java.util.UUID
-
-import javax.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.Dish
-import lunatech.lunchplanner.models._
-import lunatech.lunchplanner.services.{
-  DishService,
-  MenuDishService,
-  UserService
-}
-import lunatech.lunchplanner.viewModels.{DishForm, ListDishesForm}
+import lunatech.lunchplanner.models.{ Dish, _ }
+import lunatech.lunchplanner.services.{ DishService, MenuDishService, UserService }
+import lunatech.lunchplanner.viewModels.{ DishForm, ListDishesForm }
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}
-import play.api.{Configuration, Environment}
+import play.api.mvc.{ Action, AnyContent, BaseController, ControllerComponents }
+import play.api.{ Configuration, Environment }
 
+import java.util.UUID
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -25,7 +19,7 @@ class DishController @Inject()(
     menuDishService: MenuDishService,
     val controllerComponents: ControllerComponents,
     val environment: Environment,
-    val configuration: Configuration)(implicit val connection: DBConnection)
+    val configuration: Configuration)
     extends BaseController
     with Secured
     with I18nSupport {
@@ -54,7 +48,7 @@ class DishController @Inject()(
 
   def createNewDish: Action[AnyContent] = adminAction.async {
     implicit request =>
-      DishForm.dishForm.bindFromRequest
+      DishForm.dishForm.bindFromRequest()
         .fold(
           formWithErrors => {
             for {
@@ -68,10 +62,11 @@ class DishController @Inject()(
           dishForm =>
             dishService
               .add(getDish(dishForm))
-              .map(_ =>
-                Redirect(lunatech.lunchplanner.controllers.routes.DishController
-                  .getAllDishes())
-                  .flashing("success" -> "New dish created!"))
+              .map(
+                _ =>
+                  Redirect(
+                    lunatech.lunchplanner.controllers.routes.DishController.getAllDishes())
+                    .flashing("success" -> "New dish created!"))
         )
   }
 
@@ -90,7 +85,7 @@ class DishController @Inject()(
 
   def saveDishDetails(uuid: UUID): Action[AnyContent] = adminAction.async {
     implicit request =>
-      DishForm.dishForm.bindFromRequest
+      DishForm.dishForm.bindFromRequest()
         .fold(
           formWithErrors => {
             for {
@@ -106,17 +101,18 @@ class DishController @Inject()(
           dishForm => {
             dishService
               .update(uuid, getDish(dishForm))
-              .map(_ =>
-                Redirect(lunatech.lunchplanner.controllers.routes.DishController
-                  .getAllDishes())
-                  .flashing("success" -> "Dish updated!"))
+              .map(
+                _ =>
+                  Redirect(
+                    lunatech.lunchplanner.controllers.routes.DishController.getAllDishes())
+                    .flashing("success" -> "Dish updated!"))
           }
         )
   }
 
   def deleteDishes(): Action[AnyContent] = adminAction.async {
     implicit request =>
-      ListDishesForm.listDishesForm.bindFromRequest
+      ListDishesForm.listDishesForm.bindFromRequest()
         .fold(
           formWithErrors => {
             for {
@@ -132,8 +128,8 @@ class DishController @Inject()(
               .sequence(
                 dishData.listUuids.map(uuid => deleteDishAndDependencies(uuid)))
               .map(_ =>
-                Redirect(lunatech.lunchplanner.controllers.routes.DishController
-                  .getAllDishes())
+                Redirect(
+                  lunatech.lunchplanner.controllers.routes.DishController.getAllDishes())
                   .flashing("success" -> "Dish(es) deleted!"))
         )
   }
@@ -141,10 +137,10 @@ class DishController @Inject()(
   def deleteDish(uuid: UUID): Action[AnyContent] = adminAction.async {
     implicit request =>
       deleteDishAndDependencies(uuid)
-        .map(
-          _ =>
-            Redirect(lunatech.lunchplanner.controllers.routes.DishController
-              .getAllDishes()).flashing("success" -> "Dish deleted!"))
+        .map(_ =>
+          Redirect(
+            lunatech.lunchplanner.controllers.routes.DishController.getAllDishes())
+            .flashing("success" -> "Dish deleted!"))
   }
 
   private def deleteDishAndDependencies(uuid: UUID) = {

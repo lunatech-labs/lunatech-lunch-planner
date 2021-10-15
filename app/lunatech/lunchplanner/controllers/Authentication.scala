@@ -1,19 +1,11 @@
 package lunatech.lunchplanner.controllers
 
-import javax.inject.Inject
-
 import com.lunatech.openconnect.Authenticate
 import lunatech.lunchplanner.services.UserService
-import play.api.mvc.{
-  AbstractController,
-  Action,
-  AnyContent,
-  BaseController,
-  ControllerComponents,
-  EssentialAction
-}
-import play.api.{Configuration, Environment, Mode}
+import play.api.mvc.{ Action, AnyContent, BaseController, ControllerComponents, EssentialAction }
+import play.api.{ Configuration, Environment, Mode }
 
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

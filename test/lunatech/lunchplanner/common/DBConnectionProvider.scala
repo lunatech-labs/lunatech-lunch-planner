@@ -2,7 +2,7 @@ package lunatech.lunchplanner.common
 
 import com.typesafe.config.ConfigFactory
 import lunatech.lunchplanner.persistence._
-import org.scalatest.WordSpecLike
+import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.{ Application, Configuration }
 import play.api.db.slick.{ DatabaseConfigProvider, HasDatabaseConfigProvider }
@@ -12,7 +12,7 @@ import slick.jdbc.{ JdbcProfile, PostgresProfile }
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-trait InMemoryDatabase extends WordSpecLike with GuiceOneAppPerSuite {
+trait InMemoryDatabase extends AnyWordSpecLike with GuiceOneAppPerSuite {
 
   override def fakeApplication(): Application = {
     val builder = overrideDependencies(
@@ -44,7 +44,7 @@ trait DBConnectionProvider extends InMemoryDatabase with HasDatabaseConfigProvid
     MenuPerDayTable.menuPerDayTable.schema ++
     MenuPerDayPerPersonTable.menuPerDayPerPersonTable.schema
 
-  private val duration: Duration = 3 second
+  private val duration: Duration = 3.seconds
 
   def createTestSchema(): Unit = Await.result(jdbc.run(createSchema.create), duration)
 

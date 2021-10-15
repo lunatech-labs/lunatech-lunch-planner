@@ -11,12 +11,15 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class ReportServiceSpec extends BehaviorTestingConfig with BeforeAndAfterEach {
   private val dishService = new DishService()
-  private val menuService =  new MenuService()
+  private val menuService = new MenuService()
   private val menuPerDayService = new MenuPerDayService(menuService)
   private val menuPerDayPerPersonService = new MenuPerDayPerPersonService(dishService, menuService, menuPerDayService)
   private val reportService = new ReportService(menuPerDayPerPersonService, menuPerDayService)
 
-  override def beforeEach: Unit = {
+  private val date1 = new java.sql.Date(1515106800000L)
+  private val date2 = new java.sql.Date(1518217200000L)
+
+  override def beforeEach(): Unit = {
     createTestSchema()
 
     Await.result(
@@ -39,11 +42,11 @@ class ReportServiceSpec extends BehaviorTestingConfig with BeforeAndAfterEach {
 
       _ <- MenuTable.add(menu1)
       _ <- MenuTable.add(menu2)
-      menuDish1 <- MenuDishTable.add(MenuDish(menuUuid = menu1.uuid, dishUuid = dish1.uuid))
-      menuDish2 <- MenuDishTable.add(MenuDish(menuUuid = menu1.uuid, dishUuid = dish2.uuid))
-      menuDish3 <- MenuDishTable.add(MenuDish(menuUuid = menu2.uuid, dishUuid = dish3.uuid))
-      menuDish4 <- MenuDishTable.add(MenuDish(menuUuid = menu2.uuid, dishUuid = dish4.uuid))
-      menuDish5 <- MenuDishTable.add(MenuDish(menuUuid = menu2.uuid, dishUuid = dish5.uuid))
+      _ <- MenuDishTable.add(MenuDish(menuUuid = menu1.uuid, dishUuid = dish1.uuid))
+      _ <- MenuDishTable.add(MenuDish(menuUuid = menu1.uuid, dishUuid = dish2.uuid))
+      _ <- MenuDishTable.add(MenuDish(menuUuid = menu2.uuid, dishUuid = dish3.uuid))
+      _ <- MenuDishTable.add(MenuDish(menuUuid = menu2.uuid, dishUuid = dish4.uuid))
+      _ <- MenuDishTable.add(MenuDish(menuUuid = menu2.uuid, dishUuid = dish5.uuid))
 
       menuperday1 <- MenuPerDayTable.add(MenuPerDay(menuUuid = menu1.uuid, date = new java.sql.Date(118, 0, 5), location = "Rotterdam"))
       menuperday2 <- MenuPerDayTable.add(MenuPerDay(menuUuid = menu2.uuid, date = new java.sql.Date(118, 0, 5), location = "Amsterdam"))
@@ -67,25 +70,25 @@ class ReportServiceSpec extends BehaviorTestingConfig with BeforeAndAfterEach {
   "Report service" should {
     "produce list of attendees per location by date for January 2018" in {
       val result = Await.result(reportService.getReportByLocationAndDate(1, 2018), defaultTimeout)
-      result.usersPerDateAndLocation mustBe Vector(
+      result.usersPerDateAndLocation mustBe List(
         ((new java.sql.Date(118, 0, 5), "Amsterdam"), Vector("user 2")),
         ((new java.sql.Date(118, 0, 5), "Rotterdam"), Vector("user 1", "user 3")))
     }
 
     "produce list of attendees per location by date for February 2018" in {
       val result = Await.result(reportService.getReportByLocationAndDate(2, 2018), defaultTimeout)
-      result.usersPerDateAndLocation mustBe Vector(
+      result.usersPerDateAndLocation mustBe List(
         ((new java.sql.Date(118, 1, 10), "Amsterdam"), Vector("user 1", "user 2", "user 4")))
     }
 
     "produce list of non attendees by date in January" in {
       val result = Await.result(reportService.getReportForNotAttending(1, 2018), defaultTimeout)
-      result.usersPerDate mustBe Vector(("2018-01-05", Vector("user 4")))
+      result.usersPerDate mustBe List(("2018-01-05", Vector("user 4")))
     }
 
     "produce list of non attendees by date in February" in {
       val result = Await.result(reportService.getReportForNotAttending(2, 2018), defaultTimeout)
-      result.usersPerDate mustBe Vector(("2018-02-10", Vector("user 3")))
+      result.usersPerDate mustBe List(("2018-02-10", Vector("user 3")))
     }
   }
 

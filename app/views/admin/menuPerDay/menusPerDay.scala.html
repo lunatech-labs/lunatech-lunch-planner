@@ -1,14 +1,15 @@
-@import b3.vertical.fieldConstructor
 @import lunatech.lunchplanner.models.User
 @import lunatech.lunchplanner.models.MenuWithNamePerDay
 @import lunatech.lunchplanner.viewModels.ListMenusPerDayForm
 
 @(admin: User, defaultDateStart: String, defaultDateEnd: String, listMenusPerDayForm: Form[ListMenusPerDayForm], listOfMenusPerDay: Array[MenuWithNamePerDay])(implicit messages: MessagesProvider, flash: play.api.mvc.Flash)
+@implicitFieldConstructor = @{ b4.vertical.fieldConstructor() }
+
 @main("New schedule", admin) {
 <!-- Nav tabs -->
 <ul class="nav nav-tabs">
     <li role="presentation" class="active"><a data-toggle="tab" href="#list">All schedules</a></li>
-    <li role="presentation"><a  href="@lunatech.lunchplanner.controllers.routes.MenuPerDayController.getNewMenuPerDay">Create new</a></li>
+    <li role="presentation"><a  href="@lunatech.lunchplanner.controllers.routes.MenuPerDayController.getNewMenuPerDay()">Create new</a></li>
 </ul>
 
 <!-- Tab panes -->
@@ -22,12 +23,12 @@
                     @message
                 </div>
             }
-            @b3.form(lunatech.lunchplanner.controllers.routes.MenuPerDayController.filterMenusPerDay, 'id -> "filterDateRange") {
-                @datepickerrange(listMenusPerDayForm("dateStart"), 'value -> defaultDateStart)(
-                    listMenusPerDayForm("dateEnd"), 'value -> defaultDateEnd)('_label -> "Choose a date range")
+            @b4.form(lunatech.lunchplanner.controllers.routes.MenuPerDayController.filterMenusPerDay(), Symbol("id") -> "filterDateRange") {
+                @datepickerrange(listMenusPerDayForm("dateStart"), Symbol("value") -> defaultDateStart)(
+                    listMenusPerDayForm("dateEnd"), Symbol("value") -> defaultDateEnd)(Symbol("_label") -> "Choose a date range")
             }
             <br>
-            @b3.form(lunatech.lunchplanner.controllers.routes.MenuPerDayController.deleteMenusPerDay) {
+            @b4.form(lunatech.lunchplanner.controllers.routes.MenuPerDayController.deleteMenusPerDay()) {
                 <input type="hidden" name="dateStart" value="@defaultDateStart" />
                 <input type="hidden" name="dateEnd" value="@defaultDateEnd" />
                 <table class="table" >
@@ -52,7 +53,7 @@
                         </tr>
                     }
                 </table>
-                @b3.submit('class -> "btn btn-danger js-delete-confirmation"){ <span class="glyphicon glyphicon-remove"></span> Delete selected }
+                @b4.submit(Symbol("class") -> "btn btn-danger js-delete-confirmation"){ <span class="glyphicon glyphicon-remove"></span> Delete selected }
 
             }
 

@@ -1,9 +1,9 @@
-@import b3.vertical.fieldConstructor
 @import lunatech.lunchplanner.models.User
 @import lunatech.lunchplanner.models.UserProfile
 @import lunatech.lunchplanner.viewModels.ProfileForm
 
 @(user: User, profileForm: Form[ProfileForm], userProfile: UserProfile)(implicit messages: MessagesProvider, flash: play.api.mvc.Flash)
+@implicitFieldConstructor = @{ b4.vertical.fieldConstructor() }
 
 @main("Profile", user) {
 
@@ -26,20 +26,20 @@
   <label class="font-normal">@user.emailAddress </label>
   <br><br>
 
-  @b3.form(lunatech.lunchplanner.controllers.routes.ProfileController.saveProfile) {
+  @b4.form(lunatech.lunchplanner.controllers.routes.ProfileController.saveProfile()) {
     <div class="no-left-padding col col-lg-6" style="padding-left: 0">
       <label class="extra-info">Diet restrictions: </label> <br>
       <label class="font-normal">** Please use this space for real diet restrictions and not diet preferences **</label><br>
-      @b3.checkbox( profileForm("vegetarian"), '_text -> "Vegetarian", 'checked-> userProfile.vegetarian)
-      @b3.checkbox( profileForm("seaFoodRestriction"), '_text -> "Sea food allergic", 'checked-> userProfile.seaFoodRestriction)
-      @b3.checkbox( profileForm("porkRestriction"), '_text -> "Don't eat pork", 'checked-> userProfile.porkRestriction)
-      @b3.checkbox( profileForm("beefRestriction"), '_text -> "Don't eat beef", 'checked-> userProfile.beefRestriction)
-      @b3.checkbox( profileForm("chickenRestriction"), '_text -> "Don't eat chicken", 'checked-> userProfile.chickenRestriction)
-      @b3.checkbox( profileForm("glutenRestriction"), '_text -> "Gluten intolerant", 'checked-> userProfile.glutenRestriction)
-      @b3.checkbox( profileForm("lactoseRestriction"), '_text -> "Lactose intolerant", 'checked-> userProfile.lactoseRestriction)
-      @b3.text( profileForm("otherRestriction"), '_label -> "Any other important food allergies:", 'placeholder -> "Optional", 'value -> userProfile.otherRestriction.getOrElse(""))
+      @b4.checkbox( profileForm("vegetarian"), Symbol("_text") -> "Vegetarian", Symbol("checked")-> userProfile.vegetarian)
+      @b4.checkbox( profileForm("seaFoodRestriction"), Symbol("_text") -> "Sea food allergic", Symbol("checked")-> userProfile.seaFoodRestriction)
+      @b4.checkbox( profileForm("porkRestriction"), Symbol("_text") -> "Don't eat pork", Symbol("checked")-> userProfile.porkRestriction)
+      @b4.checkbox( profileForm("beefRestriction"), Symbol("_text") -> "Don't eat beef", Symbol("checked")-> userProfile.beefRestriction)
+      @b4.checkbox( profileForm("chickenRestriction"), Symbol("_text") -> "Don't eat chicken", Symbol("checked")-> userProfile.chickenRestriction)
+      @b4.checkbox( profileForm("glutenRestriction"), Symbol("_text") -> "Gluten intolerant", Symbol("checked")-> userProfile.glutenRestriction)
+      @b4.checkbox( profileForm("lactoseRestriction"), Symbol("_text") -> "Lactose intolerant", Symbol("checked")-> userProfile.lactoseRestriction)
+      @b4.text( profileForm("otherRestriction"), Symbol("_label") -> "Any other important food allergies:", Symbol("placeholder") -> "Optional", Symbol("value") -> userProfile.otherRestriction.getOrElse(""))
 
-      @b3.submit('class -> "btn btn-primary"){ <span class="glyphicon glyphicon-ok"></span> Save }
+      @b4.submit(Symbol("class") -> "btn btn-primary"){ <span class="glyphicon glyphicon-ok"></span> Save }
     </div>
   }
 }

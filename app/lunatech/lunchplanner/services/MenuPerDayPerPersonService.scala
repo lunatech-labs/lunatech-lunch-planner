@@ -1,17 +1,13 @@
 package lunatech.lunchplanner.services
 
+import lunatech.lunchplanner.common.DBConnection
+import lunatech.lunchplanner.models._
+import lunatech.lunchplanner.persistence.{ MenuDishTable, MenuPerDayPerPersonTable }
+
 import java.sql.Date
 import java.text.SimpleDateFormat
 import java.util.UUID
 import javax.inject.Inject
-
-import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models._
-import lunatech.lunchplanner.persistence.{
-  MenuDishTable,
-  MenuPerDayPerPersonTable
-}
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

@@ -1,24 +1,17 @@
 package lunatech.lunchplanner.schedulers.actors
 
 import akka.actor.Actor
-import lunatech.lunchplanner.services.{
-  MenuPerDayPerPersonService,
-  SlackService,
-  UserService
-}
-import play.api.libs.ws.WSClient
-import play.api.Logger
+import lunatech.lunchplanner.services.{ MenuPerDayPerPersonService, SlackService, UserService }
+import play.api.Logging
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.util.{Failure, Success}
+import scala.util.{ Failure, Success }
 
-class LunchBotActor(ws: WSClient,
-                    hostName: String,
-                    userService: UserService,
+class LunchBotActor(userService: UserService,
                     menuPerDayPerPersonService: MenuPerDayPerPersonService,
                     slackService: SlackService)
-    extends Actor {
+    extends Actor with Logging {
 
   override def receive: Receive = {
     case StartBot => act()
@@ -32,9 +25,9 @@ class LunchBotActor(ws: WSClient,
     val response = postMessages(channelIds)
     response onComplete {
       case Success(res) =>
-        Logger.info(res)
+        logger.info(res)
       case Failure(exception) =>
-        Logger.error(exception.getMessage, exception)
+        logger.error(exception.getMessage, exception)
     }
   }
 

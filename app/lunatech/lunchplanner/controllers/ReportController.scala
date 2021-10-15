@@ -1,22 +1,21 @@
 package lunatech.lunchplanner.controllers
 
-import java.io.ByteArrayInputStream
-
 import akka.stream.scaladsl.StreamConverters
-import javax.inject.Inject
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.data.Month
 import lunatech.lunchplanner.models.ReportDate
 import lunatech.lunchplanner.services._
 import lunatech.lunchplanner.viewModels.ReportForm
-import org.joda.time.DateTime
 import play.api.data.Form
 import play.api.http.HttpEntity
 import play.api.i18n.I18nSupport
 import play.api.mvc._
-import play.api.{Configuration, Environment}
+import play.api.{ Configuration, Environment }
 import play.mvc.Http
 
+import java.io.ByteArrayInputStream
+import java.time.LocalDateTime
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -27,8 +26,7 @@ class ReportController @Inject()(userService: UserService,
                                  reportService: ReportService,
                                  val controllerComponents: ControllerComponents,
                                  val environment: Environment,
-                                 val configuration: Configuration,
-                                 implicit val connection: DBConnection)
+                                 val configuration: Configuration)
     extends BaseController
     with Secured
     with I18nSupport {
@@ -61,8 +59,9 @@ class ReportController @Inject()(userService: UserService,
 
   def filterAttendees: EssentialAction = userAction.async { implicit request =>
     def hasErrors: Form[ReportDate] => Future[Result] = { _ =>
-      Future(Redirect(
-        lunatech.lunchplanner.controllers.routes.ReportController.getReport()))
+      Future(
+        Redirect(
+          lunatech.lunchplanner.controllers.routes.ReportController.getReport))
     }
 
     def success: ReportDate => Future[Result] = {
@@ -70,13 +69,12 @@ class ReportController @Inject()(userService: UserService,
         val session = updateSession(request.session, selectedReportDate)
         Future {
           Redirect(
-            lunatech.lunchplanner.controllers.routes.ReportController
-              .getReport())
+            lunatech.lunchplanner.controllers.routes.ReportController.getReport)
             .withSession(session)
         }
     }
 
-    ReportForm.reportForm.bindFromRequest.fold(hasErrors, success)
+    ReportForm.reportForm.bindFromRequest().fold(hasErrors, success)
   }
 
   def export: EssentialAction = adminAction.async { implicit request =>
@@ -104,8 +102,10 @@ class ReportController @Inject()(userService: UserService,
       )
   }
 
-  private def getDefaultDate: ReportDate =
-    ReportDate(month = DateTime.now.getMonthOfYear, year = DateTime.now.getYear)
+  private def getDefaultDate: ReportDate = {
+    val currentDate = LocalDateTime.now()
+    ReportDate(month = currentDate.getMonthValue, year = currentDate.getYear)
+  }
 
   private def getMonth(session: Session): Int =
     session.get(month).map(_.toInt).getOrElse(getDefaultDate.month)

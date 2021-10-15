@@ -1,18 +1,17 @@
 package lunatech.lunchplanner.services
 
-import java.text.SimpleDateFormat
-import java.util.UUID
-
-import javax.inject.Inject
-import lunatech.lunchplanner.models.{MenuPerDay, MenuPerDayPerPerson, User}
+import lunatech.lunchplanner.models.{ MenuPerDay, MenuPerDayPerPerson, User }
 import lunatech.lunchplanner.viewModels._
-import play.api.{Configuration, Logger}
 import play.api.http.ContentTypes
 import play.api.libs.json.JsValue
 import play.api.libs.ws.WSClient
+import play.api.{ Configuration, Logging }
 import play.mvc.Http.HeaderNames
 import scalaz.Monad
 
+import java.text.SimpleDateFormat
+import java.util.UUID
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -21,7 +20,7 @@ class SlackService @Inject()(
     val menuPerDayPerPersonService: MenuPerDayPerPersonService,
     val menuPerDayService: MenuPerDayService,
     val ws: WSClient,
-    val configuration: Configuration) {
+    val configuration: Configuration) extends Logging {
 
   val token: String = configuration.get[String]("slack.api.token")
   val sdf = new SimpleDateFormat("dd-MM-yyyy")
@@ -133,7 +132,7 @@ class SlackService @Inject()(
     response.action.headOption
       .map(_.value)
       .fold {
-        Logger.error(s"Empty slack response ${response}")
+        logger.error(s"Empty slack response ${response}")
         ""
       }(identity)
 
@@ -143,7 +142,7 @@ class SlackService @Inject()(
       .find { case (uuid, _) => uuid == UUID.fromString(menuUuid) }
       .map(_._2)
       .fold {
-        Logger.error(
+        logger.error(
           s"Error computing response for slack action with menu uuid $menuUuid")
         ""
       }(identity)

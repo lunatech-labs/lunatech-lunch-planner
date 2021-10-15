@@ -1,21 +1,14 @@
 package lunatech.lunchplanner.controllers
 
-import javax.inject.Inject
-
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.User
-import lunatech.lunchplanner.services.{MenuPerDayPerPersonService, UserService}
+import lunatech.lunchplanner.services.{ MenuPerDayPerPersonService, UserService }
 import lunatech.lunchplanner.viewModels.MenuPerDayPerPersonForm
-import play.api.i18n.{I18nSupport, Messages}
-import play.api.mvc.{
-  Action,
-  AnyContent,
-  BaseController,
-  ControllerComponents,
-  Flash
-}
-import play.api.{Configuration, Environment}
+import play.api.i18n.{ I18nSupport, Messages }
+import play.api.mvc.{ Action, AnyContent, BaseController, ControllerComponents, Flash }
+import play.api.{ Configuration, Environment }
 
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

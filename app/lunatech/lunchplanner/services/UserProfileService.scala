@@ -1,13 +1,12 @@
 package lunatech.lunchplanner.services
 
-import java.util.UUID
-import javax.inject.Inject
-
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.{MenuPerDayDietRestrictions, UserProfile}
+import lunatech.lunchplanner.models.{ MenuPerDayDietRestrictions, UserProfile }
 import lunatech.lunchplanner.persistence.UserProfileTable
 import play.api.Configuration
 
+import java.util.UUID
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

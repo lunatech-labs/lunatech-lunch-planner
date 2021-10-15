@@ -1,12 +1,13 @@
 package lunatech.lunchplanner.services
 
-import javax.inject.Inject
 import lunatech.lunchplanner.configuration.MonthlyReportEmailConfiguration
 import org.apache.commons.mail.EmailAttachment
-import play.api.Logger
-import play.api.libs.mailer.{AttachmentData, Email, MailerClient}
+import play.api.Logging
+import play.api.libs.mailer.{ AttachmentData, Email, MailerClient }
 
-class EmailService @Inject()(mailerClient: MailerClient) {
+import javax.inject.Inject
+
+class EmailService @Inject()(mailerClient: MailerClient) extends Logging {
 
   def sendMessageWithAttachment(
       emailConfiguration: MonthlyReportEmailConfiguration,
@@ -29,7 +30,7 @@ class EmailService @Inject()(mailerClient: MailerClient) {
       )
 
     val result = mailerClient.send(message)
-    Logger.info(
+    logger.info(
       s"Monthly report sent to [${emailConfiguration.to.mkString(", ")}]")
     result
   }

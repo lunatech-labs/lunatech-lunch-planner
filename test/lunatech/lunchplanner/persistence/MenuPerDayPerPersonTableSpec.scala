@@ -8,7 +8,6 @@ import org.scalacheck.Prop._
 
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
-import shapeless.contrib.scalacheck._
 
 object MenuPerDayPerPersonTableSpec extends Properties(name = "MenuPerDayPerPerson") with PropertyTestingConfig {
 
