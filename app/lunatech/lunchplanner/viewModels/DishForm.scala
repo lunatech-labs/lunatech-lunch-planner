@@ -1,9 +1,9 @@
 package lunatech.lunchplanner.viewModels
 
 import play.api.data.Form
-import play.api.data.Forms.{ mapping, optional, text, _ }
+import play.api.data.Forms.{mapping, optional, text, _}
 import play.api.data.format.Formats._
-import play.api.libs.json.{ Json, OFormat }
+import play.api.libs.json.{Json, OFormat}
 
 import java.util.UUID
 
@@ -26,17 +26,17 @@ object DishForm {
 
   val dishForm = Form(
     mapping(
-      "name" -> nonEmptyText,
-      "description" -> nonEmptyText,
+      "name"         -> nonEmptyText,
+      "description"  -> nonEmptyText,
       "isVegetarian" -> boolean,
-      "isHalal" -> boolean,
-      "hasSeaFood" -> boolean,
-      "hasPork" -> boolean,
-      "hasBeef" -> boolean,
-      "hasChicken" -> boolean,
+      "isHalal"      -> boolean,
+      "hasSeaFood"   -> boolean,
+      "hasPork"      -> boolean,
+      "hasBeef"      -> boolean,
+      "hasChicken"   -> boolean,
       "isGlutenFree" -> boolean,
-      "hasLactose" -> boolean,
-      "remarks" -> optional(text)
+      "hasLactose"   -> boolean,
+      "remarks"      -> optional(text)
     )(DishForm.apply)(DishForm.unapply)
   )
 }

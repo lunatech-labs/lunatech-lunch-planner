@@ -74,8 +74,10 @@ object MenuPerDayTableSpec
 
       // skipping adding menuPerDay to DB
 
-      val result = Await.result(MenuPerDayTable.getByMenuUuid(menuPerDay.uuid),
-                                defaultTimeout)
+      val result = Await.result(
+        MenuPerDayTable.getByMenuUuid(menuPerDay.uuid),
+        defaultTimeout
+      )
 
       dropTestSchema()
 
@@ -88,8 +90,10 @@ object MenuPerDayTableSpec
 
       val menuPerDayToAdd = addMenuAndMenuPerDayToDB(menu, menuPerDay)
 
-      val result = Await.result(MenuPerDayTable.getByDate(menuPerDayToAdd.date),
-                                defaultTimeout)
+      val result = Await.result(
+        MenuPerDayTable.getByDate(menuPerDayToAdd.date),
+        defaultTimeout
+      )
 
       dropTestSchema()
 
@@ -140,17 +144,22 @@ object MenuPerDayTableSpec
       val menuPerDayToAddBiggerDate =
         menuPerDay2.copy(menuUuid = menu.uuid, date = new Date(maxDate))
       Await.result(MenuPerDayTable.add(menuPerDayToSmallerDate), defaultTimeout)
-      Await.result(MenuPerDayTable.add(menuPerDayToAddBiggerDate),
-                   defaultTimeout)
+      Await.result(
+        MenuPerDayTable.add(menuPerDayToAddBiggerDate),
+        defaultTimeout
+      )
 
-      val result = Await.result(MenuPerDayTable.getAllOrderedByDateAscending,
-                                defaultTimeout)
+      val result = Await.result(
+        MenuPerDayTable.getAllOrderedByDateAscending,
+        defaultTimeout
+      )
 
       dropTestSchema()
 
       result.map(_.date.toString) == Seq(
         menuPerDayToSmallerDate,
-        menuPerDayToAddBiggerDate).map(_.date.toString)
+        menuPerDayToAddBiggerDate
+      ).map(_.date.toString)
   }
 
   property("query all future menus per day ordered by date ascending") =
@@ -171,13 +180,16 @@ object MenuPerDayTableSpec
       Await.result(MenuPerDayTable.add(menuPerDayToAddPast), defaultTimeout)
 
       val result =
-        Await.result(MenuPerDayTable.getAllFutureAndOrderedByDateAscending,
-                     defaultTimeout)
+        Await.result(
+          MenuPerDayTable.getAllFutureAndOrderedByDateAscending,
+          defaultTimeout
+        )
 
       dropTestSchema()
 
       result.map(_.date.toString) == Seq(menuPerDayToAddFuture).map(
-        _.date.toString)
+        _.date.toString
+      )
     }
 
   property("remove an existing menu per day by uuid") = forAll {
@@ -187,8 +199,10 @@ object MenuPerDayTableSpec
       val menuPerDayToAdd = addMenuAndMenuPerDayToDB(menu, menuPerDay)
 
       val result =
-        Await.result(MenuPerDayTable.removeByUuid(menuPerDayToAdd.uuid),
-                     defaultTimeout)
+        Await.result(
+          MenuPerDayTable.removeByUuid(menuPerDayToAdd.uuid),
+          defaultTimeout
+        )
       val getByUuid = Await
         .result(MenuPerDayTable.getByUuid(menuPerDayToAdd.uuid), defaultTimeout)
         .get
@@ -199,19 +213,21 @@ object MenuPerDayTableSpec
   }
 
   property(
-    "not fail when trying to remove a menu per day that does not exist") =
-    forAll { menuPerDay: MenuPerDay =>
-      createTestSchema()
+    "not fail when trying to remove a menu per day that does not exist"
+  ) = forAll { menuPerDay: MenuPerDay =>
+    createTestSchema()
 
-      // skipping adding menuPerDay to DB
+    // skipping adding menuPerDay to DB
 
-      val result = Await.result(MenuPerDayTable.removeByUuid(menuPerDay.uuid),
-                                defaultTimeout)
+    val result = Await.result(
+      MenuPerDayTable.removeByUuid(menuPerDay.uuid),
+      defaultTimeout
+    )
 
-      dropTestSchema()
+    dropTestSchema()
 
-      result == 0
-    }
+    result == 0
+  }
 
   property("remove existing menu per day by menu uuid") = forAll {
     (menu: Menu, menuPerDay1: MenuPerDay, menuPerDay2: MenuPerDay) =>
@@ -224,8 +240,10 @@ object MenuPerDayTableSpec
       Await.result(MenuPerDayTable.add(menuPerDayToAdd1), defaultTimeout)
       Await.result(MenuPerDayTable.add(menuPerDayToAdd2), defaultTimeout)
 
-      val result = Await.result(MenuPerDayTable.removeByMenuUuid(menu.uuid),
-                                defaultTimeout)
+      val result = Await.result(
+        MenuPerDayTable.removeByMenuUuid(menu.uuid),
+        defaultTimeout
+      )
 
       dropTestSchema()
 
@@ -250,13 +268,15 @@ object MenuPerDayTableSpec
 //    result.date.toLocalDate == new Date(newDate).toLocalDate
 //  }
 
-  private def addMenuAndMenuPerDayToDB(menu: Menu,
-                                       menuPerDay: MenuPerDay): MenuPerDay = {
+  private def addMenuAndMenuPerDayToDB(
+      menu: Menu,
+      menuPerDay: MenuPerDay
+  ): MenuPerDay = {
     import scala.concurrent.ExecutionContext.Implicits.global
 
     val menuPerDayToAdd = menuPerDay.copy(menuUuid = menu.uuid)
     val query = for {
-      _ <- MenuTable.add(menu)
+      _               <- MenuTable.add(menu)
       addedMenuPerDay <- MenuPerDayTable.add(menuPerDayToAdd)
     } yield addedMenuPerDay
 

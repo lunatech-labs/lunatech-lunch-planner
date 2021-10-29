@@ -2,28 +2,30 @@ package lunatech.lunchplanner.services
 
 import lunatech.lunchplanner.configuration.EmailConfiguration
 import play.api.i18n.MessagesApi
-import play.api.{ Configuration, Logging }
+import play.api.{Configuration, Logging}
 
 import java.time.LocalDateTime
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class MonthlyReportService @Inject()(val configuration: Configuration,
-                                     val messagesApi: MessagesApi,
-                                     reportService: ReportService,
-                                     emailService: EmailService,
-                                     emailConfiguration: EmailConfiguration) extends Logging {
-  val oneMonth = 1
+class MonthlyReportService @Inject() (
+    val configuration: Configuration,
+    val messagesApi: MessagesApi,
+    reportService: ReportService,
+    emailService: EmailService,
+    emailConfiguration: EmailConfiguration
+) extends Logging {
+  val oneMonth      = 1
   val fileExtension = "xls"
 
   def sendMonthlyReport(): Future[Unit] = {
     val (month, year) = getPreviousMonthAndYear
-    val monthName = fromMonthNumberToName(month)
+    val monthName     = fromMonthNumberToName(month)
 
     val emailConf = emailConfiguration.getMonthlyReportEmailConfiguration()
     val emailConfWithMonth = emailConf.copy(
-      subject = emailConf.subject + s" for the month of $monthName",
+      subject = emailConf.subject + s" for the month of $monthName"
     )
     val messageBody =
       s"Please find the lunch planner monthly report attached, for the month of $monthName."
@@ -33,20 +35,23 @@ class MonthlyReportService @Inject()(val configuration: Configuration,
     getLastAvailableReport(month, year).map { reportData =>
       logger.info("Monthly report data generated.")
 
-      emailService.sendMessageWithAttachment(emailConfWithMonth,
-                                             messageBody,
-                                             attachmentName,
-                                             reportData)
+      emailService.sendMessageWithAttachment(
+        emailConfWithMonth,
+        messageBody,
+        attachmentName,
+        reportData
+      )
     }
   }
 
-  private def getLastAvailableReport(month: Int,
-                                     year: Int): Future[Array[Byte]] = {
+  private def getLastAvailableReport(
+      month: Int,
+      year: Int
+  ): Future[Array[Byte]] =
     for {
-      totalAttendees <- reportService.getReportByLocationAndDate(month, year)
+      totalAttendees    <- reportService.getReportByLocationAndDate(month, year)
       totalNotAttending <- reportService.getReportForNotAttending(month, year)
     } yield reportService.exportToExcel(totalAttendees, totalNotAttending)
-  }
 
   private def getPreviousMonthAndYear: (Int, Int) = {
     val previousMonth = LocalDateTime.now().minusMonths(oneMonth)

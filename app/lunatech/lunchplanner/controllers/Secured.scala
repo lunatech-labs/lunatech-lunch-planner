@@ -3,7 +3,7 @@ package lunatech.lunchplanner.controllers
 import com.lunatech.openconnect.GoogleSecured
 import lunatech.lunchplanner.models.User
 import play.api.Configuration
-import play.api.mvc.{ ControllerComponents, Request, Result, Results }
+import play.api.mvc.{ControllerComponents, Request, Result, Results}
 
 trait Secured extends GoogleSecured {
 
@@ -18,9 +18,11 @@ trait Secured extends GoogleSecured {
       .Redirect(routes.Application.index())
       .flashing("error" -> "You are not an admin!")
 
-  def getCurrentUser(optionUser: Option[User],
-                     isAdmin: Boolean,
-                     emailAddress: String): User = {
+  def getCurrentUser(
+      optionUser: Option[User],
+      isAdmin: Boolean,
+      emailAddress: String
+  ): User = {
     val user = optionUser.map(_.copy(isAdmin = isAdmin))
     user.getOrElse(User(name = "", emailAddress = emailAddress))
   }

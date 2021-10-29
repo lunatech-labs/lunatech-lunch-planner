@@ -9,12 +9,12 @@ import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class MenuPerDayService @Inject()(menuService: MenuService)(
-    implicit val connection: DBConnection) {
+class MenuPerDayService @Inject() (menuService: MenuService)(implicit
+    val connection: DBConnection
+) {
 
-  def add(menuPerDay: MenuPerDay): Future[MenuPerDay] = {
+  def add(menuPerDay: MenuPerDay): Future[MenuPerDay] =
     MenuPerDayTable.add(menuPerDay)
-  }
 
   def getAll: Future[Seq[MenuPerDay]] = MenuPerDayTable.getAll
 
@@ -23,16 +23,21 @@ class MenuPerDayService @Inject()(menuService: MenuService)(
 
   def getAllOrderedByDateFilterDateRange(
       dateStart: Date,
-      dateEnd: Date): Future[Seq[MenuPerDay]] =
-    MenuPerDayTable.getAllFilteredDateRangeOrderedDateAscending(dateStart,
-                                                                dateEnd)
+      dateEnd: Date
+  ): Future[Seq[MenuPerDay]] =
+    MenuPerDayTable.getAllFilteredDateRangeOrderedDateAscending(
+      dateStart,
+      dateEnd
+    )
 
   def getAllOrderedByDateFilterDateRangeWithDeleted(
       dateStart: Date,
-      dateEnd: Date): Future[Seq[MenuPerDay]] =
+      dateEnd: Date
+  ): Future[Seq[MenuPerDay]] =
     MenuPerDayTable.getAllFilteredDateRangeOrderedDateAscendingWithDeleted(
       dateStart,
-      dateEnd)
+      dateEnd
+    )
 
   def getMenuPerDayByUuid(uuid: UUID): Future[Option[MenuPerDay]] =
     MenuPerDayTable.getByUuid(uuid)
@@ -40,13 +45,11 @@ class MenuPerDayService @Inject()(menuService: MenuService)(
   def getAllByMenuUuid(menuUuid: UUID): Future[Seq[MenuPerDay]] =
     MenuPerDayTable.getByMenuUuid(menuUuid)
 
-  def getMenuForUpcomingSchedule: Future[Seq[(MenuPerDay, String)]] = {
+  def getMenuForUpcomingSchedule: Future[Seq[(MenuPerDay, String)]] =
     MenuPerDayTable.getMenuForUpcomingSchedule
-  }
 
-  def update(uuid: UUID, menuPerDay: MenuPerDay): Future[Boolean] = {
+  def update(uuid: UUID, menuPerDay: MenuPerDay): Future[Boolean] =
     MenuPerDayTable.update(menuPerDay.copy(uuid))
-  }
 
   def deleteByMenuUuid(menuUuid: UUID): Future[Int] =
     MenuPerDayTable.removeByMenuUuid(menuUuid)
@@ -54,8 +57,9 @@ class MenuPerDayService @Inject()(menuService: MenuService)(
   def delete(uuid: UUID): Future[Int] =
     MenuPerDayTable.removeByUuid(uuid)
 
-  def getAllAvailableDatesWithinRange(dateStart: Date,
-                                      dateEnd: Date): Future[Seq[Date]] = {
+  def getAllAvailableDatesWithinRange(
+      dateStart: Date,
+      dateEnd: Date
+  ): Future[Seq[Date]] =
     MenuPerDayTable.getAllAvailableDatesWithinRange(dateStart, dateEnd)
-  }
 }

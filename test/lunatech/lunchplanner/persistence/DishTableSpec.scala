@@ -10,7 +10,9 @@ import org.scalacheck.Prop._
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object DishTableSpec extends Properties(name = "Dish") with PropertyTestingConfig {
+object DishTableSpec
+    extends Properties(name = "Dish")
+    with PropertyTestingConfig {
   import lunatech.lunchplanner.data.TableDataGenerator._
 
   property("add a new dish") = forAll { dish: Dish =>
@@ -27,7 +29,8 @@ object DishTableSpec extends Properties(name = "Dish") with PropertyTestingConfi
     createTestSchema()
 
     addDishToDB(dish)
-    val result = Await.result(DishTable.getByUuid(dish.uuid), defaultTimeout).get
+    val result =
+      Await.result(DishTable.getByUuid(dish.uuid), defaultTimeout).get
 
     dropTestSchema()
 
@@ -38,11 +41,12 @@ object DishTableSpec extends Properties(name = "Dish") with PropertyTestingConfi
     createTestSchema()
 
     Await.result(
-      for{
+      for {
         _ <- DishTable.add(dish1)
         _ <- DishTable.add(dish2)
-      } yield(),
-      defaultTimeout)
+      } yield (),
+      defaultTimeout
+    )
 
     val result = Await.result(DishTable.getAll, defaultTimeout)
 
@@ -57,33 +61,41 @@ object DishTableSpec extends Properties(name = "Dish") with PropertyTestingConfi
     createTestSchema()
 
     addDishToDB(dish)
-    val dishesRemoved = Await.result(DishTable.removeByUuid(dish.uuid), defaultTimeout)
-    val getByUuis = Await.result(DishTable.getByUuid(dish.uuid), defaultTimeout).get
+    val dishesRemoved =
+      Await.result(DishTable.removeByUuid(dish.uuid), defaultTimeout)
+    val getByUuis =
+      Await.result(DishTable.getByUuid(dish.uuid), defaultTimeout).get
 
     dropTestSchema()
 
     dishesRemoved == 1 && getByUuis.isDeleted
   }
 
-  property("not fail when trying to remove a dish that does not exist") = forAll { dish: Dish =>
-    createTestSchema()
+  property("not fail when trying to remove a dish that does not exist") =
+    forAll { dish: Dish =>
+      createTestSchema()
 
-    val dishesRemoved = Await.result(DishTable.removeByUuid(UUID.randomUUID), defaultTimeout)
+      val dishesRemoved =
+        Await.result(DishTable.removeByUuid(UUID.randomUUID), defaultTimeout)
 
-    dropTestSchema()
+      dropTestSchema()
 
-    dishesRemoved == 0
-  }
+      dishesRemoved == 0
+    }
 
   property("update an existing dish by uuid") = forAll { dish: Dish =>
     createTestSchema()
 
     addDishToDB(dish)
-    val isDishUpdated = Await.result(DishTable.update(dish.copy(description = "updated description")), defaultTimeout)
+    val isDishUpdated = Await.result(
+      DishTable.update(dish.copy(description = "updated description")),
+      defaultTimeout
+    )
 
     assert(isDishUpdated)
 
-    val updatedDish = Await.result(DishTable.getByUuid(dish.uuid), defaultTimeout).get
+    val updatedDish =
+      Await.result(DishTable.getByUuid(dish.uuid), defaultTimeout).get
 
     dropTestSchema()
 
@@ -91,5 +103,6 @@ object DishTableSpec extends Properties(name = "Dish") with PropertyTestingConfi
 
   }
 
-  private def addDishToDB(dish: Dish): Dish = Await.result(DishTable.add(dish), defaultTimeout)
+  private def addDishToDB(dish: Dish): Dish =
+    Await.result(DishTable.add(dish), defaultTimeout)
 }

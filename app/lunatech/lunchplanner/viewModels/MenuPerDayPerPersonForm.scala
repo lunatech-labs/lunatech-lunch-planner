@@ -1,9 +1,9 @@
 package lunatech.lunchplanner.viewModels
 
 import play.api.data.Form
-import play.api.data.Forms.{ mapping, _ }
+import play.api.data.Forms.{mapping, _}
 import play.api.data.format.Formats._
-import play.api.libs.json.{ Json, OFormat }
+import play.api.libs.json.{Json, OFormat}
 
 import java.util.UUID
 
@@ -18,7 +18,7 @@ object MenuPerDayPerPersonForm {
 
   val menuPerDayPerPersonForm = Form(
     mapping(
-      "menuPerDayUuids" -> list(of[UUID]),
+      "menuPerDayUuids"             -> list(of[UUID]),
       "menuPerDayUuidsNotAttending" -> list(text)
     )(MenuPerDayPerPersonForm.apply)(MenuPerDayPerPersonForm.unapply)
   )

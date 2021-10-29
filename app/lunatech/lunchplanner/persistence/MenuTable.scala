@@ -3,7 +3,7 @@ package lunatech.lunchplanner.persistence
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.Menu
 import slick.jdbc.PostgresProfile.api._
-import slick.lifted.{ ProvenShape, TableQuery }
+import slick.lifted.{ProvenShape, TableQuery}
 
 import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -28,24 +28,26 @@ object MenuTable {
     connection.db.run(query).map(_ => menu)
   }
 
-  def getByUUID(uuid: UUID)(
-      implicit connection: DBConnection): Future[Option[Menu]] = {
+  def getByUUID(
+      uuid: UUID
+  )(implicit connection: DBConnection): Future[Option[Menu]] = {
     val query = menuTable.filter(_.uuid === uuid)
     connection.db.run(query.result.headOption)
   }
 
-  def getByName(name: String)(
-      implicit connection: DBConnection): Future[Option[Menu]] = {
+  def getByName(
+      name: String
+  )(implicit connection: DBConnection): Future[Option[Menu]] = {
     val query = menuTable.filter(_.name === name)
     connection.db.run(query.result.headOption)
   }
 
-  def getAll(implicit connection: DBConnection): Future[Seq[Menu]] = {
+  def getAll(implicit connection: DBConnection): Future[Seq[Menu]] =
     connection.db.run(menuTable.filter(_.isDeleted === false).result)
-  }
 
-  def removeByUuid(uuid: UUID)(
-      implicit connection: DBConnection): Future[Int] = {
+  def removeByUuid(
+      uuid: UUID
+  )(implicit connection: DBConnection): Future[Int] = {
     val query = menuTable.filter(_.uuid === uuid).map(_.isDeleted).update(true)
     connection.db.run(query)
   }

@@ -3,7 +3,7 @@ package lunatech.lunchplanner.persistence
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.Dish
 import slick.jdbc.PostgresProfile.api._
-import slick.lifted.{ ProvenShape, TableQuery }
+import slick.lifted.{ProvenShape, TableQuery}
 
 import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -37,19 +37,21 @@ class DishTable(tag: Tag) extends Table[Dish](tag, _tableName = "Dish") {
   def isDeleted: Rep[Boolean] = column[Boolean]("isDeleted")
 
   def * : ProvenShape[Dish] =
-    (uuid,
-     name,
-     description,
-     isVegetarian,
-     isHalal,
-     hasSeaFood,
-     hasPork,
-     hasBeef,
-     hasChicken,
-     isGlutenFree,
-     hasLactose,
-     remarks,
-     isDeleted) <> ((Dish.apply _).tupled, Dish.unapply)
+    (
+      uuid,
+      name,
+      description,
+      isVegetarian,
+      isHalal,
+      hasSeaFood,
+      hasPork,
+      hasBeef,
+      hasChicken,
+      isGlutenFree,
+      hasLactose,
+      remarks,
+      isDeleted
+    ) <> ((Dish.apply _).tupled, Dish.unapply)
 }
 
 object DishTable {
@@ -60,18 +62,19 @@ object DishTable {
     connection.db.run(query).map(_ => dish)
   }
 
-  def getByUuid(uuid: UUID)(
-      implicit connection: DBConnection): Future[Option[Dish]] = {
+  def getByUuid(
+      uuid: UUID
+  )(implicit connection: DBConnection): Future[Option[Dish]] = {
     val query = dishTable.filter(_.uuid === uuid)
     connection.db.run(query.result.headOption)
   }
 
-  def getAll(implicit connection: DBConnection): Future[Seq[Dish]] = {
+  def getAll(implicit connection: DBConnection): Future[Seq[Dish]] =
     connection.db.run(dishTable.filter(_.isDeleted === false).result)
-  }
 
-  def removeByUuid(uuid: UUID)(
-      implicit connection: DBConnection): Future[Int] = {
+  def removeByUuid(
+      uuid: UUID
+  )(implicit connection: DBConnection): Future[Int] = {
     val query = dishTable.filter(_.uuid === uuid).map(_.isDeleted).update(true)
     connection.db.run(query)
   }
@@ -79,33 +82,38 @@ object DishTable {
   def update(dish: Dish)(implicit connection: DBConnection): Future[Boolean] = {
     val query = dishTable
       .filter(_.uuid === dish.uuid)
-      .map(
-        d =>
-          (d.name,
-           d.description,
-           d.isVegetarian,
-           d.isHalal,
-           d.hasSeaFood,
-           d.hasPork,
-           d.hasBeef,
-           d.hasChicken,
-           d.isGlutenFree,
-           d.hasLactose,
-           d.remarks,
-           d.isDeleted))
+      .map(d =>
+        (
+          d.name,
+          d.description,
+          d.isVegetarian,
+          d.isHalal,
+          d.hasSeaFood,
+          d.hasPork,
+          d.hasBeef,
+          d.hasChicken,
+          d.isGlutenFree,
+          d.hasLactose,
+          d.remarks,
+          d.isDeleted
+        )
+      )
       .update(
-        (dish.name,
-         dish.description,
-         dish.isVegetarian,
-         dish.isHalal,
-         dish.hasSeaFood,
-         dish.hasPork,
-         dish.hasBeef,
-         dish.hasChicken,
-         dish.isGlutenFree,
-         dish.hasLactose,
-         dish.remarks,
-         dish.isDeleted))
+        (
+          dish.name,
+          dish.description,
+          dish.isVegetarian,
+          dish.isHalal,
+          dish.hasSeaFood,
+          dish.hasPork,
+          dish.hasBeef,
+          dish.hasChicken,
+          dish.isGlutenFree,
+          dish.hasLactose,
+          dish.remarks,
+          dish.isDeleted
+        )
+      )
     connection.db.run(query).map(_ == 1)
   }
 }

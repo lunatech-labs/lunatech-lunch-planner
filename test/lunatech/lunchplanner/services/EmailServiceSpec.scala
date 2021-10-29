@@ -14,9 +14,9 @@ class EmailServiceSpec extends BehaviorTestingConfig with BeforeAndAfterEach {
   val emailConfiguration = MonthlyReportEmailConfiguration(
     "email subject",
     "from@emailLunatech.nl",
-    Seq("to@reportClien.com"),
+    Seq("to@reportClien.com")
   )
-  val messageBody = "This is the message body!"
+  val messageBody    = "This is the message body!"
   val attachmentName = "attachmentName.txt"
   val attachmentData = "This is the attachment data".getBytes
 

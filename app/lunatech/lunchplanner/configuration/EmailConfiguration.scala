@@ -4,11 +4,13 @@ import play.api.Configuration
 
 import javax.inject.Inject
 
-case class MonthlyReportEmailConfiguration(subject: String,
-                                           from: String,
-                                           to: Seq[String])
+case class MonthlyReportEmailConfiguration(
+    subject: String,
+    from: String,
+    to: Seq[String]
+)
 
-class EmailConfiguration @Inject()(val configuration: Configuration) {
+class EmailConfiguration @Inject() (val configuration: Configuration) {
   def getMonthlyReportEmailConfiguration(): MonthlyReportEmailConfiguration =
     MonthlyReportEmailConfiguration(
       subject = configuration.get[String]("monthly-report-email.subject"),

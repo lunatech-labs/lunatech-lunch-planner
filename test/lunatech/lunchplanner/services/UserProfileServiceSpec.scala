@@ -8,7 +8,10 @@ import play.api.Configuration
 
 import scala.concurrent.Await
 
-class UserProfileServiceSpec extends BehaviorTestingConfig with BeforeAndAfterEach with MockFactory {
+class UserProfileServiceSpec
+    extends BehaviorTestingConfig
+    with BeforeAndAfterEach
+    with MockFactory {
   private val userProfileService = new UserProfileService()
 
   override def beforeEach(): Unit = createTestSchema()
@@ -17,7 +20,10 @@ class UserProfileServiceSpec extends BehaviorTestingConfig with BeforeAndAfterEa
 
   "user profile service" should {
     "return none when getting user profile by non-existent ulunatech.lunchplanner.persistence.UserProfileTableSpecser uuid" in {
-      val result = Await.result(userProfileService.getUserProfileByUserUuid(UUID.randomUUID), defaultTimeout)
+      val result = Await.result(
+        userProfileService.getUserProfileByUserUuid(UUID.randomUUID),
+        defaultTimeout
+      )
 
       result mustBe None
     }

@@ -5,7 +5,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
 
 trait BehaviorTestingConfig
-  extends MockFactory
+    extends MockFactory
     with Matchers
     with ScalaFutures
     with DBConnectionProvider

@@ -1,9 +1,9 @@
 package lunatech.lunchplanner.persistence
 
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.{ User, UserProfile }
+import lunatech.lunchplanner.models.{User, UserProfile}
 import slick.jdbc.PostgresProfile.api._
-import slick.lifted.{ ForeignKeyQuery, ProvenShape, TableQuery }
+import slick.lifted.{ForeignKeyQuery, ProvenShape, TableQuery}
 
 import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -37,36 +37,42 @@ class UserProfileTable(tag: Tag)
   def isDeleted: Rep[Boolean] = column[Boolean]("isDeleted")
 
   def userProfileUserForeignKey: ForeignKeyQuery[UserTable, User] =
-    foreignKey(name = "userProfileUser_fkey_",
-               sourceColumns = userUuid,
-               targetTableQuery = userTable)(_.uuid)
+    foreignKey(
+      name = "userProfileUser_fkey_",
+      sourceColumns = userUuid,
+      targetTableQuery = userTable
+    )(_.uuid)
 
   def * : ProvenShape[UserProfile] =
-    (userUuid,
-     vegetarian,
-     halal,
-     seaFoodRestriction,
-     porkRestriction,
-     beefRestriction,
-     chickenRestriction,
-     glutenRestriction,
-     lactoseRestriction,
-     otherRestriction,
-     isDeleted) <> ((UserProfile.apply _).tupled, UserProfile.unapply)
+    (
+      userUuid,
+      vegetarian,
+      halal,
+      seaFoodRestriction,
+      porkRestriction,
+      beefRestriction,
+      chickenRestriction,
+      glutenRestriction,
+      lactoseRestriction,
+      otherRestriction,
+      isDeleted
+    ) <> ((UserProfile.apply _).tupled, UserProfile.unapply)
 }
 
 object UserProfileTable {
   val userProfileTable: TableQuery[UserProfileTable] =
     TableQuery[UserProfileTable]
 
-  def add(userProfile: UserProfile)(
-      implicit connection: DBConnection): Future[UserProfile] = {
+  def add(
+      userProfile: UserProfile
+  )(implicit connection: DBConnection): Future[UserProfile] = {
     val query = userProfileTable += userProfile
     connection.db.run(query).map(_ => userProfile)
   }
 
-  def getByUserUUID(userUuid: UUID)(
-      implicit connection: DBConnection): Future[Option[UserProfile]] = {
+  def getByUserUUID(
+      userUuid: UUID
+  )(implicit connection: DBConnection): Future[Option[UserProfile]] = {
     val query = userProfileTable.filter(_.userUuid === userUuid)
     connection.db.run(query.result.headOption)
   }
@@ -74,8 +80,9 @@ object UserProfileTable {
   def getAll(implicit connection: DBConnection): Future[Seq[UserProfile]] =
     connection.db.run(userProfileTable.result)
 
-  def removeByUserUuid(userUuid: UUID)(
-      implicit connection: DBConnection): Future[Int] = {
+  def removeByUserUuid(
+      userUuid: UUID
+  )(implicit connection: DBConnection): Future[Int] = {
     val query = userProfileTable
       .filter(_.userUuid === userUuid)
       .map(_.isDeleted)
@@ -83,37 +90,43 @@ object UserProfileTable {
     connection.db.run(query)
   }
 
-  def update(userProfile: UserProfile)(
-      implicit connection: DBConnection): Future[Boolean] = {
+  def update(
+      userProfile: UserProfile
+  )(implicit connection: DBConnection): Future[Boolean] = {
     val query = userProfileTable
       .filter(_.userUuid === userProfile.userUuid)
-      .map(
-        up =>
-          (up.vegetarian,
-           up.seaFoodRestriction,
-           up.porkRestriction,
-           up.beefRestriction,
-           up.chickenRestriction,
-           up.glutenRestriction,
-           up.lactoseRestriction,
-           up.otherRestriction,
-           up.isDeleted))
+      .map(up =>
+        (
+          up.vegetarian,
+          up.seaFoodRestriction,
+          up.porkRestriction,
+          up.beefRestriction,
+          up.chickenRestriction,
+          up.glutenRestriction,
+          up.lactoseRestriction,
+          up.otherRestriction,
+          up.isDeleted
+        )
+      )
       .update(
-        (userProfile.vegetarian,
-         userProfile.seaFoodRestriction,
-         userProfile.porkRestriction,
-         userProfile.beefRestriction,
-         userProfile.chickenRestriction,
-         userProfile.glutenRestriction,
-         userProfile.lactoseRestriction,
-         userProfile.otherRestriction,
-         userProfile.isDeleted))
+        (
+          userProfile.vegetarian,
+          userProfile.seaFoodRestriction,
+          userProfile.porkRestriction,
+          userProfile.beefRestriction,
+          userProfile.chickenRestriction,
+          userProfile.glutenRestriction,
+          userProfile.lactoseRestriction,
+          userProfile.otherRestriction,
+          userProfile.isDeleted
+        )
+      )
     connection.db.run(query).map(_ == 1)
   }
 
-  def getRestrictionsByMenuPerDay(menuPerDayUuid: UUID)(
-      implicit connection: DBConnection)
-    : Future[Vector[(Int, Int, Int, Int, Int, Int, Int, Int)]] = {
+  def getRestrictionsByMenuPerDay(menuPerDayUuid: UUID)(implicit
+      connection: DBConnection
+  ): Future[Vector[(Int, Int, Int, Int, Int, Int, Int, Int)]] = {
     val query = sql"""SELECT
          SUM(case when vegetarian then 1 else 0 end) as "vegetarianCount",
          SUM(case when halal then 1 else 0 end) as "halalCount",

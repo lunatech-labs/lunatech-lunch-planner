@@ -35,6 +35,8 @@ final case class MenuPerDayDietRestrictions(
 final case class MenuPerDayAttendant(name: String, otherRestrictions: String)
 
 final case class MenuPerDayReport(name: String, date: Date)
-final case class MenuPerDayReportByDateAndLocation(date: Date,
-                                                   location: String,
-                                                   attendeeName: String)
+final case class MenuPerDayReportByDateAndLocation(
+    date: Date,
+    location: String,
+    attendeeName: String
+)

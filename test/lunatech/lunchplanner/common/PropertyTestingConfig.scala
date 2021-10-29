@@ -1,5 +1,5 @@
 package lunatech.lunchplanner.common
 
 trait PropertyTestingConfig
-  extends DBConnectionProvider
+    extends DBConnectionProvider
     with TestDatabaseProvider
