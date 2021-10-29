@@ -74,35 +74,34 @@ class ReportServiceSpec extends BehaviorTestingConfig with BeforeAndAfterEach {
             location = "Amsterdam"
           )
         )
-        _ <- MenuPerDayPerPersonTable.add(
+        _ <- MenuPerDayPerPersonTable.addOrUpdate(
           MenuPerDayPerPerson(
             menuPerDayUuid = menuperday1.uuid,
             userUuid = user1.uuid,
             isAttending = true
           )
         )
-        _ <- MenuPerDayPerPersonTable.add(
+        _ <- MenuPerDayPerPersonTable.addOrUpdate(
           MenuPerDayPerPerson(
             menuPerDayUuid = menuperday2.uuid,
             userUuid = user2.uuid,
             isAttending = true
           )
         )
-        _ <- MenuPerDayPerPersonTable.add(
+        _ <- MenuPerDayPerPersonTable.addOrUpdate(
           MenuPerDayPerPerson(
             menuPerDayUuid = menuperday1.uuid,
             userUuid = user3.uuid,
             isAttending = true
           )
         )
-        _ <- MenuPerDayPerPersonTable.add(
+        _ <- MenuPerDayPerPersonTable.addOrUpdate(
           MenuPerDayPerPerson(
             menuPerDayUuid = menuperday1.uuid,
             userUuid = user4.uuid,
             isAttending = false
           )
         )
-
         menuperday3 <- MenuPerDayTable.add(
           MenuPerDay(
             menuUuid = menu1.uuid,
@@ -118,28 +117,28 @@ class ReportServiceSpec extends BehaviorTestingConfig with BeforeAndAfterEach {
           )
         )
 
-        _ <- MenuPerDayPerPersonTable.add(
+        _ <- MenuPerDayPerPersonTable.addOrUpdate(
           MenuPerDayPerPerson(
             menuPerDayUuid = menuperday4.uuid,
             userUuid = user1.uuid,
             isAttending = true
           )
         )
-        _ <- MenuPerDayPerPersonTable.add(
+        _ <- MenuPerDayPerPersonTable.addOrUpdate(
           MenuPerDayPerPerson(
             menuPerDayUuid = menuperday4.uuid,
             userUuid = user2.uuid,
             isAttending = true
           )
         )
-        _ <- MenuPerDayPerPersonTable.add(
+        _ <- MenuPerDayPerPersonTable.addOrUpdate(
           MenuPerDayPerPerson(
             menuPerDayUuid = menuperday4.uuid,
             userUuid = user3.uuid,
             isAttending = false
           )
         )
-        _ <- MenuPerDayPerPersonTable.add(
+        _ <- MenuPerDayPerPersonTable.addOrUpdate(
           MenuPerDayPerPerson(
             menuPerDayUuid = menuperday4.uuid,
             userUuid = user4.uuid,

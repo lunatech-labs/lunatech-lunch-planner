@@ -31,7 +31,7 @@ object MenuPerDayPerPersonTableSpec
         userUuid = user.uuid
       )
       val result = Await.result(
-        MenuPerDayPerPersonTable.add(menuPerDayPerPersonToAdd),
+        MenuPerDayPerPersonTable.addOrUpdate(menuPerDayPerPersonToAdd),
         defaultTimeout
       )
 
@@ -277,7 +277,7 @@ object MenuPerDayPerPersonTableSpec
       addedMenuPerDay <- MenuPerDayTable.add(
         menuPerDay.copy(menuUuid = menu.uuid)
       )
-      addedMenu <- MenuPerDayPerPersonTable.add(
+      addedMenu <- MenuPerDayPerPersonTable.addOrUpdate(
         menuPerDayPerPerson
           .copy(menuPerDayUuid = addedMenuPerDay.uuid, userUuid = user.uuid)
       )
