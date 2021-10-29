@@ -4,7 +4,7 @@ import akka.actor.{ ActorSystem, Props }
 import com.typesafe.akka.extension.quartz.QuartzSchedulerExtension
 import lunatech.lunchplanner.schedulers.actors.{ MonthlyReportActor, SendLastMonthlyReport }
 import lunatech.lunchplanner.services.MonthlyReportService
-import play.api.Configuration
+import play.api.{ Configuration, Logging }
 import play.api.inject.ApplicationLifecycle
 
 import java.util.TimeZone
@@ -16,7 +16,7 @@ import scala.concurrent.Future
   */
 class MonthlyReportScheduler @Inject()(service: MonthlyReportService,
                                        conf: Configuration,
-                                       lifecycle: ApplicationLifecycle) {
+                                       lifecycle: ApplicationLifecycle) extends Logging {
   private val system = ActorSystem("MonthlyReportActorSystem")
   private val scheduler = QuartzSchedulerExtension(system)
   private val scheduleName = "MonthlyReport"
@@ -34,6 +34,7 @@ class MonthlyReportScheduler @Inject()(service: MonthlyReportService,
   scheduler.schedule(scheduleName, monthlyReportActor, SendLastMonthlyReport)
 
   lifecycle.addStopHook { () =>
+    logger.info("About to terminate MonthlyReportScheduler")
     Future.successful(system.terminate())
   }
 }
