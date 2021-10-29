@@ -1,0 +1,8 @@
+  version: 1
+  updates:
+      # Maintain dependencies for maven
+      - package-ecosystem: "maven"
+        directory: "/"
+        schedule:
+            interval: "weekly"
+            day: "friday"
