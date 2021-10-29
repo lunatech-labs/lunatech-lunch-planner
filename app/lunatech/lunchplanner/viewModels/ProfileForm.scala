@@ -1,8 +1,8 @@
 package lunatech.lunchplanner.viewModels
 
 import play.api.data.Form
-import play.api.data.Forms.{ mapping, optional, text, _ }
-import play.api.libs.json.{ Json, OFormat }
+import play.api.data.Forms.{mapping, optional, text, _}
+import play.api.libs.json.{Json, OFormat}
 
 case class ProfileForm(
     vegetarian: Boolean,
@@ -21,15 +21,15 @@ object ProfileForm {
 
   val profileForm = Form(
     mapping(
-      "vegetarian" -> boolean,
-      "halal" -> boolean,
+      "vegetarian"         -> boolean,
+      "halal"              -> boolean,
       "seaFoodRestriction" -> boolean,
-      "porkRestriction" -> boolean,
-      "beefRestriction" -> boolean,
+      "porkRestriction"    -> boolean,
+      "beefRestriction"    -> boolean,
       "chickenRestriction" -> boolean,
-      "glutenRestriction" -> boolean,
+      "glutenRestriction"  -> boolean,
       "lactoseRestriction" -> boolean,
-      "otherRestriction" -> optional(text)
+      "otherRestriction"   -> optional(text)
     )(ProfileForm.apply)(ProfileForm.unapply)
   )
 }

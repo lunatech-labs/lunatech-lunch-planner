@@ -9,7 +9,7 @@ import play.api.test.Writeables
 import scala.concurrent.duration._
 
 trait ControllerSpec
-  extends PlaySpec
+    extends PlaySpec
     with Results
     with MockFactory
     with GuiceOneAppPerSuite

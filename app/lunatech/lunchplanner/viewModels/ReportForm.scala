@@ -9,7 +9,7 @@ object ReportForm {
   val reportForm: Form[ReportDate] = Form(
     mapping(
       "month" -> number,
-      "year" -> number
+      "year"  -> number
     )(ReportDate.apply)(ReportDate.unapply)
   )
 }

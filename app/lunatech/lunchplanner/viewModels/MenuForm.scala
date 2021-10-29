@@ -3,7 +3,7 @@ package lunatech.lunchplanner.viewModels
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.format.Formats._
-import play.api.libs.json.{ Json, OFormat }
+import play.api.libs.json.{Json, OFormat}
 
 import java.util.UUID
 
@@ -17,7 +17,7 @@ object MenuForm {
 
   val menuForm = Form(
     mapping(
-      "menuName" -> nonEmptyText,
+      "menuName"   -> nonEmptyText,
       "dishesUuid" -> list(of[UUID])
     )(MenuForm.apply)(MenuForm.unapply)
   )

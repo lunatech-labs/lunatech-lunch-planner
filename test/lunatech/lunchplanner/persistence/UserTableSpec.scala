@@ -7,13 +7,15 @@ import org.scalacheck.Prop._
 
 import scala.concurrent.Await
 
-object UserTableSpec extends Properties(name = "User") with PropertyTestingConfig {
+object UserTableSpec
+    extends Properties(name = "User")
+    with PropertyTestingConfig {
 
   import lunatech.lunchplanner.data.TableDataGenerator._
 
   property("add a new user") = forAll { user: User =>
     createTestSchema()
-    
+
     val result = addUserToDB(user)
 
     dropTestSchema()
@@ -23,10 +25,11 @@ object UserTableSpec extends Properties(name = "User") with PropertyTestingConfi
 
   property("query for users by UUID successfully") = forAll { user: User =>
     createTestSchema()
-    
+
     addUserToDB(user)
 
-    val result = Await.result(UserTable.getByUUID(user.uuid), defaultTimeout).get
+    val result =
+      Await.result(UserTable.getByUUID(user.uuid), defaultTimeout).get
 
     dropTestSchema()
 
@@ -35,10 +38,12 @@ object UserTableSpec extends Properties(name = "User") with PropertyTestingConfi
 
   property("query for users by email address") = forAll { user: User =>
     createTestSchema()
-    
+
     addUserToDB(user)
 
-    val result = Await.result(UserTable.getByEmailAddress(user.emailAddress), defaultTimeout).get
+    val result = Await
+      .result(UserTable.getByEmailAddress(user.emailAddress), defaultTimeout)
+      .get
 
     dropTestSchema()
 
@@ -47,10 +52,11 @@ object UserTableSpec extends Properties(name = "User") with PropertyTestingConfi
 
   property("check if a user exist by email address") = forAll { user: User =>
     createTestSchema()
-    
+
     addUserToDB(user)
 
-    val result = Await.result(UserTable.existsByEmail(user.emailAddress), defaultTimeout)
+    val result =
+      Await.result(UserTable.existsByEmail(user.emailAddress), defaultTimeout)
 
     dropTestSchema()
 
@@ -59,7 +65,7 @@ object UserTableSpec extends Properties(name = "User") with PropertyTestingConfi
 
   property("query for all users") = forAll { (user1: User, user2: User) =>
     createTestSchema()
-    
+
     addUserToDB(user1)
     addUserToDB(user2)
 
@@ -72,11 +78,13 @@ object UserTableSpec extends Properties(name = "User") with PropertyTestingConfi
 
   property("delete an existing user by uuid") = forAll { user: User =>
     createTestSchema()
-    
+
     addUserToDB(user)
 
-    val deletedResult = Await.result(UserTable.removeByUuid(user.uuid), defaultTimeout)
-    val getByUUIDUser = Await.result(UserTable.getByUUID(user.uuid), defaultTimeout).get
+    val deletedResult =
+      Await.result(UserTable.removeByUuid(user.uuid), defaultTimeout)
+    val getByUUIDUser =
+      Await.result(UserTable.getByUUID(user.uuid), defaultTimeout).get
 
     dropTestSchema()
 
@@ -85,15 +93,17 @@ object UserTableSpec extends Properties(name = "User") with PropertyTestingConfi
 
   property("delete a non existing user by uuid") = forAll { user: User =>
     createTestSchema()
-    
+
     //skip adding user to DB
 
-    val deletedResult = Await.result(UserTable.removeByUuid(user.uuid), defaultTimeout)
+    val deletedResult =
+      Await.result(UserTable.removeByUuid(user.uuid), defaultTimeout)
 
     dropTestSchema()
 
     deletedResult == 0
   }
 
-  private def addUserToDB(user: User): User = Await.result(UserTable.add(user), defaultTimeout)
+  private def addUserToDB(user: User): User =
+    Await.result(UserTable.add(user), defaultTimeout)
 }

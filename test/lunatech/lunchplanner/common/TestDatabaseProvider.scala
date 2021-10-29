@@ -13,15 +13,17 @@ trait TestDatabaseProvider {
 
   val defaultTimeout: FiniteDuration = 10.seconds
 
-  val userProfileTable: TableQuery[UserProfileTable] = TableQuery[UserProfileTable]
-  val userTable: TableQuery[UserTable] = TableQuery[UserTable]
-  val dishTable: TableQuery[DishTable] = TableQuery[DishTable]
-  val menuTable: TableQuery[MenuTable] = TableQuery[MenuTable]
-  val menuDishTable: TableQuery[MenuDishTable] = TableQuery[MenuDishTable]
+  val userProfileTable: TableQuery[UserProfileTable] =
+    TableQuery[UserProfileTable]
+  val userTable: TableQuery[UserTable]             = TableQuery[UserTable]
+  val dishTable: TableQuery[DishTable]             = TableQuery[DishTable]
+  val menuTable: TableQuery[MenuTable]             = TableQuery[MenuTable]
+  val menuDishTable: TableQuery[MenuDishTable]     = TableQuery[MenuDishTable]
   val menuPerDayTable: TableQuery[MenuPerDayTable] = TableQuery[MenuPerDayTable]
-  val menuPerDayPerPersonTable: TableQuery[MenuPerDayPerPersonTable] = TableQuery[MenuPerDayPerPersonTable]
+  val menuPerDayPerPersonTable: TableQuery[MenuPerDayPerPersonTable] =
+    TableQuery[MenuPerDayPerPersonTable]
 
-  def cleanDatabase: Unit = {
+  def cleanDatabase: Unit =
     Await.result(
       for {
         _ <- jdbc.run(menuPerDayPerPersonTable.delete)
@@ -31,28 +33,33 @@ trait TestDatabaseProvider {
         _ <- jdbc.run(menuTable.delete)
         _ <- jdbc.run(userProfileTable.delete)
         _ <- jdbc.run(userTable.delete)
-      } yield (), defaultTimeout)
-  }
+      } yield (),
+      defaultTimeout
+    )
 
-  def cleanUserAndProfileTable: Unit = {
+  def cleanUserAndProfileTable: Unit =
     Await.result(
       for {
         _ <- jdbc.run(userProfileTable.delete)
         _ <- jdbc.run(userTable.delete)
-      } yield (), defaultTimeout)
-  }
+      } yield (),
+      defaultTimeout
+    )
 
-  def cleanMenuTable: Int = Await.result(jdbc.run(menuTable.delete), defaultTimeout)
+  def cleanMenuTable: Int =
+    Await.result(jdbc.run(menuTable.delete), defaultTimeout)
 
-  def cleanDishTable: Int = Await.result(jdbc.run(dishTable.delete), defaultTimeout)
+  def cleanDishTable: Int =
+    Await.result(jdbc.run(dishTable.delete), defaultTimeout)
 
-  def cleanMenuDishTable: Unit = {
+  def cleanMenuDishTable: Unit =
     Await.result(
       for {
         _ <- jdbc.run(menuDishTable.delete)
         _ <- jdbc.run(dishTable.delete)
-      } yield (), defaultTimeout)
-  }
+      } yield (),
+      defaultTimeout
+    )
 
   def cleanMenuPerDayTable: Unit = {
     Await.result(jdbc.run(menuPerDayTable.delete), defaultTimeout)

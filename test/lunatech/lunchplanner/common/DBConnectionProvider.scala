@@ -4,10 +4,10 @@ import com.typesafe.config.ConfigFactory
 import lunatech.lunchplanner.persistence._
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.{ Application, Configuration }
-import play.api.db.slick.{ DatabaseConfigProvider, HasDatabaseConfigProvider }
+import play.api.{Application, Configuration}
+import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import play.api.inject.guice.GuiceApplicationBuilder
-import slick.jdbc.{ JdbcProfile, PostgresProfile }
+import slick.jdbc.{JdbcProfile, PostgresProfile}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -22,19 +22,22 @@ trait InMemoryDatabase extends AnyWordSpecLike with GuiceOneAppPerSuite {
     builder.build()
   }
 
-  def overrideDependencies(application: GuiceApplicationBuilder): GuiceApplicationBuilder = {
+  def overrideDependencies(
+      application: GuiceApplicationBuilder
+  ): GuiceApplicationBuilder =
     application
-  }
 }
 
-trait DBConnectionProvider extends InMemoryDatabase with HasDatabaseConfigProvider[JdbcProfile] {
+trait DBConnectionProvider
+    extends InMemoryDatabase
+    with HasDatabaseConfigProvider[JdbcProfile] {
   import PostgresProfile.api._
 
   override lazy val dbConfigProvider: DatabaseConfigProvider =
     app.injector.instanceOf[DatabaseConfigProvider]
 
   implicit val dbConnection: DBConnection = new DBConnection(dbConfigProvider)
-  implicit val jdbc = dbConnection.db
+  implicit val jdbc                       = dbConnection.db
 
   private val createSchema = UserTable.userTable.schema ++
     UserProfileTable.userProfileTable.schema ++
@@ -46,7 +49,9 @@ trait DBConnectionProvider extends InMemoryDatabase with HasDatabaseConfigProvid
 
   private val duration: Duration = 3.seconds
 
-  def createTestSchema(): Unit = Await.result(jdbc.run(createSchema.create), duration)
+  def createTestSchema(): Unit =
+    Await.result(jdbc.run(createSchema.create), duration)
 
-  def dropTestSchema(): Unit = Await.result(jdbc.run(createSchema.drop), duration)
+  def dropTestSchema(): Unit =
+    Await.result(jdbc.run(createSchema.drop), duration)
 }

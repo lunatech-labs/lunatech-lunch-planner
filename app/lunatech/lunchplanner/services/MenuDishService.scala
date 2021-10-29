@@ -1,7 +1,12 @@
 package lunatech.lunchplanner.services
 
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.{ DishIsSelected, MenuDish, MenuWithAllDishesAndIsSelected, MenuWithDishes }
+import lunatech.lunchplanner.models.{
+  DishIsSelected,
+  MenuDish,
+  MenuWithAllDishesAndIsSelected,
+  MenuWithDishes
+}
 import lunatech.lunchplanner.persistence.MenuDishTable
 
 import java.util.UUID
@@ -9,15 +14,15 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class MenuDishService @Inject()(
+class MenuDishService @Inject() (
     dishService: DishService,
-    menuService: MenuService)(implicit val connection: DBConnection) {
+    menuService: MenuService
+)(implicit val connection: DBConnection) {
 
-  def add(menuDish: MenuDish): Future[MenuDish] = {
+  def add(menuDish: MenuDish): Future[MenuDish] =
     MenuDishTable.add(menuDish)
-  }
 
-  def getAllWithListOfDishes: Future[Seq[MenuWithDishes]] = {
+  def getAllWithListOfDishes: Future[Seq[MenuWithDishes]] =
     for {
       allMenus <- menuService.getAll
       result <- Future.sequence(allMenus.map { menu =>
@@ -25,12 +30,12 @@ class MenuDishService @Inject()(
           menuDishes <- MenuDishTable.getByMenuUuid(menu.uuid)
           dishes <- Future
             .sequence(
-              menuDishes.map(dish => dishService.getByUuid(dish.dishUuid)))
+              menuDishes.map(dish => dishService.getByUuid(dish.dishUuid))
+            )
             .map(_.flatten)
         } yield MenuWithDishes(menu.uuid, menu.name, dishes)
       })
     } yield result
-  }
 
   def deleteByMenuUuid(menuUuid: UUID): Future[Int] =
     MenuDishTable.removeByMenuUuid(menuUuid)
@@ -39,26 +44,31 @@ class MenuDishService @Inject()(
     MenuDishTable.removeByDishUuid(dishUuid)
 
   def getByUuidWithSelectedDishes(
-      menuUuid: UUID): Future[Option[MenuWithAllDishesAndIsSelected]] = {
+      menuUuid: UUID
+  ): Future[Option[MenuWithAllDishesAndIsSelected]] =
     for {
       menuOption <- menuService.getByUuid(menuUuid)
       listDishes <- allIsSelectedInMenu(menuUuid)
-    } yield
-      menuOption.map(menu =>
-        MenuWithAllDishesAndIsSelected(menuUuid, menu.name, listDishes))
-  }
+    } yield menuOption.map(menu =>
+      MenuWithAllDishesAndIsSelected(menuUuid, menu.name, listDishes)
+    )
 
   private def allIsSelectedInMenu(
-      menuUuid: UUID): Future[Seq[DishIsSelected]] = {
-    dishService.getAll.flatMap(Future.traverse(_)(dish =>
-      isSelectedInMenu(menuUuid, dish.uuid).map(isSelected =>
-        DishIsSelected(dish.uuid, dish.name, isSelected))))
-  }
+      menuUuid: UUID
+  ): Future[Seq[DishIsSelected]] =
+    dishService.getAll.flatMap(
+      Future.traverse(_)(dish =>
+        isSelectedInMenu(menuUuid, dish.uuid).map(isSelected =>
+          DishIsSelected(dish.uuid, dish.name, isSelected)
+        )
+      )
+    )
 
-  private def isSelectedInMenu(menuUuid: UUID,
-                               dishUuid: UUID): Future[Boolean] = {
+  private def isSelectedInMenu(
+      menuUuid: UUID,
+      dishUuid: UUID
+  ): Future[Boolean] =
     MenuDishTable
       .getByMenuUuid(menuUuid)
       .map(_.exists((dish: MenuDish) => dish.dishUuid == dishUuid))
-  }
 }

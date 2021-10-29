@@ -1,13 +1,13 @@
 package lunatech.lunchplanner.persistence
 
 import lunatech.lunchplanner.common.DBConnection
-import lunatech.lunchplanner.models.{ Menu, MenuPerDay }
+import lunatech.lunchplanner.models.{Menu, MenuPerDay}
 import slick.jdbc.GetResult
 import slick.jdbc.PostgresProfile.api._
-import slick.lifted.{ ForeignKeyQuery, ProvenShape, TableQuery }
+import slick.lifted.{ForeignKeyQuery, ProvenShape, TableQuery}
 
 import java.sql.Date
-import java.time.{ LocalDateTime, ZoneOffset }
+import java.time.{LocalDateTime, ZoneOffset}
 import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -28,92 +28,115 @@ class MenuPerDayTable(tag: Tag)
   def isDeleted: Rep[Boolean] = column[Boolean]("isDeleted")
 
   def menuPerDayMenuForeignKey: ForeignKeyQuery[MenuTable, Menu] =
-    foreignKey(name = "menuPerDayMenu_fkey_",
-               sourceColumns = menuUuid,
-               targetTableQuery = menuTable)(_.uuid)
+    foreignKey(
+      name = "menuPerDayMenu_fkey_",
+      sourceColumns = menuUuid,
+      targetTableQuery = menuTable
+    )(_.uuid)
 
   def * : ProvenShape[MenuPerDay] =
-    (uuid, menuUuid, date, location, isDeleted) <> ((MenuPerDay.apply _).tupled, MenuPerDay.unapply)
+    (
+      uuid,
+      menuUuid,
+      date,
+      location,
+      isDeleted
+    ) <> ((MenuPerDay.apply _).tupled, MenuPerDay.unapply)
 }
 
 object MenuPerDayTable {
   val menuPerDayTable: TableQuery[MenuPerDayTable] = TableQuery[MenuPerDayTable]
 
-  def add(menuPerDay: MenuPerDay)(
-      implicit connection: DBConnection): Future[MenuPerDay] = {
+  def add(
+      menuPerDay: MenuPerDay
+  )(implicit connection: DBConnection): Future[MenuPerDay] = {
     val query = menuPerDayTable += menuPerDay
     connection.db.run(query).map(_ => menuPerDay)
   }
 
-  def getByUuid(uuid: UUID)(
-      implicit connection: DBConnection): Future[Option[MenuPerDay]] = {
+  def getByUuid(
+      uuid: UUID
+  )(implicit connection: DBConnection): Future[Option[MenuPerDay]] = {
     val query = menuPerDayTable.filter(_.uuid === uuid)
     connection.db.run(query.result.headOption)
   }
 
-  def getByMenuUuid(menuUuid: UUID)(
-      implicit connection: DBConnection): Future[Seq[MenuPerDay]] = {
+  def getByMenuUuid(
+      menuUuid: UUID
+  )(implicit connection: DBConnection): Future[Seq[MenuPerDay]] = {
     val query = menuPerDayTable.filter(mpd =>
-      mpd.menuUuid === menuUuid && mpd.isDeleted === false)
+      mpd.menuUuid === menuUuid && mpd.isDeleted === false
+    )
     connection.db.run(query.result)
   }
 
-  def getByDate(date: Date)(
-      implicit connection: DBConnection): Future[Seq[MenuPerDay]] = {
+  def getByDate(
+      date: Date
+  )(implicit connection: DBConnection): Future[Seq[MenuPerDay]] = {
     val query = menuPerDayTable.filter(mpd =>
-      mpd.date === date && mpd.isDeleted === false)
+      mpd.date === date && mpd.isDeleted === false
+    )
     connection.db.run(query.result)
   }
 
-  def getAll(implicit connection: DBConnection): Future[Seq[MenuPerDay]] = {
+  def getAll(implicit connection: DBConnection): Future[Seq[MenuPerDay]] =
     connection.db.run(menuPerDayTable.filter(_.isDeleted === false).result)
-  }
 
-  def getAllOrderedByDateAscending(
-      implicit connection: DBConnection): Future[Seq[MenuPerDay]] = {
+  def getAllOrderedByDateAscending(implicit
+      connection: DBConnection
+  ): Future[Seq[MenuPerDay]] = {
     val query =
       menuPerDayTable.filter(_.isDeleted === false).sortBy(menu => menu.date)
     connection.db.run(query.result)
   }
 
-  def getAllFutureAndOrderedByDateAscending(
-      implicit connection: DBConnection): Future[Seq[MenuPerDay]] = {
+  def getAllFutureAndOrderedByDateAscending(implicit
+      connection: DBConnection
+  ): Future[Seq[MenuPerDay]] = {
     val query = menuPerDayTable
       .filter(mpd =>
-        mpd.isDeleted === false && mpd.date >= new Date(LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli))
+        mpd.isDeleted === false && mpd.date >= new Date(
+          LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli
+        )
+      )
       .sortBy(mpd => mpd.date)
     connection.db.run(query.result)
   }
 
-  def getAllFilteredDateRangeOrderedDateAscending(dateStart: Date,
-                                                  dateEnd: Date)(
-      implicit connection: DBConnection): Future[Seq[MenuPerDay]] = {
+  def getAllFilteredDateRangeOrderedDateAscending(
+      dateStart: Date,
+      dateEnd: Date
+  )(implicit connection: DBConnection): Future[Seq[MenuPerDay]] = {
     val query = menuPerDayTable
       .filter(mpd =>
-        mpd.isDeleted === false && mpd.date >= dateStart && mpd.date <= dateEnd)
+        mpd.isDeleted === false && mpd.date >= dateStart && mpd.date <= dateEnd
+      )
       .sortBy(mpd => mpd.date)
     connection.db.run(query.result)
   }
 
   // Method to be used on reports, does not filter out deleted data
-  def getAllFilteredDateRangeOrderedDateAscendingWithDeleted(dateStart: Date,
-                                                             dateEnd: Date)(
-      implicit connection: DBConnection): Future[Seq[MenuPerDay]] = {
+  def getAllFilteredDateRangeOrderedDateAscendingWithDeleted(
+      dateStart: Date,
+      dateEnd: Date
+  )(implicit connection: DBConnection): Future[Seq[MenuPerDay]] = {
     val query = menuPerDayTable
       .filter(mpd => mpd.date >= dateStart && mpd.date <= dateEnd)
       .sortBy(mpd => mpd.date)
     connection.db.run(query.result)
   }
 
-  def removeByUuid(uuid: UUID)(
-      implicit connection: DBConnection): Future[Int] = {
+  def removeByUuid(
+      uuid: UUID
+  )(implicit connection: DBConnection): Future[Int] = {
     val query =
       menuPerDayTable.filter(_.uuid === uuid).map(_.isDeleted).update(true)
     connection.db.run(query)
   }
 
-  def removeByMenuUuid(menuUuid: UUID)(
-      implicit connection: DBConnection): Future[Int] = {
+  def removeByMenuUuid(
+      menuUuid: UUID
+  )(implicit connection: DBConnection): Future[Int] = {
     val query = menuPerDayTable
       .filter(_.menuUuid === menuUuid)
       .map(_.isDeleted)
@@ -121,23 +144,29 @@ object MenuPerDayTable {
     connection.db.run(query)
   }
 
-  def update(menuPerDay: MenuPerDay)(
-      implicit connection: DBConnection): Future[Boolean] = {
+  def update(
+      menuPerDay: MenuPerDay
+  )(implicit connection: DBConnection): Future[Boolean] = {
     val query = menuPerDayTable
       .filter(_.uuid === menuPerDay.uuid)
       .map(m => (m.menuUuid, m.date, m.location, m.isDeleted))
       .update(
-        (menuPerDay.menuUuid,
-         menuPerDay.date,
-         menuPerDay.location,
-         menuPerDay.isDeleted))
+        (
+          menuPerDay.menuUuid,
+          menuPerDay.date,
+          menuPerDay.location,
+          menuPerDay.isDeleted
+        )
+      )
     connection.db.run(query).map(_ == 1)
   }
 
-  def getMenuForUpcomingSchedule(
-      implicit connection: DBConnection): Future[Seq[(MenuPerDay, String)]] = {
-    implicit val getTupleResult: GetResult[MenuPerDay] = GetResult(
-      r => MenuPerDay(UUID.fromString(r.<<), UUID.fromString(r.<<), r.<<, r.<<))
+  def getMenuForUpcomingSchedule(implicit
+      connection: DBConnection
+  ): Future[Seq[(MenuPerDay, String)]] = {
+    implicit val getTupleResult: GetResult[MenuPerDay] = GetResult(r =>
+      MenuPerDay(UUID.fromString(r.<<), UUID.fromString(r.<<), r.<<, r.<<)
+    )
     val query =
       sql"""SELECT mpd."uuid", mpd."menuUuid", mpd."date", mpd."location", m."name"
            FROM "MenuPerDay" mpd JOIN "Menu" m ON mpd."menuUuid"=m."uuid" AND m."isDeleted" = FALSE AND mpd."isDeleted" = FALSE
@@ -148,8 +177,9 @@ object MenuPerDayTable {
   }
 
   // Method used on reports, data not filtered by `isDeleted`
-  def getAllAvailableDatesWithinRange(dateStart: Date, dateEnd: Date)(
-      implicit connection: DBConnection): Future[Seq[Date]] = {
+  def getAllAvailableDatesWithinRange(dateStart: Date, dateEnd: Date)(implicit
+      connection: DBConnection
+  ): Future[Seq[Date]] = {
     implicit val result: GetResult[Date] = GetResult(r => r.nextDate())
 
     val query = sql"""SELECT DISTINCT "date"

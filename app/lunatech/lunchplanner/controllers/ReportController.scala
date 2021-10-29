@@ -10,7 +10,7 @@ import play.api.data.Form
 import play.api.http.HttpEntity
 import play.api.i18n.I18nSupport
 import play.api.mvc._
-import play.api.{ Configuration, Environment }
+import play.api.{Configuration, Environment}
 import play.mvc.Http
 
 import java.io.ByteArrayInputStream
@@ -19,49 +19,53 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-/**
-  * Displays list of people attending and not attending at where on when
+/** Displays list of people attending and not attending at where on when
   */
-class ReportController @Inject()(userService: UserService,
-                                 reportService: ReportService,
-                                 val controllerComponents: ControllerComponents,
-                                 val environment: Environment,
-                                 val configuration: Configuration)
-    extends BaseController
+class ReportController @Inject() (
+    userService: UserService,
+    reportService: ReportService,
+    val controllerComponents: ControllerComponents,
+    val environment: Environment,
+    val configuration: Configuration
+) extends BaseController
     with Secured
     with I18nSupport {
 
   val month = "month"
-  val year = "year"
+  val year  = "year"
 
   def getReport: EssentialAction = userAction.async { implicit request =>
     val reportMonth = getMonth(request.session)
-    val reportYear = getYear(request.session)
+    val reportYear  = getYear(request.session)
 
     for {
-      currentUser <- userService.getByEmailAddress(request.email)
+      currentUser  <- userService.getByEmailAddress(request.email)
       sortedReport <- reportService.getSortedReport(reportMonth, reportYear)
-      totalNotAttending <- reportService.getReportForNotAttending(reportMonth,
-                                                                  reportYear)
-      isAdmin = currentUser.exists(user =>
-        userService.isAdminUser(user.emailAddress))
-    } yield
-      Ok(
-        views.html.admin.report(
-          getCurrentUser(currentUser, isAdmin = isAdmin, request.email),
-          ReportForm.reportForm,
-          sortedReport,
-          totalNotAttending,
-          ReportDate(reportMonth, reportYear)
-        )
+      totalNotAttending <- reportService.getReportForNotAttending(
+        reportMonth,
+        reportYear
       )
+      isAdmin = currentUser.exists(user =>
+        userService.isAdminUser(user.emailAddress)
+      )
+    } yield Ok(
+      views.html.admin.report(
+        getCurrentUser(currentUser, isAdmin = isAdmin, request.email),
+        ReportForm.reportForm,
+        sortedReport,
+        totalNotAttending,
+        ReportDate(reportMonth, reportYear)
+      )
+    )
   }
 
   def filterAttendees: EssentialAction = userAction.async { implicit request =>
     def hasErrors: Form[ReportDate] => Future[Result] = { _ =>
       Future(
         Redirect(
-          lunatech.lunchplanner.controllers.routes.ReportController.getReport))
+          lunatech.lunchplanner.controllers.routes.ReportController.getReport
+        )
+      )
     }
 
     def success: ReportDate => Future[Result] = {
@@ -69,7 +73,8 @@ class ReportController @Inject()(userService: UserService,
         val session = updateSession(request.session, selectedReportDate)
         Future {
           Redirect(
-            lunatech.lunchplanner.controllers.routes.ReportController.getReport)
+            lunatech.lunchplanner.controllers.routes.ReportController.getReport
+          )
             .withSession(session)
         }
     }
@@ -78,28 +83,34 @@ class ReportController @Inject()(userService: UserService,
   }
 
   def export: EssentialAction = adminAction.async { implicit request =>
-    val chunkSize = 1024
+    val chunkSize   = 1024
     val reportMonth = getMonth(request.session)
-    val reportYear = getYear(request.session)
+    val reportYear  = getYear(request.session)
 
     for {
-      totalAttendees <- reportService.getReportByLocationAndDate(reportMonth,
-                                                                 reportYear)
-      totalNotAttending <- reportService.getReportForNotAttending(reportMonth,
-                                                                  reportYear)
-      inputStream = new ByteArrayInputStream(
-        reportService.exportToExcel(totalAttendees, totalNotAttending))
-      month = Month.values(reportMonth - 1).month
-      content = StreamConverters.fromInputStream(() => inputStream, chunkSize)
-    } yield
-      Result(
-        header = ResponseHeader(
-          Http.Status.OK,
-          Map(
-            Http.HeaderNames.CONTENT_DISPOSITION -> s"""attachment; filename="$month $reportYear report.xls"""")),
-        body =
-          HttpEntity.Streamed(content, None, Some("application/vnd.ms-excel"))
+      totalAttendees <- reportService.getReportByLocationAndDate(
+        reportMonth,
+        reportYear
       )
+      totalNotAttending <- reportService.getReportForNotAttending(
+        reportMonth,
+        reportYear
+      )
+      inputStream = new ByteArrayInputStream(
+        reportService.exportToExcel(totalAttendees, totalNotAttending)
+      )
+      month   = Month.values(reportMonth - 1).month
+      content = StreamConverters.fromInputStream(() => inputStream, chunkSize)
+    } yield Result(
+      header = ResponseHeader(
+        Http.Status.OK,
+        Map(
+          Http.HeaderNames.CONTENT_DISPOSITION -> s"""attachment; filename="$month $reportYear report.xls""""
+        )
+      ),
+      body =
+        HttpEntity.Streamed(content, None, Some("application/vnd.ms-excel"))
+    )
   }
 
   private def getDefaultDate: ReportDate = {
