@@ -173,29 +173,18 @@ class SlackService @Inject() (
     def addMenuPerDayPerPerson(
         value: String,
         userUuid: UUID
-    ): Future[Seq[MenuPerDayPerPerson]] =
-      if (isUserAttending(value)) {
-        menuPerDayPerPersonService
-          .add(
-            MenuPerDayPerPerson(
-              menuPerDayUuid = UUID.fromString(value),
-              userUuid = userUuid,
-              isAttending = true
-            )
-          )
+    ): Future[Seq[MenuPerDayPerPerson]] = {
+      val isAttending = isUserAttending(value)
+      if (isAttending) {
+        insertAttendingData(UUID.fromString(value), userUuid, isAttending)
           .map(Seq(_))
       } else {
         val menuUuids = getListMenuUuids(value)
         Future.traverse(menuUuids) { menuUuid =>
-          menuPerDayPerPersonService.add(
-            MenuPerDayPerPerson(
-              menuPerDayUuid = UUID.fromString(menuUuid),
-              userUuid = userUuid,
-              isAttending = false
-            )
-          )
+          insertAttendingData(UUID.fromString(menuUuid), userUuid, isAttending)
         }
       }
+    }
 
     user
       .map(addToDb(slackResponse.action, _))
@@ -207,6 +196,18 @@ class SlackService @Inject() (
         )
       )
   }
+
+  private def insertAttendingData(
+      menuUuid: UUID,
+      userUuid: UUID,
+      isAttending: Boolean
+  ): Future[MenuPerDayPerPerson] = menuPerDayPerPersonService.addOrUpdate(
+    MenuPerDayPerPerson(
+      menuPerDayUuid = menuUuid,
+      userUuid = userUuid,
+      isAttending = isAttending
+    )
+  )
 
   // A "~" in value means that the user picked "Not Attending".
   // Sample value is menuUuid1~menuUuid2 which will be added separately to the DB

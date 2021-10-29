@@ -60,11 +60,43 @@ object MenuPerDayPerPersonTable {
   val menuPerDayPerPersonTable: TableQuery[MenuPerDayPerPersonTable] =
     TableQuery[MenuPerDayPerPersonTable]
 
-  def add(
+  def addOrUpdate(menuPerDayPerPerson: MenuPerDayPerPerson)(implicit
+      connection: DBConnection
+  ): Future[MenuPerDayPerPerson] =
+    for {
+      containsData <- contains(menuPerDayPerPerson)
+      result <-
+        if (containsData.isEmpty) add(menuPerDayPerPerson)
+        else update(menuPerDayPerPerson)
+    } yield result
+
+  private def contains(
+      mpdpp: MenuPerDayPerPerson
+  )(implicit connection: DBConnection): Future[Option[MenuPerDayPerPerson]] = {
+    val query = menuPerDayPerPersonTable.filter(mpdppt =>
+      mpdppt.menuPerDayUuid === mpdpp.menuPerDayUuid && mpdppt.userUuid === mpdpp.menuPerDayUuid
+    )
+    connection.db.run(query.result.headOption)
+  }
+
+  private def add(
       menuPerDayPerPerson: MenuPerDayPerPerson
   )(implicit connection: DBConnection): Future[MenuPerDayPerPerson] = {
     val query = menuPerDayPerPersonTable += menuPerDayPerPerson
     connection.db.run(query).map(_ => menuPerDayPerPerson)
+  }
+
+  private def update(
+      mpdpp: MenuPerDayPerPerson
+  )(implicit connection: DBConnection): Future[MenuPerDayPerPerson] = {
+    val query = menuPerDayPerPersonTable
+      .filter(mpdppt =>
+        mpdppt.menuPerDayUuid === mpdpp.menuPerDayUuid && mpdppt.userUuid === mpdpp.menuPerDayUuid
+      )
+      .map(mp => mp.isAttending)
+      .update(mpdpp.isAttending)
+
+    connection.db.run(query).map(_ => mpdpp)
   }
 
   def getByUuid(

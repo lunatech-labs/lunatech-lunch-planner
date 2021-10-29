@@ -20,10 +20,10 @@ class MenuPerDayPerPersonService @Inject() (
     menuPerDayService: MenuPerDayService
 )(implicit val connection: DBConnection) {
 
-  def add(
+  def addOrUpdate(
       menuPerDayPerPerson: MenuPerDayPerPerson
   ): Future[MenuPerDayPerPerson] =
-    MenuPerDayPerPersonTable.add(menuPerDayPerPerson)
+    MenuPerDayPerPersonTable.addOrUpdate(menuPerDayPerPerson)
 
   def getAllByUserUuid(userUuid: UUID): Future[Seq[MenuPerDayPerPerson]] =
     MenuPerDayPerPersonTable.getByUserUuid(userUuid)

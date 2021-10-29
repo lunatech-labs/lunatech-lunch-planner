@@ -113,7 +113,7 @@ class MenuPerDayPerPersonController @Inject() (
           userUuid = userUuid,
           isAttending = true
         )
-        menuPerDayPerPersonService.add(newMenuPerDayPerPerson)
+        menuPerDayPerPersonService.addOrUpdate(newMenuPerDayPerPerson)
       }
     }
 
@@ -132,7 +132,7 @@ class MenuPerDayPerPersonController @Inject() (
             userUuid = userUuid,
             isAttending = false
           )
-        menuPerDayPerPersonService.add(newMenuPerDayPerPerson)
+        menuPerDayPerPersonService.addOrUpdate(newMenuPerDayPerPerson)
       }
     }
 }

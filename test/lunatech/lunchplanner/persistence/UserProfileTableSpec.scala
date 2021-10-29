@@ -94,7 +94,7 @@ object UserProfileTableSpec
         defaultTimeout
       )
       Await.result(
-        MenuPerDayPerPersonTable.add(
+        MenuPerDayPerPersonTable.addOrUpdate(
           menuPerDayPerPerson
             .copy(menuPerDayUuid = menuPerDay.uuid, userUuid = user.uuid)
         ),
