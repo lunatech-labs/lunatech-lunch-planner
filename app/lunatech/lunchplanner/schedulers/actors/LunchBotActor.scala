@@ -14,16 +14,23 @@ class LunchBotActor(userService: UserService,
     extends Actor with Logging {
 
   override def receive: Receive = {
-    case StartBot => act()
+    case RunBot => sendMessagesToUsers()
   }
 
-  def act(): Unit = {
-    val allEmails = userService.getAllEmailAddresses
-    val emailsNoDecision = getEmailAddressesOfUsersWhoHaveNoDecision(allEmails)
-    val slackUserIds = getSlackUserIdsByUserEmails(emailsNoDecision)
-    val channelIds = openConversation(slackUserIds)
-    val response = postMessages(channelIds)
-    response onComplete {
+  def sendMessagesToUsers(): Unit = {
+    logger.info("Received RunBot message")
+
+    for{
+      allEmails <- userService.getAllEmailAddresses
+      _ = logger.info("Got all users email addresses")
+      emailsNoDecision <- getEmailAddressesOfUsersWhoHaveNoDecision(allEmails)
+      _ = logger.info("Got all users that have not answered on lunch planner email addresses")
+      slackUserIds <- getSlackUserIdsByUserEmails(emailsNoDecision)
+      _ = logger.info("Got all users slack users ids")
+      channelIds <- openConversation(slackUserIds)
+      _ = logger.info("Got all users channels ids")
+      response = postMessages(channelIds)
+    } yield response onComplete {
       case Success(res) =>
         logger.info(res)
       case Failure(exception) =>
@@ -31,40 +38,16 @@ class LunchBotActor(userService: UserService,
     }
   }
 
-  def getEmailAddressesOfUsersWhoHaveNoDecision(
-      allEmails: Future[Seq[String]]): Future[Seq[String]] = {
-    val emailsOfAttendees =
-      menuPerDayPerPersonService.getAttendeesEmailAddressesForUpcomingLunch
+  def getEmailAddressesOfUsersWhoHaveNoDecision(allEmails: Seq[String]): Future[Seq[String]] =
+    menuPerDayPerPersonService.getAttendeesEmailAddressesForUpcomingLunch.map(
+      emailsOfAttendees => allEmails.filterNot(emailsOfAttendees.contains(_)))
 
-    for {
-      all <- allEmails
-      toFilterOut <- emailsOfAttendees
-    } yield all.filterNot(toFilterOut.contains(_))
-  }
+  def getSlackUserIdsByUserEmails(emails: Seq[String]): Future[Seq[String]] =
+    slackService.getAllSlackUsersByEmails(emails)
 
-  def getSlackUserIdsByUserEmails(
-      emails: Future[Seq[String]]): Future[Seq[String]] = {
-    for {
-      emailList <- emails
-      userIds <- slackService.getAllSlackUsersByEmails(emailList)
-    } yield userIds
-  }
+  def openConversation(slackUserIds: Seq[String]): Future[Seq[String]] = slackService.openConversation(slackUserIds)
 
-  def openConversation(
-      slackUserIds: Future[Seq[String]]): Future[Seq[String]] = {
-    for {
-      userIds <- slackUserIds
-      channelIds <- slackService.openConversation(userIds)
-    } yield channelIds
-  }
-
-  def postMessages(channelIds: Future[Seq[String]]): Future[String] = {
-    for {
-      channels <- channelIds
-      response <- slackService.postMessage(channels)
-    } yield response
-  }
-
+  def postMessages(channelIds: Seq[String]): Future[String] = slackService.postMessage(channelIds)
 }
 
-case object StartBot
+case object RunBot

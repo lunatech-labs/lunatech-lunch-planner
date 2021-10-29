@@ -2,9 +2,9 @@ package lunatech.lunchplanner.schedulers
 
 import akka.actor.{ ActorSystem, Props }
 import com.typesafe.akka.extension.quartz.QuartzSchedulerExtension
-import lunatech.lunchplanner.schedulers.actors.{ LunchBotActor, StartBot }
+import lunatech.lunchplanner.schedulers.actors.{ LunchBotActor, RunBot }
 import lunatech.lunchplanner.services.{ MenuPerDayPerPersonService, SlackService, UserService }
-import play.api.Configuration
+import play.api.{ Configuration, Logging }
 import play.api.inject.ApplicationLifecycle
 
 import java.util.TimeZone
@@ -19,7 +19,7 @@ class LunchBotScheduler @Inject()(
     menuPerDayPerPersonService: MenuPerDayPerPersonService,
     slackService: SlackService,
     lifecycle: ApplicationLifecycle,
-    conf: Configuration) {
+    conf: Configuration) extends Logging {
 
   private val system = ActorSystem("LunchBotActorSystem")
   private val scheduler = QuartzSchedulerExtension(system)
@@ -40,9 +40,10 @@ class LunchBotScheduler @Inject()(
                            None,
                            TimeZone.getDefault)
 
-  scheduler.schedule(scheduleName, lunchBotActor, StartBot)
+  scheduler.schedule(scheduleName, lunchBotActor, RunBot)
 
   lifecycle.addStopHook { () =>
+    logger.info("About to terminate LunchBotScheduler")
     Future.successful(system.terminate())
   }
 }

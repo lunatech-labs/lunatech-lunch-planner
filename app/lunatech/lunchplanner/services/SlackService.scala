@@ -7,7 +7,6 @@ import play.api.libs.json.JsValue
 import play.api.libs.ws.WSClient
 import play.api.{ Configuration, Logging }
 import play.mvc.Http.HeaderNames
-import scalaz.Monad
 
 import java.text.SimpleDateFormat
 import java.util.UUID
@@ -25,13 +24,8 @@ class SlackService @Inject()(
   val token: String = configuration.get[String]("slack.api.token")
   val sdf = new SimpleDateFormat("dd-MM-yyyy")
 
-  implicit val futureMonad: Monad[Future] = new Monad[Future] {
-    def point[A](a: => A): Future[A] = Future(a)
-    def bind[A, B](fa: Future[A])(f: (A) => Future[B]): Future[B] = fa flatMap f
-  }
-
   /**
-    * Will get the lunatech e-mail address of the Slack user.
+    * Will get the Lunatech e-mail address of the Slack user.
     * We use the e-mail as this is the data that is common between Slack and Lunch App.
     */
   def getAllSlackUsersByEmails(emails: Seq[String]): Future[Seq[String]] = {
@@ -199,10 +193,9 @@ class SlackService @Inject()(
 
   // A "~" in value means that the user picked "Not Attending".
   // Sample value is menuUuid1~menuUuid2 which will be added separately to the DB
-  private def isUserAttending(response: String): Boolean =
-    !response.contains("~")
-  private def getListMenuUuids(listMenus: String): Seq[String] =
-    listMenus.split("~").toList
+  private def isUserAttending(response: String): Boolean = !response.contains("~")
+
+  private def getListMenuUuids(listMenus: String): Seq[String] = listMenus.split("~").toList
 
   private def getEmailAddressBySlackUserId(
       slackUserId: String): Future[String] = {
@@ -228,6 +221,7 @@ class SlackService @Inject()(
           val value = menuPerDay.uuid.toString
           AttachmentsActions(text = text, value = value)
       }
+
       val noAction = AttachmentsActions(
         text = getString("slack.bot.button.no.text"),
         style = "danger",
@@ -246,9 +240,11 @@ class SlackService @Inject()(
         .map {
           case (menuPerDay, menuName) => s"$menuName in ${menuPerDay.location}"
         }
+
         .mkString(" and ")
       val message =
         getString("slack.bot.attachment.text").format(menuAndLocations)
+
       if (actions.nonEmpty) Seq(Attachments(message, "callback_id", actions))
       else Seq.empty
     }
