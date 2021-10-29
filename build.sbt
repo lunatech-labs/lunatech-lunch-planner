@@ -45,3 +45,4 @@ resolvers ++= Seq(
 )
 
 addCommandAlias("validate", ";scalafmt;coverage;test;dependencyCheck")
+addCommandAlias("testCoverage", ";coverage;test;coverageReport")
