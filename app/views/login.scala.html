@@ -67,7 +67,7 @@
                         <button id="signinButton">Sign in with Google</button>
                         <script>
                             $('#signinButton').click(function () {
-                                auth2.grantOfflineAccess().then(signInCallback);
+                                auth2.grantOfflineAccess({prompt: 'select_account'}).then(signInCallback);
                             });
                     </script>
                         <div id="result"></div>
