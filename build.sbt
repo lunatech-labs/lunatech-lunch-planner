@@ -18,7 +18,7 @@ libraryDependencies ++= Seq(
   ehcache,
   ws,
   evolutions,
-  "com.lunatech"           %% "play-googleopenconnect" % "2.7.0",
+  "com.lunatech"           %% "play-googleopenconnect" % "2.8.0",
   "com.typesafe.play"      %% "play-json"              % "2.9.2",
   "com.typesafe.play"      %% "play-slick"             % "5.0.0", // 2019
   "com.typesafe.play"      %% "play-slick-evolutions"  % "5.0.0", // 2019
