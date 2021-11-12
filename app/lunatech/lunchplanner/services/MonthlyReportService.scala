@@ -58,7 +58,7 @@ class MonthlyReportService @Inject() (
     (previousMonth.getMonthValue, previousMonth.getYear)
   }
 
-  //noinspection ScalaStyle
+  // noinspection ScalaStyle
   private def fromMonthNumberToName(month: Int): String =
     month match {
       case 1  => "January"
