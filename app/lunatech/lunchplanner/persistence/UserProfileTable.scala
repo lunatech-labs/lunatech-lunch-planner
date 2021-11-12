@@ -98,6 +98,7 @@ object UserProfileTable {
       .map(up =>
         (
           up.vegetarian,
+          up.halal,
           up.seaFoodRestriction,
           up.porkRestriction,
           up.beefRestriction,
@@ -111,6 +112,7 @@ object UserProfileTable {
       .update(
         (
           userProfile.vegetarian,
+          userProfile.halal,
           userProfile.seaFoodRestriction,
           userProfile.porkRestriction,
           userProfile.beefRestriction,
