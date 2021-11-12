@@ -1,48 +1,42 @@
 package lunatech.lunchplanner.schedulers.actors
 
-import akka.actor.Actor
-import lunatech.lunchplanner.services.{
-  MenuPerDayPerPersonService,
-  SlackService,
-  UserService
-}
-import play.api.Logging
+import akka.actor.{ Actor, ActorLogging }
+import lunatech.lunchplanner.services.{ MenuPerDayPerPersonService, SlackService, UserService }
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.util.{Failure, Success}
+import scala.util.{ Failure, Success }
 
 class LunchBotActor(
     userService: UserService,
     menuPerDayPerPersonService: MenuPerDayPerPersonService,
     slackService: SlackService
-) extends Actor
-    with Logging {
+) extends Actor with ActorLogging {
 
   override def receive: Receive = { case RunBot =>
     sendMessagesToUsers()
   }
 
   def sendMessagesToUsers(): Unit = {
-    logger.info("Received RunBot message")
+    log.info("Received RunBot message")
 
     for {
       allEmails <- userService.getAllEmailAddresses
-      _ = logger.info("Got all users email addresses")
+      _ = log.info("Got all users email addresses")
       emailsNoDecision <- getEmailAddressesOfUsersWhoHaveNoDecision(allEmails)
-      _ = logger.info(
+      _ = log.info(
         "Got all users that have not answered on lunch planner email addresses"
       )
       slackUserIds <- getSlackUserIdsByUserEmails(emailsNoDecision)
-      _ = logger.info("Got all users slack users ids")
+      _ = log.info("Got all users slack users ids")
       channelIds <- openConversation(slackUserIds)
-      _        = logger.info("Got all users channels ids")
+      _        = log.info("Got all users channels ids")
       response = postMessages(channelIds)
     } yield response.onComplete {
       case Success(res) =>
-        logger.info(res)
+        log.info(res)
       case Failure(exception) =>
-        logger.error(exception.getMessage, exception)
+        log.error(exception.getMessage, exception)
     }
   }
 
