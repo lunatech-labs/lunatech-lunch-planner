@@ -184,7 +184,7 @@ class MenuController @Inject() (
     menuService
       .add(newMenu)
       .flatMap(menu =>
-        //Add MenuDishes
+        // Add MenuDishes
         addMenuDishes(menu.uuid, menuData.dishesUuid)
       )
   }

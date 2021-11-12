@@ -94,7 +94,7 @@ object UserTableSpec
   property("delete a non existing user by uuid") = forAll { user: User =>
     createTestSchema()
 
-    //skip adding user to DB
+    // skip adding user to DB
 
     val deletedResult =
       Await.result(UserTable.removeByUuid(user.uuid), defaultTimeout)
