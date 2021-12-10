@@ -4,15 +4,19 @@
   <conversionRule conversionWord="coloredLevel" converterClass="play.api.libs.logback.ColoredLevel" />
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-    <encoder>
-      <pattern>%date %coloredLevel %logger{15} - %message%n%xException{10}</pattern>
-    </encoder>
+    <!-- changed the encoder -->
+    <encoder class="com.newrelic.logging.logback.NewRelicEncoder"/>
+  </appender>
+
+  <!-- added the ASYNC appender -->
+  <appender name="ASYNC" class="com.newrelic.logging.logback.NewRelicAsyncAppender">
+    <appender-ref ref="STDOUT" />
   </appender>
 
   <logger name="play" level="INFO" />
 
   <root level="INFO">
-    <appender-ref ref="STDOUT" />
+    <appender-ref ref="ASYNC" />
   </root>
 
 </configuration>

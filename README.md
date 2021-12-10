@@ -59,3 +59,9 @@ localhost:9000
 
 To run the tests no docker image is necessary, instead an H2 in-memory DB has been setup
 
+
+### Deployment
+The lunch-planner is hosted in clever-cloud. To deploy a new version just merge master branch into production branch
+and an automatic deployment will be triggered.
+
+
