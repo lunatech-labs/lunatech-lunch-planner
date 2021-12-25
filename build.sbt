@@ -31,7 +31,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.play"      %% "play-mailer"            % "8.0.1",
   "com.typesafe.play"      %% "play-mailer-guice"      % "8.0.1",
   "com.newrelic.logging"    % "logback"                % "2.3.1",
-  "org.scalamock"          %% "scalamock"              % "5.1.0" % Test,
+  "org.scalamock"          %% "scalamock"              % "5.2.0" % Test,
   "org.scalatestplus.play" %% "scalatestplus-play"     % "5.1.0" % Test,
   "org.scalatestplus"      %% "scalacheck-1-15"        % "3.2.10.0" % Test,
   "org.scalacheck"         %% "scalacheck"             % "1.15.4" % Test,
