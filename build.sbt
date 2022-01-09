@@ -36,7 +36,7 @@ libraryDependencies ++= Seq(
   "org.scalatestplus"      %% "scalacheck-1-15"        % "3.2.10.0" % Test,
   "org.scalacheck"         %% "scalacheck"             % "1.15.4" % Test,
   "io.github.wolfendale"   %% "scalacheck-gen-regexp"  % "0.1.3" % Test,
-  "com.h2database"          % "h2"                     % "2.0.204" % Test
+  "com.h2database"          % "h2"                     % "2.0.206" % Test
 )
 
 resolvers ++= Seq(
