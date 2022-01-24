@@ -33,7 +33,7 @@ libraryDependencies ++= Seq(
   "com.newrelic.logging"    % "logback"                % "2.3.1",
   "org.scalamock"          %% "scalamock"              % "5.2.0" % Test,
   "org.scalatestplus.play" %% "scalatestplus-play"     % "5.1.0" % Test,
-  "org.scalatestplus"      %% "scalacheck-1-15"        % "3.2.10.0" % Test,
+  "org.scalatestplus"      %% "scalacheck-1-15"        % "3.2.11.0" % Test,
   "org.scalacheck"         %% "scalacheck"             % "1.15.4" % Test,
   "io.github.wolfendale"   %% "scalacheck-gen-regexp"  % "0.1.3" % Test,
   "com.h2database"          % "h2"                     % "2.0.206" % Test
