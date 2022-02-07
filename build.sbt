@@ -2,7 +2,7 @@ name := """lunatech-lunch-planner"""
 
 version := "1.0-SNAPSHOT"
 
-scalaVersion := "2.13.7"
+scalaVersion := "2.13.8"
 
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala)
