@@ -57,7 +57,7 @@ localhost:9000
 
 ##### Run the tests:
 
-To run the tests no docker image is necessary, instead an H2 in-memory DB has been setup
+To run the tests no docker image is necessary, instead an H2 in-memory DB has been set up
 
 
 ### Deployment
