@@ -82,7 +82,7 @@ class ReportController @Inject() (
     ReportForm.reportForm.bindFromRequest().fold(hasErrors, success)
   }
 
-  def export: EssentialAction = adminAction.async { implicit request =>
+  def exportToExcel: EssentialAction = adminAction.async { implicit request =>
     val chunkSize   = 1024
     val reportMonth = getMonth(request.session)
     val reportYear  = getYear(request.session)

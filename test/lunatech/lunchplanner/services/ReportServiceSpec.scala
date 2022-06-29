@@ -6,6 +6,7 @@ import lunatech.lunchplanner.models.{MenuDish, MenuPerDay, MenuPerDayPerPerson}
 import lunatech.lunchplanner.persistence._
 import org.scalatest.BeforeAndAfterEach
 
+import java.sql.Date
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -63,14 +64,14 @@ class ReportServiceSpec extends BehaviorTestingConfig with BeforeAndAfterEach {
         menuperday1 <- MenuPerDayTable.add(
           MenuPerDay(
             menuUuid = menu1.uuid,
-            date = new java.sql.Date(118, 0, 5),
+            date = Date.valueOf("2018-01-05"),
             location = "Rotterdam"
           )
         )
         menuperday2 <- MenuPerDayTable.add(
           MenuPerDay(
             menuUuid = menu2.uuid,
-            date = new java.sql.Date(118, 0, 5),
+            date = Date.valueOf("2018-01-05"),
             location = "Amsterdam"
           )
         )
@@ -105,14 +106,14 @@ class ReportServiceSpec extends BehaviorTestingConfig with BeforeAndAfterEach {
         menuperday3 <- MenuPerDayTable.add(
           MenuPerDay(
             menuUuid = menu1.uuid,
-            date = new java.sql.Date(118, 1, 10),
+            date = Date.valueOf("2018-02-10"),
             location = "Rotterdam"
           )
         )
         menuperday4 <- MenuPerDayTable.add(
           MenuPerDay(
             menuUuid = menu2.uuid,
-            date = new java.sql.Date(118, 1, 10),
+            date = Date.valueOf("2018-02-10"),
             location = "Amsterdam"
           )
         )
@@ -159,9 +160,9 @@ class ReportServiceSpec extends BehaviorTestingConfig with BeforeAndAfterEach {
         defaultTimeout
       )
       result.usersPerDateAndLocation mustBe List(
-        ((new java.sql.Date(118, 0, 5), "Amsterdam"), Vector("user 2")),
+        ((Date.valueOf("2018-01-05"), "Amsterdam"), Vector("user 2")),
         (
-          (new java.sql.Date(118, 0, 5), "Rotterdam"),
+          (Date.valueOf("2018-01-05"), "Rotterdam"),
           Vector("user 1", "user 3")
         )
       )
@@ -174,7 +175,7 @@ class ReportServiceSpec extends BehaviorTestingConfig with BeforeAndAfterEach {
       )
       result.usersPerDateAndLocation mustBe List(
         (
-          (new java.sql.Date(118, 1, 10), "Amsterdam"),
+          (Date.valueOf("2018-02-10"), "Amsterdam"),
           Vector("user 1", "user 2", "user 4")
         )
       )

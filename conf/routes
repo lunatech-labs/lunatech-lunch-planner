@@ -43,7 +43,7 @@ POST        /menuPerDay/:uuid                  lunatech.lunchplanner.controllers
 #Report
 GET         /report/                           lunatech.lunchplanner.controllers.ReportController.getReport
 GET         /report/filter                     lunatech.lunchplanner.controllers.ReportController.filterAttendees
-GET         /report/export                     lunatech.lunchplanner.controllers.ReportController.export
+GET         /report/export                     lunatech.lunchplanner.controllers.ReportController.exportToExcel
 
 # Menu per day per person
 POST        /menuPerDayPerPerson/add           lunatech.lunchplanner.controllers.MenuPerDayPerPersonController.createNewMenuPerDayPerPerson

@@ -45,7 +45,7 @@
     <br>
 
     <div class="col col-lg-12" style="padding-left: 0">
-    @b4.form(lunatech.lunchplanner.controllers.routes.ReportController.export) {
+    @b4.form(lunatech.lunchplanner.controllers.routes.ReportController.exportToExcel) {
         @if(user.isAdmin) {
             @b4.submit(Symbol("class") -> "btn btn-primary") {
                 Export
