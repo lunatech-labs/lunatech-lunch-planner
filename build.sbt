@@ -27,7 +27,7 @@ libraryDependencies ++= Seq(
   "com.adrianhurt"         %% "play-bootstrap"         % "1.6.1-P28-B4",
   "org.scalaz"             %% "scalaz-core"            % "7.4.0-M12",
   "org.apache.poi"          % "poi-ooxml"              % "5.2.2",
-  "com.enragedginger"      %% "akka-quartz-scheduler"  % "1.9.2-akka-2.6.x",
+  "com.enragedginger"      %% "akka-quartz-scheduler"  % "1.9.3-akka-2.6.x",
   "com.typesafe.play"      %% "play-mailer"            % "8.0.1",
   "com.typesafe.play"      %% "play-mailer-guice"      % "8.0.1",
   "com.newrelic.logging"    % "logback"                % "2.5.0",
