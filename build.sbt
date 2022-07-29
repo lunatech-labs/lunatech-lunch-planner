@@ -39,11 +39,8 @@ libraryDependencies ++= Seq(
   "com.h2database"          % "h2"                     % "2.1.214" % Test
 )
 
-resolvers ++= Seq(
-  "Lunatech Artifactory".at(
-    "https://artifactory.lunatech.com/artifactory/releases-public"
-  )
-)
+githubTokenSource := TokenSource.Environment("GITHUB_TOKEN") || TokenSource.GitConfig("github.token")
+resolvers += Resolver.githubPackages("lunatech-labs")
 
 addCommandAlias("validate", ";scalafmt;coverage;test;dependencyCheck")
 addCommandAlias("testCoverage", ";coverage;test;coverageReport")
