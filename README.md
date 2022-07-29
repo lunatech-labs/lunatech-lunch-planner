@@ -8,6 +8,17 @@ The application will allow Lunatech do manage friday lunches' menus and the peop
 
 ### To get started:
 
+##### Set up authentication for github packages
+
+If you have not done so yet you have to configure authentication for github packages, because this app depends on some lunatech provided jars hosted there.
+
+For this you need to generated a github personal access token (https://github.com/settings/tokens) with access to at least the following scope: `write:packages`.
+
+This can be provided to the build in two ways:
+
+1. Set the environment variable `GITHUB_TOKEN`
+2. Configure it in your git config (e.g.: `$HOME/.gitconfig`) with the following command: `git config --global github.token "<your token>"`
+
 ##### Compile and run the docker container:
 
 In `/dockerdev/postgres` run
