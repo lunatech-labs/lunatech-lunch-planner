@@ -17,7 +17,9 @@ case class AttachmentsActions(
     value: String = ""
 )
 
-case class Profile(name: Option[String], email: Option[String])
+/** From Slack API at https://api.slack.com/methods/users.list
+  */
+case class Profile(real_name: Option[String], email: Option[String])
 case class Member(id: String, profile: Profile)
 
 case class ResponseAction(name: String, `type`: String, value: String)
@@ -46,7 +48,7 @@ object SlackForm {
 
   implicit val profileWrites = new Writes[Profile] {
     override def writes(profile: Profile): JsValue = Json.obj(
-      "name"  -> profile.name,
+      "name"  -> profile.real_name,
       "email" -> profile.email
     )
   }
@@ -58,26 +60,26 @@ object SlackForm {
     )
   }
 
-  implicit val profileReads: Reads[Profile] = (
+  implicit val profileReads: Reads[Profile] =
     (JsPath \ "name")
       .readNullable[String]
-      .and((JsPath \ "email").readNullable[String])
-  )(Profile.apply _)
+      .and((JsPath \ "email").readNullable[String])(Profile.apply _)
 
-  implicit val memberReads: Reads[Member] = (
-    (JsPath \ "id").read[String].and((JsPath \ "profile").read[Profile])
-  )(Member.apply _)
+  implicit val memberReads: Reads[Member] =
+    (JsPath \ "id")
+      .read[String]
+      .and((JsPath \ "profile").read[Profile])(Member.apply _)
 
-  implicit val responseActionReads: Reads[ResponseAction] = (
+  implicit val responseActionReads: Reads[ResponseAction] =
     (JsPath \ "name")
       .read[String]
       .and((JsPath \ "type").read[String])
-      .and((JsPath \ "value").read[String])
-  )(ResponseAction.apply _)
+      .and((JsPath \ "value").read[String])(ResponseAction.apply _)
 
-  implicit val slackUserReads: Reads[SlackUser] = (
-    (JsPath \ "id").read[String].and((JsPath \ "name").read[String])
-  )(SlackUser.apply _)
+  implicit val slackUserReads: Reads[SlackUser] =
+    (JsPath \ "id")
+      .read[String]
+      .and((JsPath \ "name").read[String])(SlackUser.apply _)
 
   def jsonToString(attachments: Seq[Attachments]): String =
     Json.toJson(attachments).toString
@@ -88,14 +90,31 @@ object SlackForm {
       (json \ "actions").get.as[Seq[ResponseAction]]
     )
 
-  def jsonToMemberObject(json: JsValue): Seq[Member] = {
+  def jsonToResponseStatus(json: JsValue): Either[String, Boolean] = {
+    val jsonResult = (json \ "ok").toOption
+    if (jsonResult.isDefined) {
+      Right(jsonResult.get.as[Boolean])
+    } else {
+      Left("Slack response did not have expected field 'ok'.")
+    }
+  }
+
+  def jsonToErrorMessage(json: JsValue): String = {
+    val jsonResult = (json \ "error").toOption
+    if (jsonResult.isDefined) {
+      jsonResult.get.as[String]
+    } else {
+      "Slack response did not have expected field 'error'."
+    }
+  }
+
+  def jsonToMemberObject(json: JsValue): Either[String, Seq[Member]] = {
     val jsonResult = (json \ "members").toOption
     if (jsonResult.isDefined) {
-      jsonResult.get.as[Seq[Member]]
+      Right(jsonResult.get.as[Seq[Member]])
     } else {
-      Seq()
+      Left("Slack response did not have expected field 'members'.")
     }
-
   }
 
 }

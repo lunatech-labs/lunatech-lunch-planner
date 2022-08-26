@@ -28,12 +28,29 @@ class SlackService @Inject() (
   /** Will get the Lunatech e-mail address of the Slack user. We use the e-mail
     * as this is the data that is common between Slack and Lunch App.
     */
-  def getAllSlackUsersByEmails(emails: Seq[String]): Future[Seq[String]] = {
+  def getAllSlackUsersByEmails(
+      emails: Seq[String]
+  ): Future[Either[String, Seq[String]]] = {
     val requestBody = Map("token" -> Seq(token))
+    doPost(getString("slack.api.usersList.url"), requestBody).map { response =>
+      SlackForm.jsonToResponseStatus(response.json).map { isOk =>
+        if (isOk) {
+          SlackForm.jsonToMemberObject(response.json).map { members =>
+            members
+              .filter(member =>
+                member.profile.email.isDefined && emails.contains(
+                  member.profile.email.get
+                )
+              )
+              .map(_.id)
+          }
+        } else { SlackForm.jsonToErrorMessage(response.json).map(Left(_)) }
+      }
+    }
+
     for {
       response <- doPost(getString("slack.api.usersList.url"), requestBody)
-    } yield {
-      val members = SlackForm.jsonToMemberObject(response.json)
+    } yield SlackForm.jsonToMemberObject(response.json).map { members =>
       members
         .filter(member =>
           member.profile.email.isDefined && emails.contains(
