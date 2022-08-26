@@ -64,16 +64,28 @@ class SlackService @Inject() (
   /** Will open a direct message channel to start a conversation. The channel ID
     * of this conversation is returned.
     */
-  def openConversation(userIds: Seq[String]): Future[Seq[String]] =
-    Future.sequence {
-      val responses = userIds.map { userId =>
-        val requestBody = Map("token" -> Seq(token), "users" -> Seq(userId))
-        val response =
-          doPost(getString("slack.api.conversations.open"), requestBody)
-        response.map(r => (r.json \ "channel" \ "id").as[String])
-      }
-      responses
-    }
+  def openConversation(
+      userIds: Seq[String]
+  ): Future[Seq[Either[String, String]]] =
+    Future.sequence(userIds.map { user =>
+      val requestBody = Map("token" -> Seq(token), "users" -> Seq(user))
+      for {
+        response <- doPost(
+          getString("slack.api.conversations.open"),
+          requestBody
+        )
+        statusResult <- Future.successful(
+          SlackForm
+            .jsonToResponseStatus(response.json) match {
+            case Left(error) => Left(error)
+            case Right(isOk) =>
+              if (isOk) {
+                SlackForm.jsonToChannelIdObject(response.json)
+              } else { Left(SlackForm.jsonToErrorMessage(response.json)) }
+          }
+        )
+      } yield statusResult
+    })
 
   /** Will post a message to a direct message channel (channel ID starts with a
     * D) with attachments.

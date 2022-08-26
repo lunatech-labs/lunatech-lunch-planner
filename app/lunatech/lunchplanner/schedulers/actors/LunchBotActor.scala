@@ -32,8 +32,8 @@ class LunchBotActor(
         s"Number of users that did not answer to lunch this week: ${emailsNoDecision.length}"
       )
       slackUserIds <- getSlackUserIdsByUserEmails(emailsNoDecision)
-      channelIds   <- openConversation(slackUserIds)
-      _        = log.info("Got all users channels ids")
+      channelIds   <- getSlackChannels(slackUserIds)
+      _ = log.info(s"Got all users channels ids. Count: ${channelIds.length}")
       response = postMessages(channelIds)
     } yield response.onComplete {
       case Success(res) =>
@@ -62,8 +62,15 @@ class LunchBotActor(
         Seq.empty
     }
 
-  def openConversation(slackUserIds: Seq[String]): Future[Seq[String]] =
-    slackService.openConversation(slackUserIds)
+  def getSlackChannels(slackUserIds: Seq[String]): Future[Seq[String]] = {
+    slackService
+      .openConversation(slackUserIds)
+      .foreach(_.collect { case Left(error) => log.error(error) })
+
+    slackService
+      .openConversation(slackUserIds)
+      .map(_.collect { case Right(channel) => channel })
+  }
 
   def postMessages(channelIds: Seq[String]): Future[String] =
     slackService.postMessage(channelIds)

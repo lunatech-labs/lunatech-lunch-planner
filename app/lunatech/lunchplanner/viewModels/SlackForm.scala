@@ -99,6 +99,9 @@ object SlackForm {
     }
   }
 
+  /** checking the result manually instead of using JsLookup.toEither to
+    * simplify the error
+    */
   def jsonToErrorMessage(json: JsValue): String = {
     val jsonResult = (json \ "error").toOption
     if (jsonResult.isDefined) {
@@ -108,12 +111,27 @@ object SlackForm {
     }
   }
 
+  /** checking the result manually instead of using JsLookup.toEither to
+    * simplify the error
+    */
   def jsonToMemberObject(json: JsValue): Either[String, Seq[Member]] = {
     val jsonResult = (json \ "members").toOption
     if (jsonResult.isDefined) {
       Right(jsonResult.get.as[Seq[Member]])
     } else {
       Left("Slack response did not have expected field 'members'.")
+    }
+  }
+
+  /** checking the result manually instead of using JsLookup.toEither to
+    * simplify the error
+    */
+  def jsonToChannelIdObject(json: JsValue): Either[String, String] = {
+    val jsonResult = (json \ "channel" \ "id").toOption
+    if (jsonResult.isDefined) {
+      Right(jsonResult.get.as[String])
+    } else {
+      Left("Slack response did not have expected field 'channel \\ id'.")
     }
   }
 
