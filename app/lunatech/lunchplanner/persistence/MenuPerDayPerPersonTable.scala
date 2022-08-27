@@ -227,7 +227,7 @@ object MenuPerDayPerPersonTable {
     connection.db.run(query)
   }
 
-  /** Get attendees for upcoming Friday lunch. The '5' refers to Friday.
+  /** Get attendees for upcoming meals up to the following 5 days
     */
   def getAttendeesEmailAddressesForUpcomingLunch(implicit
       connection: DBConnection
@@ -235,7 +235,7 @@ object MenuPerDayPerPersonTable {
     val query = sql"""SELECT u."emailAddress" FROM "MenuPerDayPerPerson" mpdpp
                       JOIN "User" u ON mpdpp."userUuid"=u."uuid" AND u."isDeleted" = FALSE
                       JOIN "MenuPerDay" mpd ON mpdpp."menuPerDayUuid"=mpd."uuid" AND mpd."isDeleted" = FALSE
-                      WHERE mpd."date" = (SELECT current_date - cast(extract(dow FROM current_date) AS int) + 5)"""
+                      WHERE mpd."date" >= (current_date + 1) AND mpd."date" <= (current_date + 5)"""
       .as[String]
     connection.db.run(query)
   }

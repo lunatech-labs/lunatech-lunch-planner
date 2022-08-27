@@ -15,7 +15,6 @@ import scala.concurrent.Future
 class MenuPerDayTable(tag: Tag)
     extends Table[MenuPerDay](tag, _tableName = "MenuPerDay") {
   private val menuTable = TableQuery[MenuTable]
-  private val dishTable = TableQuery[DishTable]
 
   def uuid: Rep[UUID] = column[UUID]("uuid", O.PrimaryKey)
 
@@ -170,7 +169,8 @@ object MenuPerDayTable {
     val query =
       sql"""SELECT mpd."uuid", mpd."menuUuid", mpd."date", mpd."location", m."name"
            FROM "MenuPerDay" mpd JOIN "Menu" m ON mpd."menuUuid"=m."uuid" AND m."isDeleted" = FALSE AND mpd."isDeleted" = FALSE
-           WHERE mpd."date" = (SELECT current_date - cast(extract(dow FROM current_date) AS int) + 5)"""
+           WHERE mpd."date" >= (current_date + 1) AND mpd."date" <= (current_date + 5)
+           ORDER BY mpd."date""""
         .as[(MenuPerDay, String)]
 
     connection.db.run(query)

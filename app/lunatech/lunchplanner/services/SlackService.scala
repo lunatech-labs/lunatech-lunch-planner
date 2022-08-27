@@ -32,33 +32,30 @@ class SlackService @Inject() (
       emails: Seq[String]
   ): Future[Either[String, Seq[String]]] = {
     val requestBody = Map("token" -> Seq(token))
-    doPost(getString("slack.api.usersList.url"), requestBody).map { response =>
-      SlackForm.jsonToResponseStatus(response.json).map { isOk =>
-        if (isOk) {
-          SlackForm.jsonToMemberObject(response.json).map { members =>
-            members
-              .filter(member =>
-                member.profile.email.isDefined && emails.contains(
-                  member.profile.email.get
-                )
-              )
-              .map(_.id)
-          }
-        } else { SlackForm.jsonToErrorMessage(response.json).map(Left(_)) }
-      }
-    }
 
     for {
       response <- doPost(getString("slack.api.usersList.url"), requestBody)
-    } yield SlackForm.jsonToMemberObject(response.json).map { members =>
-      members
-        .filter(member =>
-          member.profile.email.isDefined && emails.contains(
-            member.profile.email.get
-          )
-        )
-        .map(_.id)
-    }
+      statusResult <- Future.successful(
+        SlackForm
+          .jsonToResponseStatus(response.json) match {
+          case Left(error) => Left(error)
+          case Right(isOk) =>
+            if (isOk) {
+              SlackForm.jsonToMemberObject(response.json).map { members =>
+                members
+                  .filter(member =>
+                    member.profile.email.isDefined && emails.contains(
+                      member.profile.email.get
+                    )
+                  )
+                  .map(_.id)
+              }
+            } else {
+              Left(SlackForm.jsonToErrorMessage(response.json))
+            }
+        }
+      )
+    } yield statusResult
   }
 
   /** Will open a direct message channel to start a conversation. The channel ID
@@ -91,41 +88,56 @@ class SlackService @Inject() (
     * D) with attachments.
     */
   def postMessage(channelIds: Seq[String]): Future[String] = {
-    val text = getString("slack.bot.message.text")
+    val text = getString("slack.bot.message.salutation")
 
     def sendMessage(
-        attachments: Seq[Attachments]
+        attachment: Attachments
     ): String => Future[JsValue] = { channelId =>
       val requestBody =
         Map(
           "token"       -> Seq(token),
           "channel"     -> Seq(channelId),
           "text"        -> Seq(text),
-          "attachments" -> Seq(SlackForm.jsonToString(attachments))
+          "attachments" -> Seq(SlackForm.jsonToString(Seq(attachment)))
         )
       val response =
-        doPost(getString("slack.api.postMessage.url"), requestBody)
-      response.map(r => r.json)
+        doPost(getString("slack.api.postMessage.url"), requestBody).map(r =>
+          r.json
+        )
+
+      // log message if slack returns an error response
+      response.foreach { res =>
+        SlackForm.jsonToResponseStatus(res).foreach { isOk =>
+          if (!isOk) logger.error(SlackForm.jsonToErrorMessage(res))
+        }
+      }
+
+      response
     }
 
-    def result(attachments: Seq[Attachments]): Future[String] =
-      if (attachments.nonEmpty) {
-        for {
-          responses <- Future.traverse(channelIds)(sendMessage(attachments))
-        } yield s"SlackBot message sent to ${responses.length} people!"
+    def sendMessages(attachments: Seq[Attachments]): Future[String] = {
+      attachments.map { attachment =>
+        Future.traverse(channelIds)(sendMessage(attachment))
+      }
+
+      if (attachments.isEmpty) {
+        Future.successful(
+          "No message sent by SlackBot because there's no upcoming lunch the upcoming week."
+        )
       } else {
         Future.successful(
-          "No message sent by SlackBot because there's no upcoming lunch this coming Friday."
+          s"SlackBot message sent to ${channelIds.length} people!"
         )
       }
+    }
 
     for {
       attachments <- getAttachments
-      response    <- result(attachments)
+      response    <- sendMessages(attachments)
     } yield response
   }
 
-  /** * Compute the response for the use on Slack
+  /** * Compute the response for the user on Slack
     */
   def processSlackResponse(response: SlackResponse): Future[String] = {
     val isAttending =
@@ -134,16 +146,16 @@ class SlackService @Inject() (
     if (isAttending) {
       menuPerDayService.getMenuForUpcomingSchedule.map {
         menusForUpcomingSchedule =>
-          val uuidAndMenuName: Seq[(UUID, String)] =
-            menusForUpcomingSchedule.map { case (menuPerDay, menuName) =>
-              menuPerDay.uuid -> menuName
-            }
-          val menuName =
-            getSelectedMenuName(uuidAndMenuName, getMenuUuid(response))
+          val (menu, _): (MenuPerDay, String) = {
+            val menuUuid = getMenuUuid(response)
+            menusForUpcomingSchedule.filter { case (menu, _) =>
+              menu.uuid.toString == menuUuid
+            }.head
+          }
 
           configuration
             .get[String]("slack.bot.response.text")
-            .format(menuName)
+            .format(menu.date.toLocalDate.getDayOfWeek, menu.location)
       }
     } else {
       Future.successful(
@@ -157,19 +169,6 @@ class SlackService @Inject() (
       .map(_.value)
       .fold {
         logger.error(s"Empty slack response ${response}")
-        ""
-      }(identity)
-
-  private def getSelectedMenuName(
-      uuidAndMenuName: Seq[(UUID, String)],
-      menuUuid: String
-  ) =
-    uuidAndMenuName.find { case (uuid, _) => uuid == UUID.fromString(menuUuid) }
-      .map(_._2)
-      .fold {
-        logger.error(
-          s"Error computing response for slack action with menu uuid $menuUuid"
-        )
         ""
       }(identity)
 
@@ -262,39 +261,38 @@ class SlackService @Inject() (
 
   private def getAttachments: Future[Seq[Attachments]] = {
     def toAttachmentsActions(
-        menuWithMenuNameList: Seq[(MenuPerDay, String)]
+        menuWithMenuNameList: (MenuPerDay, String)
     ): Seq[AttachmentsActions] = {
-      val yesActions = menuWithMenuNameList.map { case (menuPerDay, menuName) =>
-        val text = getString("slack.bot.button.yes.text")
-          .format(menuName, menuPerDay.location)
+      val (menuPerDay, _) = menuWithMenuNameList
+      val yesAction = {
+        val text =
+          getString("slack.bot.button.yes.text").format(menuPerDay.location)
         val value = menuPerDay.uuid.toString
         AttachmentsActions(text = text, value = value)
       }
 
+      // A "~" in value means that the user picked "Not Attending".
       val noAction = AttachmentsActions(
         text = getString("slack.bot.button.no.text"),
         style = "danger",
-        value = if (menuWithMenuNameList.length == 1) {
-          s"${menuWithMenuNameList.head._1.uuid}~"
-        } else { menuWithMenuNameList.map(_._1.uuid).mkString("~") }
+        value = s"${menuPerDay.uuid}~"
       )
-      if (yesActions.nonEmpty) yesActions :+ noAction else Seq.empty
+      Seq(yesAction, noAction)
     }
 
     for {
       menuWithMenuNameList <- menuPerDayService.getMenuForUpcomingSchedule
-    } yield {
-      val actions = toAttachmentsActions(menuWithMenuNameList)
-      val menuAndLocations = menuWithMenuNameList.map {
-        case (menuPerDay, menuName) => s"$menuName in ${menuPerDay.location}"
-      }
-        .mkString(" and ")
-
+    } yield menuWithMenuNameList.map { menuWithMenuName =>
+      val actions                = toAttachmentsActions(menuWithMenuName)
+      val (menuPerDay, menuName) = menuWithMenuName
       val message =
-        getString("slack.bot.attachment.text").format(menuAndLocations)
-
-      if (actions.nonEmpty) Seq(Attachments(message, "callback_id", actions))
-      else Seq.empty
+        getString("slack.bot.attachment.text")
+          .format(
+            menuPerDay.date.toLocalDate.getDayOfWeek,
+            menuPerDay.location,
+            menuName
+          )
+      Attachments(message, s"`${menuPerDay.date}$menuName", actions)
     }
   }
 
