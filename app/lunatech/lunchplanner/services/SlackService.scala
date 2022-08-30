@@ -38,7 +38,8 @@ class SlackService @Inject() (
       statusResult <- Future.successful(
         SlackForm
           .jsonToResponseStatus(response.json) match {
-          case Left(error) => Left(error)
+          case Left(error) =>
+            Left(s"Error getting slack user's list: $error")
           case Right(isOk) =>
             if (isOk) {
               SlackForm.jsonToMemberObject(response.json).map { members =>
@@ -51,7 +52,8 @@ class SlackService @Inject() (
                   .map(_.id)
               }
             } else {
-              Left(SlackForm.jsonToErrorMessage(response.json))
+              Left(s"Error getting slack user's list: ${SlackForm
+                  .jsonToErrorMessage(response.json)}")
             }
         }
       )
@@ -74,7 +76,8 @@ class SlackService @Inject() (
         statusResult <- Future.successful(
           SlackForm
             .jsonToResponseStatus(response.json) match {
-            case Left(error) => Left(error)
+            case Left(error) =>
+              Left(s"Error posting slack conversations open: $error")
             case Right(isOk) =>
               if (isOk) {
                 SlackForm.jsonToChannelIdObject(response.json)
@@ -108,7 +111,11 @@ class SlackService @Inject() (
       // log message if slack returns an error response
       response.foreach { res =>
         SlackForm.jsonToResponseStatus(res).foreach { isOk =>
-          if (!isOk) logger.error(SlackForm.jsonToErrorMessage(res))
+          if (!isOk) {
+            logger.error(
+              s"Error posting message to slack ${SlackForm.jsonToErrorMessage(res)}"
+            )
+          }
         }
       }
 
@@ -256,7 +263,9 @@ class SlackService @Inject() (
 
   private def doPost(url: String, requestBody: Map[String, Seq[String]]) =
     ws.url(url)
-      .withHttpHeaders(HeaderNames.CONTENT_TYPE -> ContentTypes.FORM)
+      .withHttpHeaders(
+        HeaderNames.CONTENT_TYPE -> ContentTypes.FORM
+      )
       .post(requestBody)
 
   private def getAttachments: Future[Seq[Attachments]] = {
