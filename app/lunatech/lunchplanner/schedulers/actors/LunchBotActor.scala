@@ -9,7 +9,6 @@ import lunatech.lunchplanner.services.{
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.util.{Failure, Success}
 
 class LunchBotActor(
     userService: UserService,
@@ -34,13 +33,9 @@ class LunchBotActor(
       slackUserIds <- getSlackUserIdsByUserEmails(emailsNoDecision)
       channelIds   <- getSlackChannels(slackUserIds)
       _ = log.info(s"Got all users channels ids. Count: ${channelIds.length}")
-      response = postMessages(channelIds)
-    } yield response.onComplete {
-      case Success(res) =>
-        log.info(res)
-      case Failure(exception) =>
-        log.error(exception.getMessage, exception)
-    }
+      _ <- postMessages(channelIds)
+    } yield ()
+
   }
 
   def getEmailAddressesOfUsersWhoHaveNoDecision(
@@ -63,16 +58,16 @@ class LunchBotActor(
     }
 
   def getSlackChannels(slackUserIds: Seq[String]): Future[Seq[String]] = {
-    slackService
+    val openConversationResponse = slackService
       .openConversation(slackUserIds)
-      .foreach(_.collect { case Left(error) => log.error(error) })
 
-    slackService
-      .openConversation(slackUserIds)
-      .map(_.collect { case Right(channel) => channel })
+    openConversationResponse.foreach(_.collect { case Left(error) =>
+      log.error(error)
+    })
+    openConversationResponse.map(_.collect { case Right(channel) => channel })
   }
 
-  def postMessages(channelIds: Seq[String]): Future[String] =
+  def postMessages(channelIds: Seq[String]): Future[Unit] =
     slackService.postMessage(channelIds)
 }
 
