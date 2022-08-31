@@ -19,7 +19,7 @@ libraryDependencies ++= Seq(
   ws,
   evolutions,
   "com.lunatech"           %% "play-googleopenconnect" % "2.8.0",
-  "com.typesafe.play"      %% "play-json"              % "2.9.2",
+  "com.typesafe.play"      %% "play-json"              % "2.9.3",
   "com.typesafe.play"      %% "play-slick"             % "5.0.2", // 2019
   "com.typesafe.play"      %% "play-slick-evolutions"  % "5.0.2", // 2019
   "com.typesafe.slick"     %% "slick-hikaricp"         % "3.3.3", // 2020
@@ -39,7 +39,8 @@ libraryDependencies ++= Seq(
   "com.h2database"          % "h2"                     % "2.1.214" % Test
 )
 
-githubTokenSource := TokenSource.Environment("GITHUB_TOKEN") || TokenSource.GitConfig("github.token")
+githubTokenSource := TokenSource.Environment("GITHUB_TOKEN") || TokenSource
+  .GitConfig("github.token")
 resolvers += Resolver.githubPackages("lunatech-labs")
 
 addCommandAlias("validate", ";scalafmt;coverage;test;dependencyCheck")
