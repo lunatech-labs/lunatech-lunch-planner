@@ -19,7 +19,7 @@ class MonthlyReportService @Inject() (
   val oneMonth      = 1
   val fileExtension = "xls"
 
-  def sendMonthlyReport(): Future[Unit] = {
+  def sendMonthlyReport(): Future[Either[Throwable, String]] = {
     val (month, year) = getPreviousMonthAndYear
     val monthName     = fromMonthNumberToName(month)
 

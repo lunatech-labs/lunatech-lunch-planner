@@ -6,6 +6,7 @@ import play.api.Logging
 import play.api.libs.mailer.{AttachmentData, Email, MailerClient}
 
 import javax.inject.Inject
+import scala.util.Try
 
 class EmailService @Inject() (mailerClient: MailerClient) extends Logging {
 
@@ -14,7 +15,7 @@ class EmailService @Inject() (mailerClient: MailerClient) extends Logging {
       messageBody: String,
       attachmentName: String,
       attachmentData: Array[Byte]
-  ): String = {
+  ): Either[Throwable, String] = {
     val message =
       Email(
         emailConfiguration.subject,
@@ -32,10 +33,6 @@ class EmailService @Inject() (mailerClient: MailerClient) extends Logging {
         )
       )
 
-    val result = mailerClient.send(message)
-    logger.info(
-      s"Monthly report sent to [${emailConfiguration.to.mkString(", ")}]"
-    )
-    result
+    Try(mailerClient.send(message)).toEither
   }
 }
