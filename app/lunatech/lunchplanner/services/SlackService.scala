@@ -3,7 +3,6 @@ package lunatech.lunchplanner.services
 import lunatech.lunchplanner.models.{MenuPerDay, MenuPerDayPerPerson, User}
 import lunatech.lunchplanner.viewModels._
 import play.api.http.ContentTypes
-import play.api.libs.json.JsValue
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logging}
 import play.mvc.Http.HeaderNames
@@ -38,7 +37,8 @@ class SlackService @Inject() (
       statusResult <- Future.successful(
         SlackForm
           .jsonToResponseStatus(response.json) match {
-          case Left(error) => Left(error)
+          case Left(error) =>
+            Left(s"Error getting slack user's list: $error")
           case Right(isOk) =>
             if (isOk) {
               SlackForm.jsonToMemberObject(response.json).map { members =>
@@ -51,7 +51,8 @@ class SlackService @Inject() (
                   .map(_.id)
               }
             } else {
-              Left(SlackForm.jsonToErrorMessage(response.json))
+              Left(s"Error getting slack user's list: ${SlackForm
+                  .jsonToErrorMessage(response.json)}")
             }
         }
       )
@@ -74,7 +75,8 @@ class SlackService @Inject() (
         statusResult <- Future.successful(
           SlackForm
             .jsonToResponseStatus(response.json) match {
-            case Left(error) => Left(error)
+            case Left(error) =>
+              Left(s"Error posting slack conversations open: $error")
             case Right(isOk) =>
               if (isOk) {
                 SlackForm.jsonToChannelIdObject(response.json)
@@ -87,12 +89,13 @@ class SlackService @Inject() (
   /** Will post a message to a direct message channel (channel ID starts with a
     * D) with attachments.
     */
-  def postMessage(channelIds: Seq[String]): Future[String] = {
+  // scalastyle:off method.length
+  def postMessage(channelIds: Seq[String]): Future[Unit] = {
     val text = getString("slack.bot.message.salutation")
 
     def sendMessage(
         attachment: Attachments
-    ): String => Future[JsValue] = { channelId =>
+    ): String => Future[Unit] = { channelId =>
       val requestBody =
         Map(
           "token"       -> Seq(token),
@@ -100,42 +103,51 @@ class SlackService @Inject() (
           "text"        -> Seq(text),
           "attachments" -> Seq(SlackForm.jsonToString(Seq(attachment)))
         )
-      val response =
-        doPost(getString("slack.api.postMessage.url"), requestBody).map(r =>
-          r.json
+
+      for {
+        response <- doPost(
+          getString("slack.api.postMessage.url"),
+          requestBody
         )
-
-      // log message if slack returns an error response
-      response.foreach { res =>
-        SlackForm.jsonToResponseStatus(res).foreach { isOk =>
-          if (!isOk) logger.error(SlackForm.jsonToErrorMessage(res))
-        }
-      }
-
-      response
+        statusResult <- Future.successful(
+          SlackForm
+            .jsonToResponseStatus(response.json) match {
+            case Left(error) =>
+              logger.error(s"Error getting slack user's list: $error")
+            case Right(isOk) =>
+              if (!isOk) {
+                logger.error(s"Error posting messagee to slack: ${SlackForm
+                    .jsonToErrorMessage(response.json)}")
+              } else {
+                logger.info(s"Sent message to user with channelId $channelId")
+              }
+          }
+        )
+      } yield ()
     }
 
-    def sendMessages(attachments: Seq[Attachments]): Future[String] = {
+    def sendMessages(attachments: Seq[Attachments]): Future[Unit] = {
       attachments.map { attachment =>
         Future.traverse(channelIds)(sendMessage(attachment))
       }
 
       if (attachments.isEmpty) {
-        Future.successful(
+        logger.info(
           "No message sent by SlackBot because there's no upcoming lunch the upcoming week."
         )
       } else {
-        Future.successful(
-          s"SlackBot message sent to ${channelIds.length} people!"
-        )
+        logger.info(s"SlackBot message sent to ${channelIds.length} people!")
       }
+
+      Future.successful(())
     }
 
     for {
       attachments <- getAttachments
-      response    <- sendMessages(attachments)
-    } yield response
+      _           <- sendMessages(attachments)
+    } yield ()
   }
+  // scalastyle:on method.length
 
   /** * Compute the response for the user on Slack
     */
@@ -256,7 +268,9 @@ class SlackService @Inject() (
 
   private def doPost(url: String, requestBody: Map[String, Seq[String]]) =
     ws.url(url)
-      .withHttpHeaders(HeaderNames.CONTENT_TYPE -> ContentTypes.FORM)
+      .withHttpHeaders(
+        HeaderNames.CONTENT_TYPE -> ContentTypes.FORM
+      )
       .post(requestBody)
 
   private def getAttachments: Future[Seq[Attachments]] = {
