@@ -1,13 +1,9 @@
 package lunatech.lunchplanner.schedulers
 
-import akka.actor.{ActorSystem, Props}
+import akka.actor.{ActorRef, ActorSystem, Props}
 import com.typesafe.akka.extension.quartz.QuartzSchedulerExtension
 import lunatech.lunchplanner.schedulers.actors.{LunchBotActor, RunBot}
-import lunatech.lunchplanner.services.{
-  MenuPerDayPerPersonService,
-  SlackService,
-  UserService
-}
+import lunatech.lunchplanner.services.{MenuPerDayPerPersonService, SlackService, UserService}
 import play.api.{Configuration, Logging}
 import play.api.inject.ApplicationLifecycle
 
@@ -32,7 +28,7 @@ class LunchBotScheduler @Inject() (
   private val scheduleName        = "LunchBot"
   private val scheduleDescription = "Slack bot"
 
-  val lunchBotActor = system.actorOf(
+  val lunchBotActor: ActorRef = system.actorOf(
     Props.create(
       classOf[LunchBotActor],
       userService,

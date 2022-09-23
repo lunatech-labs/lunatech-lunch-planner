@@ -20,7 +20,7 @@ case class AttachmentsActions(
 /** From Slack API at https://api.slack.com/methods/users.list
   */
 case class Profile(real_name: Option[String], email: Option[String])
-case class Member(id: String, profile: Profile)
+case class Member(id: String, deleted: Boolean, profile: Profile)
 
 case class ResponseAction(name: String, `type`: String, value: String)
 case class SlackUser(id: String, name: String)
@@ -28,7 +28,7 @@ case class SlackResponse(user: SlackUser, action: Seq[ResponseAction])
 
 object SlackForm {
 
-  implicit val attachmentsActionsWrites = new Writes[AttachmentsActions] {
+  implicit val attachmentsActionsWrites: Writes[AttachmentsActions] = new Writes[AttachmentsActions] {
     override def writes(actions: AttachmentsActions): JsValue = Json.obj(
       "name"  -> actions.name,
       "text"  -> actions.text,
@@ -38,7 +38,7 @@ object SlackForm {
     )
   }
 
-  implicit val attachmentsWrites = new Writes[Attachments] {
+  implicit val attachmentsWrites: Writes[Attachments] = new Writes[Attachments] {
     override def writes(attachments: Attachments): JsValue = Json.obj(
       "text"        -> attachments.text,
       "callback_id" -> attachments.callback_id,
@@ -46,7 +46,7 @@ object SlackForm {
     )
   }
 
-  implicit val profileWrites = new Writes[Profile] {
+  implicit val profileWrites: Writes[Profile] = new Writes[Profile] {
     override def writes(profile: Profile): JsValue = Json.obj(
       "name"  -> profile.real_name,
       "email" -> profile.email
@@ -67,7 +67,8 @@ object SlackForm {
 
   implicit val memberReads: Reads[Member] =
     (JsPath \ "id")
-      .read[String]
+      .read[String].and((JsPath \ "deleted")
+      .read[Boolean])
       .and((JsPath \ "profile").read[Profile])(Member.apply _)
 
   implicit val responseActionReads: Reads[ResponseAction] =
