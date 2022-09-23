@@ -43,7 +43,7 @@ class SlackService @Inject() (
             if (isOk) {
               SlackForm.jsonToMemberObject(response.json).map { members =>
                 members
-                  .filter(member =>
+                  .filter(member => !member.deleted &&
                     member.profile.email.isDefined && emails.contains(
                       member.profile.email.get
                     )
@@ -116,10 +116,8 @@ class SlackService @Inject() (
               logger.error(s"Error getting slack user's list: $error")
             case Right(isOk) =>
               if (!isOk) {
-                logger.error(s"Error posting messagee to slack: ${SlackForm
+                logger.error(s"Error posting message to slack: ${SlackForm
                     .jsonToErrorMessage(response.json)}")
-              } else {
-                logger.info(s"Sent message to user with channelId $channelId")
               }
           }
         )
