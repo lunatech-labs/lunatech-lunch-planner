@@ -20,9 +20,9 @@ libraryDependencies ++= Seq(
   evolutions,
   "com.lunatech"            %% "play-googleopenconnect" % "2.8.0",
   "com.typesafe.play"       %% "play-json"              % "2.9.3",
-  "com.typesafe.play"       %% "play-slick"             % "5.0.2", // 2019
-  "com.typesafe.play"       %% "play-slick-evolutions"  % "5.0.2", // 2019
-  "com.typesafe.slick"      %% "slick-hikaricp"         % "3.3.3", // 2020
+  "com.typesafe.play"       %% "play-slick"             % "5.1.0", // 2019
+  "com.typesafe.play"       %% "play-slick-evolutions"  % "5.1.0", // 2019
+  "com.typesafe.slick"      %% "slick-hikaricp"         % "3.4.1", // 2020
   "org.postgresql"           % "postgresql"             % "42.5.0",
   "com.adrianhurt"          %% "play-bootstrap"         % "1.6.1-P28-B4",
   "org.scalaz"              %% "scalaz-core"            % "7.4.0-M12",
