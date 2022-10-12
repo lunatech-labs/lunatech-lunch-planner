@@ -15,13 +15,12 @@ object UserServicePropertySpec
   private val configuration = mock[Configuration]
   private val userService   = new UserService(configuration)
 
-  private val emailAddressGen: Gen[String] = {
+  private val emailAddressGen: Gen[String] =
     for {
       email <- RegexpGen.from(
         "^[a-zA-Z-]+[.][a-zA-Z-]+([.][a-zA-Z-]+)?@lunatech.nl"
       )
     } yield email.normalize
-  }
 
   property("extract user name from email") = forAll(emailAddressGen) { email =>
     createTestSchema()

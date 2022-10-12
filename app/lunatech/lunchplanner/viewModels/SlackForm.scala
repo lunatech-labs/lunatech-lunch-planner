@@ -28,23 +28,25 @@ case class SlackResponse(user: SlackUser, action: Seq[ResponseAction])
 
 object SlackForm {
 
-  implicit val attachmentsActionsWrites: Writes[AttachmentsActions] = new Writes[AttachmentsActions] {
-    override def writes(actions: AttachmentsActions): JsValue = Json.obj(
-      "name"  -> actions.name,
-      "text"  -> actions.text,
-      "type"  -> actions.`type`,
-      "style" -> actions.style,
-      "value" -> actions.value
-    )
-  }
+  implicit val attachmentsActionsWrites: Writes[AttachmentsActions] =
+    new Writes[AttachmentsActions] {
+      override def writes(actions: AttachmentsActions): JsValue = Json.obj(
+        "name"  -> actions.name,
+        "text"  -> actions.text,
+        "type"  -> actions.`type`,
+        "style" -> actions.style,
+        "value" -> actions.value
+      )
+    }
 
-  implicit val attachmentsWrites: Writes[Attachments] = new Writes[Attachments] {
-    override def writes(attachments: Attachments): JsValue = Json.obj(
-      "text"        -> attachments.text,
-      "callback_id" -> attachments.callback_id,
-      "actions"     -> attachments.actions
-    )
-  }
+  implicit val attachmentsWrites: Writes[Attachments] =
+    new Writes[Attachments] {
+      override def writes(attachments: Attachments): JsValue = Json.obj(
+        "text"        -> attachments.text,
+        "callback_id" -> attachments.callback_id,
+        "actions"     -> attachments.actions
+      )
+    }
 
   implicit val profileWrites: Writes[Profile] = new Writes[Profile] {
     override def writes(profile: Profile): JsValue = Json.obj(
@@ -67,8 +69,11 @@ object SlackForm {
 
   implicit val memberReads: Reads[Member] =
     (JsPath \ "id")
-      .read[String].and((JsPath \ "deleted")
-      .read[Boolean])
+      .read[String]
+      .and(
+        (JsPath \ "deleted")
+          .read[Boolean]
+      )
       .and((JsPath \ "profile").read[Profile])(Member.apply _)
 
   implicit val responseActionReads: Reads[ResponseAction] =
