@@ -2,18 +2,11 @@ package lunatech.lunchplanner.controllers
 
 import com.lunatech.openconnect.Authenticate
 import lunatech.lunchplanner.services.UserService
-import play.api.mvc.{
-  Action,
-  AnyContent,
-  BaseController,
-  ControllerComponents,
-  EssentialAction
-}
+import play.api.mvc._
 import play.api.{Configuration, Environment, Mode}
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class Authentication @Inject() (
     userService: UserService,
@@ -21,7 +14,8 @@ class Authentication @Inject() (
     environment: Environment,
     auth: Authenticate,
     val controllerComponents: ControllerComponents
-) extends BaseController {
+)(implicit val ec: ExecutionContext)
+    extends BaseController {
 
   def login: EssentialAction = Action { implicit request =>
     if (environment.mode == Mode.Prod) {
