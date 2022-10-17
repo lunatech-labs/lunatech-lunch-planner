@@ -2,7 +2,7 @@ name := """lunatech-lunch-planner"""
 
 version := "1.0-SNAPSHOT"
 
-scalaVersion := "2.13.9"
+scalaVersion := "2.13.10"
 
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala)
@@ -18,7 +18,7 @@ libraryDependencies ++= Seq(
   ehcache,
   ws,
   evolutions,
-  "com.lunatech"            %% "play-googleopenconnect" % "2.8.0",
+  "com.lunatech"            %% "play-googleopenconnect" % "2.9.1",
   "com.typesafe.play"       %% "play-json"              % "2.9.3",
   "com.typesafe.play"       %% "play-slick"             % "5.1.0", // 2019
   "com.typesafe.play"       %% "play-slick-evolutions"  % "5.1.0", // 2019

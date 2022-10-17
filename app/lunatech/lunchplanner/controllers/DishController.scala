@@ -1,11 +1,7 @@
 package lunatech.lunchplanner.controllers
 
 import lunatech.lunchplanner.models.{Dish, _}
-import lunatech.lunchplanner.services.{
-  DishService,
-  MenuDishService,
-  UserService
-}
+import lunatech.lunchplanner.services.{DishService, MenuDishService, UserService}
 import lunatech.lunchplanner.viewModels.{DishForm, ListDishesForm}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}
@@ -13,7 +9,6 @@ import play.api.{Configuration, Environment}
 
 import java.util.UUID
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class DishController @Inject() (
