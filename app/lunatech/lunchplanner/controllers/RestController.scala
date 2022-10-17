@@ -1,20 +1,22 @@
 package lunatech.lunchplanner.controllers
 
+import scala.concurrent.ExecutionContext
+
 import com.google.inject.Inject
 import play.api._
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Json
 import play.api.mvc._
 import lunatech.lunchplanner.services.UserService
-import scala.concurrent.ExecutionContext.Implicits.global
+import com.lunatech.openconnect.{APISessionCookieBaker, GoogleApiSecured}
 
 class RestController @Inject() (
     userService: UserService,
-    val sessionCookieBaker: DefaultSessionCookieBaker,
+    val apiSessionCookieBaker: APISessionCookieBaker,
     val configuration: Configuration,
     override val controllerComponents: ControllerComponents
-) extends InjectedController
-    with ApiSecured
+)(implicit ec: ExecutionContext) extends InjectedController
+    with GoogleApiSecured
     with I18nSupport
     with Logging {
 
@@ -23,7 +25,7 @@ class RestController @Inject() (
     * @return
     *   An optional User
     */
-  def getUser(email: String): Action[AnyContent] = apiAction.async {
+  def getUser(email: String): Action[AnyContent] = userAction.async {
     implicit request =>
       userService
         .getByEmailAddress(emailAddress = email)
