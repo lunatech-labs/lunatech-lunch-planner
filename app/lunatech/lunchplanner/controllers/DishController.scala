@@ -1,7 +1,11 @@
 package lunatech.lunchplanner.controllers
 
 import lunatech.lunchplanner.models.{Dish, _}
-import lunatech.lunchplanner.services.{DishService, MenuDishService, UserService}
+import lunatech.lunchplanner.services.{
+  DishService,
+  MenuDishService,
+  UserService
+}
 import lunatech.lunchplanner.viewModels.{DishForm, ListDishesForm}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}

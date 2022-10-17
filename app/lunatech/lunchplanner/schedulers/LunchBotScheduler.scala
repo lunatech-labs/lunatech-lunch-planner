@@ -3,7 +3,11 @@ package lunatech.lunchplanner.schedulers
 import akka.actor.{ActorRef, ActorSystem, Props}
 import com.typesafe.akka.extension.quartz.QuartzSchedulerExtension
 import lunatech.lunchplanner.schedulers.actors.{LunchBotActor, RunBot}
-import lunatech.lunchplanner.services.{MenuPerDayPerPersonService, SlackService, UserService}
+import lunatech.lunchplanner.services.{
+  MenuPerDayPerPersonService,
+  SlackService,
+  UserService
+}
 import play.api.{Configuration, Logging}
 import play.api.inject.ApplicationLifecycle
 

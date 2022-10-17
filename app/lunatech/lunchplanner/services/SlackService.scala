@@ -43,10 +43,11 @@ class SlackService @Inject() (
             if (isOk) {
               SlackForm.jsonToMemberObject(response.json).map { members =>
                 members
-                  .filter(member => !member.deleted &&
-                    member.profile.email.isDefined && emails.contains(
-                      member.profile.email.get
-                    )
+                  .filter(member =>
+                    !member.deleted &&
+                      member.profile.email.isDefined && emails.contains(
+                        member.profile.email.get
+                      )
                   )
                   .map(_.id)
               }
