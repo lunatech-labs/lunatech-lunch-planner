@@ -1,7 +1,6 @@
 package lunatech.lunchplanner.controllers
 
 import akka.stream.scaladsl.StreamConverters
-import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.data.Month
 import lunatech.lunchplanner.models.ReportDate
 import lunatech.lunchplanner.services._
@@ -16,7 +15,6 @@ import play.mvc.Http
 import java.io.ByteArrayInputStream
 import java.time.LocalDateTime
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 /** Displays list of people attending and not attending at where on when

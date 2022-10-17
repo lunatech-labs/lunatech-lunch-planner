@@ -1,6 +1,5 @@
 package lunatech.lunchplanner.controllers
 
-import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.data.Location
 import lunatech.lunchplanner.models.MenuPerDay
 import lunatech.lunchplanner.services._
@@ -17,7 +16,6 @@ import java.text.SimpleDateFormat
 import java.time.{LocalDateTime, ZoneOffset}
 import java.util.{Date, UUID}
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class MenuPerDayController @Inject() (

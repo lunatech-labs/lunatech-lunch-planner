@@ -9,7 +9,6 @@ import play.api.{Configuration, Environment}
 
 import java.util.UUID
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class ProfileController @Inject() (

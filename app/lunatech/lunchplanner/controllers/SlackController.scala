@@ -2,19 +2,17 @@ package lunatech.lunchplanner.controllers
 
 import lunatech.lunchplanner.services.SlackService
 import lunatech.lunchplanner.viewModels.SlackForm
-import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.mvc.{BaseController, ControllerComponents, EssentialAction}
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class SlackController @Inject() (
     val controllerComponents: ControllerComponents,
-    val slackService: SlackService,
-    val configuration: Configuration
-) extends BaseController {
+    val slackService: SlackService
+)(implicit val ec: ExecutionContext)
+    extends BaseController {
 
   def processSlackRequest: EssentialAction = Action.async { implicit request =>
     val req = request.body.asFormUrlEncoded.getOrElse(Map())
