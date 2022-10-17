@@ -15,7 +15,8 @@ class RestController @Inject() (
     val apiSessionCookieBaker: APISessionCookieBaker,
     val configuration: Configuration,
     override val controllerComponents: ControllerComponents
-)(implicit ec: ExecutionContext) extends InjectedController
+)(implicit ec: ExecutionContext)
+    extends InjectedController
     with GoogleApiSecured
     with I18nSupport
     with Logging {

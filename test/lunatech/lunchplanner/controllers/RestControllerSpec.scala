@@ -14,9 +14,20 @@ import org.scalamock.scalatest.MockFactory
 import play.api.libs.json.Json
 import play.api.Configuration
 import play.api.http.{SecretConfiguration, SessionConfiguration}
-import play.api.mvc.{AnyContentAsEmpty, ControllerComponents, DefaultSessionCookieBaker, JWTCookieDataCodec, Result}
+import play.api.mvc.{
+  AnyContentAsEmpty,
+  ControllerComponents,
+  DefaultSessionCookieBaker,
+  JWTCookieDataCodec,
+  Result
+}
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{call, contentAsString, defaultAwaitTimeout, status}
+import play.api.test.Helpers.{
+  call,
+  contentAsString,
+  defaultAwaitTimeout,
+  status
+}
 import play.test.WithApplication
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -31,21 +42,23 @@ class RestControllerSpec extends ControllerSpec with MockFactory {
 
   private val userService = mock[UserService]
 
-  private val configuration = Configuration(ConfigFactory.load("application-test.conf"))
+  private val configuration = Configuration(
+    ConfigFactory.load("application-test.conf")
+  )
 
   private val cookieDataCodec = mock[JWTCookieDataCodec]
-  class MockedCookieBaker extends APISessionCookieBaker(
-    configuration: Configuration,
-    new SecretConfiguration: SecretConfiguration,
-    new SessionConfiguration: SessionConfiguration
-  ) {
+  class MockedCookieBaker
+      extends APISessionCookieBaker(
+        configuration: Configuration,
+        new SecretConfiguration: SecretConfiguration,
+        new SessionConfiguration: SessionConfiguration
+      ) {
     override val jwtCodec: JWTCookieDataCodec = cookieDataCodec
   }
   private val cookieBaker: MockedCookieBaker = mock[MockedCookieBaker]
 
   private val controllerComponents =
     app.injector.instanceOf[ControllerComponents]
-
 
   private val controller = new RestController(
     userService = userService,
@@ -67,7 +80,8 @@ class RestControllerSpec extends ControllerSpec with MockFactory {
         FakeRequest()
           .withSession("email" -> developer.emailAddress)
           .withHeaders("Authorization" -> bearerTokenHeader)
-      val result: Future[Result] = call(controller.getUser(developer.emailAddress), request)
+      val result: Future[Result] =
+        call(controller.getUser(developer.emailAddress), request)
 
       status(result) mustBe 200
       contentAsString(result) mustBe Json.toJson(developer).toString()
@@ -86,7 +100,8 @@ class RestControllerSpec extends ControllerSpec with MockFactory {
         FakeRequest()
           .withSession("email" -> developer.emailAddress)
           .withHeaders("Authorization" -> bearerTokenHeader)
-      val result: Future[Result] = call(controller.getUser(notRegisteredEmail), request)
+      val result: Future[Result] =
+        call(controller.getUser(notRegisteredEmail), request)
 
       status(result) mustBe 404
       contentAsString(result) mustBe "User not found"
