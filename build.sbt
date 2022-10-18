@@ -40,6 +40,10 @@ libraryDependencies ++= Seq(
   "com.h2database"           % "h2"                     % "2.1.214" % Test
 )
 
+ThisBuild / libraryDependencySchemes ++= Seq(
+  "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
+)
+
 githubOwner := "lunatech-labs"
 githubRepository := "lunatech-lunch-planner"
 githubTokenSource := TokenSource.Environment("GITHUB_TOKEN") || TokenSource
