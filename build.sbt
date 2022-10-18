@@ -30,7 +30,7 @@ libraryDependencies ++= Seq(
   "com.enragedginger"       %% "akka-quartz-scheduler"  % "1.9.3-akka-2.6.x",
   "com.typesafe.play"       %% "play-mailer"            % "8.0.1",
   "com.typesafe.play"       %% "play-mailer-guice"      % "8.0.1",
-  "com.newrelic.logging"     % "logback"                % "2.5.0",
+  "com.newrelic.logging"     % "logback"                % "2.6.0",
   "org.apache.logging.log4j" % "log4j-core"             % "2.19.0",
   "org.scalamock"           %% "scalamock"              % "5.2.0" % Test,
   "org.scalatestplus.play"  %% "scalatestplus-play"     % "5.1.0" % Test,
