@@ -1,6 +1,6 @@
 addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.8.18")
 
-addSbtPlugin("org.scoverage" % "sbt-scoverage" % "2.0.5")
+addSbtPlugin("org.scoverage" % "sbt-scoverage" % "2.0.6")
 
 addSbtPlugin("net.vonbuchholtz" % "sbt-dependency-check" % "4.1.0")
 
