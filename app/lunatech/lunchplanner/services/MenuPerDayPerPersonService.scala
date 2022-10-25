@@ -126,7 +126,7 @@ class MenuPerDayPerPersonService @Inject() (
       } yield result
 
     for {
-      menuPerDays <- menuPerDayService.getAllFutureAndOrderedByDate
+      menuPerDays <- menuPerDayService.getAllFutureAndOrderedByDate()
       result      <- Future.traverse(menuPerDays)(getMenuDetails).map(_.flatten)
     } yield result
   }
@@ -180,6 +180,13 @@ class MenuPerDayPerPersonService @Inject() (
     } yield attendees.map { case (user: User, userProfile: UserProfile) =>
       MenuPerDayAttendant(user.name, userProfile.otherRestriction.getOrElse(""))
     }
+
+  def getUsersByMenuPerDay(
+      menuPerDayUuid: UUID
+  ): Future[Seq[(User, UserProfile)]] =
+    MenuPerDayPerPersonTable.getAttendeesByMenuPerDayUuid(
+      menuPerDayUuid
+    )
 
   def getListOfPeopleByMenuPerDayForReport(
       menuPerDay: MenuPerDay
