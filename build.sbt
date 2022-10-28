@@ -44,7 +44,7 @@ ThisBuild / libraryDependencySchemes ++= Seq(
   "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
 )
 
-githubOwner := "lunatech-labs"
+githubOwner      := "lunatech-labs"
 githubRepository := "lunatech-lunch-planner"
 githubTokenSource := TokenSource.Environment("GITHUB_TOKEN") || TokenSource
   .GitConfig("github.token")

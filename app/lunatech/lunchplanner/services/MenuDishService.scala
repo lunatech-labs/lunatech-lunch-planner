@@ -2,15 +2,16 @@ package lunatech.lunchplanner.services
 
 import lunatech.lunchplanner.common.DBConnection
 import lunatech.lunchplanner.models.{
+  Dish,
   DishIsSelected,
   MenuDish,
   MenuWithAllDishesAndIsSelected,
   MenuWithDishes
 }
 import lunatech.lunchplanner.persistence.MenuDishTable
-
 import java.util.UUID
 import javax.inject.Inject
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -21,6 +22,16 @@ class MenuDishService @Inject() (
 
   def add(menuDish: MenuDish): Future[MenuDish] =
     MenuDishTable.add(menuDish)
+
+  def getMenuListOfDishes(menuUuid: UUID): Future[Seq[Dish]] =
+    for {
+      menuDishes: Seq[MenuDish] <- MenuDishTable.getByMenuUuid(menuUuid)
+      dishes <- Future
+        .sequence(
+          menuDishes.map(dish => dishService.getByUuid(dish.dishUuid))
+        )
+        .map(_.flatten)
+    } yield dishes
 
   def getAllWithListOfDishes: Future[Seq[MenuWithDishes]] =
     for {

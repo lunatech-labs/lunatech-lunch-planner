@@ -1,9 +1,11 @@
 package lunatech.lunchplanner.models
 
-import play.api.libs.json.{Json, OFormat}
-
+import play.api.libs.json.{JsPath, Json, OFormat, Writes}
 import java.util.UUID
+
 import scala.collection.mutable.ListBuffer
+
+import play.api.libs.functional.syntax.{toFunctionalBuilderOps, unlift}
 
 final case class Dish(
     uuid: UUID = UUID.randomUUID(),
@@ -43,4 +45,20 @@ object Dish {
 
     list.toList
   }
+
+  implicit val writer: Writes[Dish] =
+    (JsPath \ "uuid")
+      .write[UUID]
+      .and((JsPath \ "name").write[String])
+      .and((JsPath \ "description").write[String])
+      .and((JsPath \ "isVegetarian").write[Boolean])
+      .and((JsPath \ "isHalal").write[Boolean])
+      .and((JsPath \ "hasSeaFood").write[Boolean])
+      .and((JsPath \ "hasPork").write[Boolean])
+      .and((JsPath \ "hasBeef").write[Boolean])
+      .and((JsPath \ "hasChicken").write[Boolean])
+      .and((JsPath \ "isGlutenFree").write[Boolean])
+      .and((JsPath \ "hasLactose").write[Boolean])
+      .and((JsPath \ "remarks").write[Option[String]])
+      .and((JsPath \ "isDeleted").write[Boolean])(unlift(Dish.unapply))
 }

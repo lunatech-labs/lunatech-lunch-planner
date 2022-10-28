@@ -89,16 +89,20 @@ object MenuPerDayTable {
     connection.db.run(query.result)
   }
 
-  def getAllFutureAndOrderedByDateAscending(implicit
+  def getAllFutureAndOrderedByDateAscending(limit: Option[Int] = None)(implicit
       connection: DBConnection
   ): Future[Seq[MenuPerDay]] = {
-    val query = menuPerDayTable
+    val filter: Query[MenuPerDayTable, MenuPerDay, Seq] = menuPerDayTable
       .filter(mpd =>
         mpd.isDeleted === false && mpd.date >= new Date(
           LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli
         )
       )
-      .sortBy(mpd => mpd.date)
+    val take = limit match {
+      case Some(value) => filter.take(value)
+      case None        => filter
+    }
+    val query = take.sortBy(mpd => mpd.date)
     connection.db.run(query.result)
   }
 

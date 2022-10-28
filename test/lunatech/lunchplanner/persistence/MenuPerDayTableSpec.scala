@@ -181,7 +181,7 @@ object MenuPerDayTableSpec
 
       val result =
         Await.result(
-          MenuPerDayTable.getAllFutureAndOrderedByDateAscending,
+          MenuPerDayTable.getAllFutureAndOrderedByDateAscending(),
           defaultTimeout
         )
 

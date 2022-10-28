@@ -18,8 +18,10 @@ class MenuPerDayService @Inject() (menuService: MenuService)(implicit
 
   def getAll: Future[Seq[MenuPerDay]] = MenuPerDayTable.getAll
 
-  def getAllFutureAndOrderedByDate: Future[Seq[MenuPerDay]] =
-    MenuPerDayTable.getAllFutureAndOrderedByDateAscending
+  def getAllFutureAndOrderedByDate(
+      limit: Option[Int] = None
+  ): Future[Seq[MenuPerDay]] =
+    MenuPerDayTable.getAllFutureAndOrderedByDateAscending(limit)
 
   def getAllOrderedByDateFilterDateRange(
       dateStart: Date,

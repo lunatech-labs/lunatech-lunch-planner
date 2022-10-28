@@ -51,6 +51,7 @@ GET         /menuPerDayPerPerson/attendees     lunatech.lunchplanner.controllers
 
 # Rest API
 GET        /api/users                          lunatech.lunchplanner.controllers.RestController.getUser(email: String)
+GET        /api/events                         lunatech.lunchplanner.controllers.RestController.getFutureEvents(limit: Int ?= 2)
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                      controllers.Assets.at(path="/public", file)
