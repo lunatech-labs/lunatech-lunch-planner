@@ -47,11 +47,9 @@ class MonthlyReportService @Inject() (
   private def getLastAvailableReport(
       month: Int,
       year: Int
-  ): Future[Array[Byte]] =
-    for {
-      totalAttendees    <- reportService.getReportByLocationAndDate(month, year)
-      totalNotAttending <- reportService.getReportForNotAttending(month, year)
-    } yield reportService.exportToExcel(totalAttendees, totalNotAttending)
+  ): Future[Array[Byte]] = reportService
+    .getReportByLocationAndDate(month, year)
+    .map(reportService.exportToExcel)
 
   private def getPreviousMonthAndYear: (Int, Int) = {
     val previousMonth = LocalDateTime.now().minusMonths(oneMonth)

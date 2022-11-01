@@ -39,7 +39,7 @@ class ReportController @Inject() (
     for {
       currentUser  <- userService.getByEmailAddress(request.email)
       sortedReport <- reportService.getSortedReport(reportMonth, reportYear)
-      totalNotAttending <- reportService.getReportForNotAttending(
+      totalNotAttending <- reportService.getReportNotAttendingByDate(
         reportMonth,
         reportYear
       )
@@ -51,7 +51,6 @@ class ReportController @Inject() (
         getCurrentUser(currentUser, isAdmin = isAdmin, request.email),
         ReportForm.reportForm,
         sortedReport,
-        totalNotAttending,
         ReportDate(reportMonth, reportYear)
       )
     )
@@ -90,12 +89,8 @@ class ReportController @Inject() (
         reportMonth,
         reportYear
       )
-      totalNotAttending <- reportService.getReportForNotAttending(
-        reportMonth,
-        reportYear
-      )
       inputStream = new ByteArrayInputStream(
-        reportService.exportToExcel(totalAttendees, totalNotAttending)
+        reportService.exportToExcel(totalAttendees)
       )
       month   = Month.values(reportMonth - 1).month
       content = StreamConverters.fromInputStream(() => inputStream, chunkSize)
