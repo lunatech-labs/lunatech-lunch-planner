@@ -1,13 +1,16 @@
 package lunatech.lunchplanner.services
 
 import lunatech.lunchplanner.common.DBConnection
+import lunatech.lunchplanner.models.Report.{Users, WeekNumber, Location}
 import lunatech.lunchplanner.models._
 import org.apache.poi.ss.usermodel.CellStyle
 import org.apache.poi.xssf.usermodel.{XSSFRow, XSSFSheet, XSSFWorkbook}
 
 import java.io.ByteArrayOutputStream
 import java.sql.Date
+import java.time.temporal.WeekFields
 import java.time.{LocalDateTime, ZoneOffset}
+import java.util.Locale
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -32,11 +35,11 @@ class ReportService @Inject() (
       year: Int
   ): Future[List[(Date, ReportByDateAndLocation)]] =
     getReportByLocationAndDate(month, year).map { repList =>
-      repList.usersPerDateAndLocation.groupBy { case ((date, _), _) =>
+      repList.usersPerDateAndLocation.groupBy { case ((date, _, _), _) =>
         date
       }.map { item =>
         (item._1, ReportByDateAndLocation(item._2))
-      }.toList.sortWith((rep1, rep2) => rep1._1.after(rep2._1))
+      }.toList.sortBy(_._1)
     }
 
   def getReportByLocationAndDate(
@@ -47,11 +50,9 @@ class ReportService @Inject() (
     val startDate = baseDate.withDayOfMonth(1)
     val endDate   = startDate.plusMonths(1).minusDays(1)
 
-    type Location  = String
-    type Attendees = Seq[String]
     def groupAndSort(
         scheduleWithAttendees: Seq[MenuPerDayReportByDateAndLocation]
-    ): Seq[((Date, Location), Attendees)] =
+    ): Seq[((Date, WeekNumber, Location), Users)] =
       scheduleWithAttendees
         .groupBy(schedule => (schedule.date, schedule.location))
         .view
@@ -59,7 +60,14 @@ class ReportService @Inject() (
         .toSeq
         .sortBy { case ((date, location), _) => (date, location) }
         .map { case (dateAndLocation, attendees) =>
-          (dateAndLocation, attendees.sortBy(attendee => attendee))
+          (
+            (
+              dateAndLocation._1,
+              toWeekNumber(dateAndLocation._1),
+              dateAndLocation._2
+            ),
+            attendees.sortBy(identity)
+          )
         }
 
     val sDateMillis = startDate.toInstant(ZoneOffset.UTC).toEpochMilli
@@ -80,23 +88,38 @@ class ReportService @Inject() (
     )
   }
 
-  def getReportForNotAttending(month: Int, year: Int): Future[Report] = {
+  private def toWeekNumber(date: Date): WeekNumber = {
+    val weekfields = WeekFields.of(Locale.getDefault)
+    date.toLocalDate.get(weekfields.weekOfWeekBasedYear())
+  }
+
+  def getReportNotAttendingByDate(
+      month: Int,
+      year: Int
+  ): Future[ReportByDate] = {
     val baseDate  = LocalDateTime.now.withMonth(month).withYear(year)
     val startDate = baseDate.withDayOfMonth(1)
     val endDate   = startDate.plusMonths(1).minusDays(1)
 
-    type DateString = String
-    type Names      = Seq[String]
     def groupAndSort(
         people: Seq[MenuPerDayReport]
-    ): Seq[(DateString, Names)] =
+    ): Seq[(Date, WeekNumber, Seq[String])] =
       people
-        .groupBy(_.date.toString)
+        .groupBy(_.date)
         .view
         .mapValues(_.map(_.name))
         .toSeq
         .sortBy { case (date, _) =>
           date
+        }
+        .map { case (date, attendees) =>
+          (
+            (
+              date,
+              toWeekNumber(date),
+              attendees.sortBy(identity)
+            )
+          )
         }
 
     val startDateMillis = startDate.toInstant(ZoneOffset.UTC).toEpochMilli
@@ -110,13 +133,12 @@ class ReportService @Inject() (
         menuPerDayPerPersonService.getNotAttendingByDate(date)
       )
       people = peopleNotAttending.flatten[MenuPerDayReport]
-    } yield Report(usersPerDate = groupAndSort(people))
+    } yield ReportByDate(usersPerDate = groupAndSort(people))
 
   }
 
   def exportToExcel(
-      report: ReportByDateAndLocation,
-      reportNotAttending: Report
+      report: ReportByDateAndLocation
   ): Array[Byte] = {
     val workbook  = new XSSFWorkbook
     val cellStyle = workbook.createCellStyle
@@ -127,7 +149,6 @@ class ReportService @Inject() (
     val out = new ByteArrayOutputStream
     try {
       writeReport(workbook, report, cellStyle)
-      writeReportForNotAttending(workbook, reportNotAttending, cellStyle)
       workbook.write(out)
     } finally {
       out.close()
@@ -141,46 +162,47 @@ class ReportService @Inject() (
       workbook: XSSFWorkbook,
       report: ReportByDateAndLocation,
       cellStyle: CellStyle
-  ): Unit = {
-    def getTotalUsers(
-        reportByDateAndLocations: Seq[((Date, Report.Location), Report.Users)]
-    ): Int =
-      reportByDateAndLocations.flatMap { case ((_, _), users) => users }.size
-
+  ): Unit =
     if (report.usersPerDateAndLocation.isEmpty) {
       workbook.createSheet("No attendants")
     } else {
-      report.usersPerDateAndLocation.groupBy { case ((date, _), _) =>
-        date
-      }.foreach { case (date, reportByDateAndLocations) =>
-        val sheet = workbook.createSheet(date.toString)
-        initializeSheet(
-          sheet = sheet,
-          date = date.toString,
-          totalUsers = getTotalUsers(reportByDateAndLocations),
-          cellStyle = cellStyle
-        )
+      report.usersPerDateAndLocation.groupBy { case ((_, weekNumber, _), _) =>
+        weekNumber
+      }.toList.sortBy { case (weekNumber, _) => weekNumber }.foreach {
+        case (weekNUmber, reportByDateAndLocations) =>
+          val sheet = workbook.createSheet(s"Week $weekNUmber")
+          sheet.setDefaultColumnWidth(30)
 
-        reportByDateAndLocations.zipWithIndex.foreach {
-          case (((_, location), users), index) =>
-            val row = Option(sheet.getRow(StartingRow)) match {
-              case Some(r) => r
-              case None    => sheet.createRow(StartingRow)
-            }
-            writeSecondRow(row, s"$location:", cellStyle, index)
-            writeUserData(sheet, users, index)
-        }
+          initializeSheet(
+            sheet = sheet,
+            weekNumber = weekNUmber,
+            cellStyle = cellStyle
+          )
+
+          reportByDateAndLocations.zipWithIndex.foreach {
+            case (((_, _, location), users), index) =>
+              val row = Option(sheet.getRow(StartingRow)) match {
+                case Some(r) => r
+                case None    => sheet.createRow(StartingRow)
+              }
+              writeSecondRow(
+                row,
+                s"$location: (total ${users.length})",
+                cellStyle,
+                index
+              )
+              writeUserData(sheet, users, index)
+          }
       }
     }
-  }
 
   private def writeReportForNotAttending(
       workbook: XSSFWorkbook,
-      reportNotAttending: Report,
+      reportNotAttending: ReportByDate,
       cellStyle: CellStyle
   ): Unit =
-    reportNotAttending.usersPerDate.foreach { case (date, users) =>
-      Option(workbook.getSheet(date)) match {
+    reportNotAttending.usersPerDate.foreach { case (date, weekNumber, users) =>
+      Option(workbook.getSheet(weekNumber.toString)) match {
         case Some(s) =>
           val columnSkips = 3
           writeSecondRow(
@@ -191,12 +213,11 @@ class ReportService @Inject() (
           )
           writeUserData(sheet = s, users = users, columnIndex = columnSkips)
         case None =>
-          val sheet       = workbook.createSheet(date)
+          val sheet       = workbook.createSheet(weekNumber.toString)
           val firstColumn = 0
           initializeSheet(
             sheet = sheet,
-            date = date,
-            totalUsers = users.size,
+            weekNumber = weekNumber,
             cellStyle = cellStyle
           )
           writeSecondRow(
@@ -211,18 +232,22 @@ class ReportService @Inject() (
 
   private def initializeSheet(
       sheet: XSSFSheet,
-      date: String,
-      totalUsers: Int,
+      weekNumber: Int,
       cellStyle: CellStyle
   ): Unit = {
-    val row      = sheet.createRow(0)
-    val firstRow = Array("Date:", date, "", "Total Attendees:", s"$totalUsers")
+
+    val row = sheet.createRow(0)
+    val firstRow =
+      Array(
+        "Week number:",
+        weekNumber.toString
+      )
 
     firstRow.zipWithIndex.foreach { case (cellValue, index) =>
       val cell = row.createCell(index)
       cell.setCellValue(cellValue)
 
-      if (cellValue == "Date:" || cellValue == "Total Attendees:") {
+      if (cellValue == "Week number:") {
         cell.setCellStyle(cellStyle)
       }
     }
@@ -252,7 +277,7 @@ class ReportService @Inject() (
       }
 
       val cell = row.createCell(columnIndex)
-      cell.setCellValue(user.toString)
+      cell.setCellValue(user)
     }
   }
 

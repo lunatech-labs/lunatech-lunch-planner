@@ -1,10 +1,10 @@
-@import lunatech.lunchplanner.models.{Report, ReportByDateAndLocation, User, ReportDate}
-@import java.sql.Date
+@import lunatech.lunchplanner.models.{ReportByDateAndLocation, User, ReportDate}
 @import java.time.LocalDateTime
+@import java.sql.Date
 
 @(user: User, reportForm: Form[ReportDate],
         report: List[(Date, ReportByDateAndLocation)],
-        reportNotAttending: Report, reportDate: ReportDate)(implicit messages: MessagesProvider)
+        reportDate: ReportDate)(implicit messages: MessagesProvider)
 
 @months = @{
     Seq(1 -> "January",
@@ -59,7 +59,7 @@
             <div class="row text-success">
                 <h4>@date</h4>
 
-                @reportByDateAndLocation.usersPerDateAndLocation.map { case ((_, location), users) =>
+                @reportByDateAndLocation.usersPerDateAndLocation.map { case ((_, _, location), users) =>
                     <div class="col col-xs-4" style="padding-left: 0">
                         <table class="table">
                             <thead>
@@ -80,31 +80,6 @@
                 }
             </div>
         }
-
-            <div class="row text-primary">
-                <h4>Didn't attend</h4>
-            </div>
-            <div class="row text-primary">
-        @reportNotAttending.usersPerDate.map { case (date, users) =>
-            <div class="col col-xs-4" style="padding-left: 0">
-                <table class="table">
-                    <thead>
-                        <th>@date </th>
-                    </thead>
-                    <tbody>
-                    @users.map { user =>
-                        <tr>
-                            <td>@user</td>
-                        </tr>
-                    }
-                    </tbody>
-                    <tfoot>
-                        <td align="right">Total: @users.length</td>
-                    </tfoot>
-                </table>
-            </div>
-        }
-            </div>
     }
     </div>
 }

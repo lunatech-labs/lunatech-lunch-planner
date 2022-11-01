@@ -3,8 +3,6 @@ package lunatech.lunchplanner.schedulers.actors
 import akka.actor.{Actor, ActorLogging}
 import lunatech.lunchplanner.services.MonthlyReportService
 
-import scala.util.{Failure, Success}
-
 class MonthlyReportActor(service: MonthlyReportService)
     extends Actor
     with ActorLogging {

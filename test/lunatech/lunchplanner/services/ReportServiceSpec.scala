@@ -19,9 +19,7 @@ class ReportServiceSpec extends BehaviorTestingConfig with BeforeAndAfterEach {
   private val reportService =
     new ReportService(menuPerDayPerPersonService, menuPerDayService)
 
-  private val date1 = new java.sql.Date(1515106800000L)
-  private val date2 = new java.sql.Date(1518217200000L)
-
+  // scalastyle:off method.length
   override def beforeEach(): Unit = {
     createTestSchema()
 
@@ -160,9 +158,9 @@ class ReportServiceSpec extends BehaviorTestingConfig with BeforeAndAfterEach {
         defaultTimeout
       )
       result.usersPerDateAndLocation mustBe List(
-        ((Date.valueOf("2018-01-05"), "Amsterdam"), Vector("user 2")),
+        ((Date.valueOf("2018-01-05"), 1, "Amsterdam"), Vector("user 2")),
         (
-          (Date.valueOf("2018-01-05"), "Rotterdam"),
+          (Date.valueOf("2018-01-05"), 1, "Rotterdam"),
           Vector("user 1", "user 3")
         )
       )
@@ -175,7 +173,7 @@ class ReportServiceSpec extends BehaviorTestingConfig with BeforeAndAfterEach {
       )
       result.usersPerDateAndLocation mustBe List(
         (
-          (Date.valueOf("2018-02-10"), "Amsterdam"),
+          (Date.valueOf("2018-02-10"), 6, "Amsterdam"),
           Vector("user 1", "user 2", "user 4")
         )
       )
@@ -183,18 +181,22 @@ class ReportServiceSpec extends BehaviorTestingConfig with BeforeAndAfterEach {
 
     "produce list of non attendees by date in January" in {
       val result = Await.result(
-        reportService.getReportForNotAttending(1, 2018),
+        reportService.getReportNotAttendingByDate(1, 2018),
         defaultTimeout
       )
-      result.usersPerDate mustBe List(("2018-01-05", Vector("user 4")))
+      result.usersPerDate mustBe List(
+        (Date.valueOf("2018-01-05"), 1, Vector("user 4"))
+      )
     }
 
     "produce list of non attendees by date in February" in {
       val result = Await.result(
-        reportService.getReportForNotAttending(2, 2018),
+        reportService.getReportNotAttendingByDate(2, 2018),
         defaultTimeout
       )
-      result.usersPerDate mustBe List(("2018-02-10", Vector("user 3")))
+      result.usersPerDate mustBe List(
+        (Date.valueOf("2018-02-10"), 6, Vector("user 3"))
+      )
     }
   }
 
