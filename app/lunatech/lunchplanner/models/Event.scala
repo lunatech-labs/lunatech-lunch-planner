@@ -6,17 +6,25 @@ import java.util.UUID
 import play.api.libs.functional.syntax.{toFunctionalBuilderOps, unlift}
 import play.api.libs.json.{JsPath, Writes}
 
-/**
- * This object is a composite, similar to MenuPerDay but containing more related data
- * @param menuUuid Menu UUID
- * @param menuPerDayUuid MenuPerDay UUID
- * @param name Menu name
- * @param date MenuPerDay date
- * @param location MenuPerDay location
- * @param attending is the current user attending
- * @param attendees number of attendees
- * @param availableDishes available dishes
- */
+/** This object is a composite, similar to MenuPerDay but containing more
+  * related data
+  * @param menuUuid
+  *   Menu UUID
+  * @param menuPerDayUuid
+  *   MenuPerDay UUID
+  * @param name
+  *   Menu name
+  * @param date
+  *   MenuPerDay date
+  * @param location
+  *   MenuPerDay location
+  * @param attending
+  *   is the current user attending
+  * @param attendees
+  *   number of attendees
+  * @param availableDishes
+  *   available dishes
+  */
 case class Event(
     menuUuid: UUID,
     menuPerDayUuid: UUID,
