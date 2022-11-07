@@ -1,31 +1,22 @@
 package lunatech.lunchplanner.controllers
 
 import java.util.UUID
-import java.sql.Date
-import java.time.Instant
 
 import scala.concurrent.Future
 
 import akka.stream.Materializer
-import com.lunatech.openconnect.APISessionCookieBaker
+import com.lunatech.openconnect.{APISessionCookieBaker, Authenticate}
 import com.typesafe.config.ConfigFactory
 import lunatech.lunchplanner.common.ControllerSpec
-import lunatech.lunchplanner.models.{Dish, Event, User}
-import lunatech.lunchplanner.services.{
-  DishService,
-  MenuDishService,
-  MenuService,
-  RestService,
-  UserService
-}
+import lunatech.lunchplanner.models.{Event, User}
+import lunatech.lunchplanner.services.{RestService, UserService}
 import org.scalamock.scalatest.MockFactory
 import play.api.libs.json.Json
-import play.api.Configuration
+import play.api.{Configuration, Environment}
 import play.api.http.{SecretConfiguration, SessionConfiguration}
 import play.api.mvc.{
   AnyContentAsEmpty,
   ControllerComponents,
-  DefaultSessionCookieBaker,
   JWTCookieDataCodec,
   Result
 }
@@ -40,6 +31,7 @@ import play.test.WithApplication
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import lunatech.lunchplanner.data.ControllersData
+import play.api.libs.ws.WSClient
 
 // scalastyle:off magic.number
 class RestControllerSpec extends ControllerSpec with MockFactory {
@@ -47,7 +39,7 @@ class RestControllerSpec extends ControllerSpec with MockFactory {
   implicit private lazy val materializer: Materializer = app.materializer
 
   private val developer =
-    User(UUID.randomUUID, "Developer", "developer@lunatech.nl")
+    User(UUID.randomUUID, "Developer", "developer@lunatech.nl", isAdmin = true)
   private val bearerToken       = "testBearerToken"
   private val bearerTokenHeader = "Bearer testBearerToken"
 
@@ -69,12 +61,17 @@ class RestControllerSpec extends ControllerSpec with MockFactory {
   }
   private val cookieBaker: MockedCookieBaker = mock[MockedCookieBaker]
 
+  class MockedAuthenticate
+      extends Authenticate(configuration, mock[WSClient]) {}
+
   private val controllerComponents =
     app.injector.instanceOf[ControllerComponents]
 
   private val controller = new RestController(
     userService = userService,
     restService = restService,
+    environment = mock[Environment],
+    authenticate = mock[MockedAuthenticate],
     apiSessionCookieBaker = cookieBaker,
     configuration = configuration,
     controllerComponents = controllerComponents
@@ -142,6 +139,27 @@ class RestControllerSpec extends ControllerSpec with MockFactory {
 
       status(result) mustBe 200
       contentAsString(result) mustBe Json.toJson(events).toString()
+    }
+
+    "return jwt token" in new WithApplication() {
+      (cookieBaker.jwtCodec.encode _)
+        .expects(
+          Map[String, String](
+            "email"   -> developer.emailAddress,
+            "isAdmin" -> developer.isAdmin.toString
+          )
+        )
+        .returns("testToken")
+
+      val request: FakeRequest[AnyContentAsEmpty.type] =
+        FakeRequest()
+          .withSession("email" -> developer.emailAddress)
+          .withHeaders("Authorization" -> bearerTokenHeader)
+      val result: Future[Result] =
+        call(controller.validateAccessToken("dummyAccessToken"), request)
+
+      status(result) mustBe 200
+      contentAsString(result) mustBe "testToken"
     }
   }
 

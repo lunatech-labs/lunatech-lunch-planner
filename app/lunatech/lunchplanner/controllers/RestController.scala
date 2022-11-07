@@ -3,24 +3,23 @@ package lunatech.lunchplanner.controllers
 import scala.concurrent.{ExecutionContext, Future}
 
 import com.google.inject.Inject
+import com.lunatech.openconnect.{
+  APISessionCookieBaker,
+  Authenticate,
+  GoogleApiSecured
+}
+import lunatech.lunchplanner.models.{Event, User}
+import lunatech.lunchplanner.services.{RestService, UserService}
 import play.api._
 import play.api.i18n.I18nSupport
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.Json
 import play.api.mvc._
-import lunatech.lunchplanner.services.{
-  DishService,
-  MenuDishService,
-  MenuPerDayService,
-  MenuService,
-  RestService,
-  UserService
-}
-import com.lunatech.openconnect.{APISessionCookieBaker, GoogleApiSecured}
-import lunatech.lunchplanner.models.{Event, MenuPerDay, MenuWithDishes, User}
 
 class RestController @Inject() (
     userService: UserService,
     restService: RestService,
+    environment: Environment,
+    authenticate: Authenticate,
     val apiSessionCookieBaker: APISessionCookieBaker,
     val configuration: Configuration,
     override val controllerComponents: ControllerComponents
@@ -29,6 +28,35 @@ class RestController @Inject() (
     with GoogleApiSecured
     with I18nSupport
     with Logging {
+
+  /** Authentication route for API-based requests.
+    *
+    * @param accessToken
+    *   valid access token obtained by external parties
+    * @return
+    *   HTTP response with an encoded map of session properties
+    */
+  def validateAccessToken(accessToken: String): Action[AnyContent] =
+    Action.async { implicit request =>
+      if (environment.mode == Mode.Prod) {
+        authenticate.getUserFromToken(accessToken).map {
+          case Left(authResult) =>
+            val email = authResult.email
+            val data =
+              Map("email" -> email, "isAdmin" -> isAdmin(email).toString)
+
+            Ok(apiSessionCookieBaker.jwtCodec.encode(data))
+          case Right(message) =>
+            BadRequest(
+              s"Authentication failed, reason: $message"
+            ).withNewSession
+        }
+      } else {
+        val email = "developer@lunatech.nl"
+        val data  = Map("email" -> email, "isAdmin" -> isAdmin(email).toString)
+        Future(Ok(apiSessionCookieBaker.jwtCodec.encode(data)))
+      }
+    }
 
   /** Get user by email address
     *
