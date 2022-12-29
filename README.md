@@ -71,8 +71,23 @@ localhost:9000
 To run the tests no docker image is necessary, instead an H2 in-memory DB has been set up
 
 
-### Deployment
-The lunch-planner is hosted in clever-cloud. To deploy a new version just merge master branch into production branch
-and an automatic deployment will be triggered.
+### New developments
+There are two permanent branches: `master` and `clevercloud`.
+All new developments are to be merged in `master` branch and tested locally and then later deployed by using the `clevercloud` branch.
+
+# Deployment
+The lunch-planner is hosted in clever-cloud. The deployment is done by rebasing `clevercloud` branch onto `master` branch locally. 
+This rebase will always be a fast-forward one.
+
+Before doing a deployment make sure you have the latest versions of `master` and `production` branches. Rebase `clevercloud` onto `master` and push it. Clever-cloud will do the deployment automatically.
+
+```
+$ git checkout master
+[master]$ git pull
+[master]$ git checkout clevercloud
+[clevercloud]$ git pull
+[clevercloud]$ git rebase master
+[clevercloud]$ git push
+```
 
 
