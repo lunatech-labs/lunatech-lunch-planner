@@ -74,7 +74,7 @@ object MenuPerDayPerPersonTable {
       mpdpp: MenuPerDayPerPerson
   )(implicit connection: DBConnection): Future[Option[MenuPerDayPerPerson]] = {
     val query = menuPerDayPerPersonTable.filter(mpdppt =>
-      mpdppt.menuPerDayUuid === mpdpp.menuPerDayUuid && mpdppt.userUuid === mpdpp.menuPerDayUuid
+      mpdppt.menuPerDayUuid === mpdpp.menuPerDayUuid && mpdppt.userUuid === mpdpp.userUuid
     )
     connection.db.run(query.result.headOption)
   }
@@ -91,7 +91,7 @@ object MenuPerDayPerPersonTable {
   )(implicit connection: DBConnection): Future[MenuPerDayPerPerson] = {
     val query = menuPerDayPerPersonTable
       .filter(mpdppt =>
-        mpdppt.menuPerDayUuid === mpdpp.menuPerDayUuid && mpdppt.userUuid === mpdpp.menuPerDayUuid
+        mpdppt.menuPerDayUuid === mpdpp.menuPerDayUuid && mpdppt.userUuid === mpdpp.userUuid
       )
       .map(mp => mp.isAttending)
       .update(mpdpp.isAttending)

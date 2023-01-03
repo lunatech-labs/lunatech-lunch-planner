@@ -14,6 +14,8 @@ import lunatech.lunchplanner.models.{
   UserProfile
 }
 import play.api.libs.json.{JsValue, Json}
+import lunatech.lunchplanner.models.MenuPerDayPerPerson
+import lunatech.lunchplanner.models.MenuPerDay
 
 // scalastyle:off magic.number
 object ControllersData {
@@ -156,8 +158,11 @@ object ControllersData {
 
   val event1MenuUuid       = UUID.randomUUID
   val event1MenuPerDayUuid = UUID.randomUUID
-  val event1Epoch          = Instant.now().plusSeconds(3600).toEpochMilli
-  val dish1Uuid            = UUID.randomUUID
+  val event1Menu           = Menu(event1MenuUuid, "menu", false)
+  val event1MenuPerDay =
+    MenuPerDay(event1MenuPerDayUuid, event1MenuUuid, new Date(0L), "Rotterdam")
+  val event1Epoch = Instant.now().plusSeconds(3600).toEpochMilli
+  val dish1Uuid   = UUID.randomUUID
   val event1 = Event(
     menuUuid = event1MenuUuid,
     menuPerDayUuid = event1MenuPerDayUuid,
@@ -176,4 +181,12 @@ object ControllersData {
     )
   )
   val events = Seq(event1)
+
+  val userAttending =
+    MenuPerDayPerPerson(
+      uuid = UUID.randomUUID,
+      menuPerDayUuid = event1MenuPerDayUuid,
+      userUuid = user1.uuid,
+      isAttending = true
+    )
 }
