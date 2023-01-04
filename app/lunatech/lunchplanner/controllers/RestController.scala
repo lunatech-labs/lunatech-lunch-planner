@@ -14,10 +14,14 @@ import play.api._
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Json
 import play.api.mvc._
+import lunatech.lunchplanner.models.MenuPerDayPerPerson
+import java.util.UUID
+import lunatech.lunchplanner.services.MenuPerDayPerPersonService
 
 class RestController @Inject() (
     userService: UserService,
     restService: RestService,
+    menuPerDayPerPersonService: MenuPerDayPerPersonService,
     environment: Environment,
     authenticate: Authenticate,
     val apiSessionCookieBaker: APISessionCookieBaker,
@@ -90,4 +94,42 @@ class RestController @Inject() (
         case None => Future.successful(NotFound("User not found"))
       }
   }
+
+  /** Register current user as attending a specific event (MenuPerDay)
+    *
+    * @param uuid
+    *   MenuPerDay UUID
+    * @return
+    *   added / updated MenuPerDayPerPerson
+    */
+  def attend(uuid: UUID): Action[AnyContent] = userAction.async {
+    implicit request =>
+      userService.getByEmailAddress(emailAddress = request.email).flatMap {
+        case Some(user: User) =>
+          restService.registerAttendance(uuid, user.uuid, true).map {
+            menuPerDayPerPerson =>
+              Ok(Json.toJson(menuPerDayPerPerson))
+          }
+        case None => Future.successful(NotFound("User not found"))
+      }
+  }
+
+  /** Register current user as not attending a specific event (MenuPerDay)
+    *
+    * @param uuid
+    * @return
+    *   added / updated MenuPerDayPerPerson
+    */
+  def unattend(uuid: UUID): Action[AnyContent] = userAction.async {
+    implicit request =>
+      userService.getByEmailAddress(emailAddress = request.email).flatMap {
+        case Some(user: User) =>
+          restService.registerAttendance(uuid, user.uuid, false).map {
+            menuPerDayPerPerson =>
+              Ok(Json.toJson(menuPerDayPerPerson))
+          }
+        case None => Future.successful(NotFound("User not found"))
+      }
+  }
+
 }

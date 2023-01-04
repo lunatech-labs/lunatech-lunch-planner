@@ -32,6 +32,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import lunatech.lunchplanner.data.ControllersData
 import play.api.libs.ws.WSClient
+import lunatech.lunchplanner.services.MenuPerDayPerPersonService
 
 // scalastyle:off magic.number
 class RestControllerSpec extends ControllerSpec with MockFactory {
@@ -43,8 +44,9 @@ class RestControllerSpec extends ControllerSpec with MockFactory {
   private val bearerToken       = "testBearerToken"
   private val bearerTokenHeader = "Bearer testBearerToken"
 
-  private val userService = mock[UserService]
-  private val restService = mock[RestService]
+  private val userService                = mock[UserService]
+  private val restService                = mock[RestService]
+  private val menuPerDayPerPersonService = mock[MenuPerDayPerPersonService]
 
   private val configuration = Configuration(
     ConfigFactory.load("application-test.conf")
@@ -70,6 +72,7 @@ class RestControllerSpec extends ControllerSpec with MockFactory {
   private val controller = new RestController(
     userService = userService,
     restService = restService,
+    menuPerDayPerPersonService = menuPerDayPerPersonService,
     environment = mock[Environment],
     authenticate = mock[MockedAuthenticate],
     apiSessionCookieBaker = cookieBaker,
@@ -162,5 +165,4 @@ class RestControllerSpec extends ControllerSpec with MockFactory {
       contentAsString(result) mustBe "testToken"
     }
   }
-
 }

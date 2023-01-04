@@ -21,6 +21,8 @@ import lunatech.lunchplanner.models.{
   User,
   UserProfile
 }
+import java.util.UUID
+import lunatech.lunchplanner.models.MenuPerDayPerPerson
 
 class RestService @Inject() (
     menuService: MenuService,
@@ -60,5 +62,19 @@ class RestService @Inject() (
         .traverse(menuPerDays)(getMenuDetails)
         .map(_.flatten)
     } yield result
+  }
+
+  def registerAttendance(
+      uuid: UUID,
+      userUuid: UUID,
+      attending: Boolean
+  ): Future[MenuPerDayPerPerson] = {
+    val newMenuPerDayPerPerson = MenuPerDayPerPerson(
+      menuPerDayUuid = uuid,
+      userUuid = userUuid,
+      isAttending = attending
+    )
+    menuPerDayPerPersonService
+      .addOrUpdate(newMenuPerDayPerPerson)
   }
 }

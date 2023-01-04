@@ -53,6 +53,8 @@ GET         /menuPerDayPerPerson/attendees     lunatech.lunchplanner.controllers
 POST        /api/authenticate                  lunatech.lunchplanner.controllers.RestController.validateAccessToken(accessToken: String)
 GET         /api/users                         lunatech.lunchplanner.controllers.RestController.getUser(email: String)
 GET         /api/events                        lunatech.lunchplanner.controllers.RestController.getFutureEvents(limit: Int ?= 2)
+POST        /api/attend                        lunatech.lunchplanner.controllers.RestController.attend(uuid: java.util.UUID)
+POST        /api/unattend                      lunatech.lunchplanner.controllers.RestController.unattend(uuid: java.util.UUID)
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                      controllers.Assets.at(path="/public", file)

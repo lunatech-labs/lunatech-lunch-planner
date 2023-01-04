@@ -1,6 +1,8 @@
 package lunatech.lunchplanner.models
 
 import java.util.UUID
+import play.api.libs.json.Json
+import play.api.libs.json.Writes
 
 final case class MenuPerDayPerPerson(
     uuid: UUID = UUID.randomUUID(),
@@ -8,6 +10,11 @@ final case class MenuPerDayPerPerson(
     userUuid: UUID,
     isAttending: Boolean
 )
+
+object MenuPerDayPerPerson {
+  implicit val writer: Writes[MenuPerDayPerPerson] =
+    Json.writes[MenuPerDayPerPerson]
+}
 
 final case class MenuWithNamePerDayPerPerson(
     menuPerDayUuid: UUID,

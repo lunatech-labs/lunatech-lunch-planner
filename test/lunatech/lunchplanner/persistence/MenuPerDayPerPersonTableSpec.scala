@@ -40,6 +40,34 @@ object MenuPerDayPerPersonTableSpec
       result == menuPerDayPerPersonToAdd
   }
 
+  property("update a menu per day per person") = forAll {
+    (
+        user: User,
+        menu: Menu,
+        menuPerDay: MenuPerDay,
+        menuPerDayPerPerson: MenuPerDayPerPerson
+    ) =>
+      createTestSchema()
+
+      val menuPerDayPerPersonToAdd =
+        addUserAndMenuDataToDB(user, menu, menuPerDay, menuPerDayPerPerson)
+      val result = Await
+        .result(
+          MenuPerDayPerPersonTable.addOrUpdate(
+            menuPerDayPerPersonToAdd.copy(isAttending =
+              !menuPerDayPerPerson.isAttending
+            )
+          ),
+          defaultTimeout
+        )
+
+      dropTestSchema()
+
+      result == menuPerDayPerPersonToAdd.copy(isAttending =
+        !menuPerDayPerPerson.isAttending
+      )
+  }
+
   property("query for menus per day per person by uuid") = forAll {
     (
         user: User,
