@@ -2,7 +2,7 @@ addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.8.18")
 
 addSbtPlugin("org.scoverage" % "sbt-scoverage" % "2.0.6")
 
-addSbtPlugin("net.vonbuchholtz" % "sbt-dependency-check" % "4.2.0")
+addSbtPlugin("net.vonbuchholtz" % "sbt-dependency-check" % "4.3.0")
 
 addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.0")
 
