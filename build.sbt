@@ -25,7 +25,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.slick"      %% "slick-hikaricp"         % "3.4.1", // 2020
   "org.postgresql"           % "postgresql"             % "42.5.1",
   "com.adrianhurt"          %% "play-bootstrap"         % "1.6.1-P28-B4",
-  "org.scalaz"              %% "scalaz-core"            % "7.4.0-M12",
+  "org.scalaz"              %% "scalaz-core"            % "7.4.0-M13",
   "org.apache.poi"           % "poi-ooxml"              % "5.2.3",
   "com.enragedginger"       %% "akka-quartz-scheduler"  % "1.9.3-akka-2.6.x",
   "com.typesafe.play"       %% "play-mailer"            % "8.0.1",
