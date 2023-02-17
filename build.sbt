@@ -23,7 +23,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.play"       %% "play-slick"             % "5.1.0", // 2019
   "com.typesafe.play"       %% "play-slick-evolutions"  % "5.1.0", // 2019
   "com.typesafe.slick"      %% "slick-hikaricp"         % "3.4.1", // 2020
-  "org.postgresql"           % "postgresql"             % "42.5.3",
+  "org.postgresql"           % "postgresql"             % "42.5.4",
   "com.adrianhurt"          %% "play-bootstrap"         % "1.6.1-P28-B4",
   "org.scalaz"              %% "scalaz-core"            % "7.4.0-M13",
   "org.apache.poi"           % "poi-ooxml"              % "5.2.3",
